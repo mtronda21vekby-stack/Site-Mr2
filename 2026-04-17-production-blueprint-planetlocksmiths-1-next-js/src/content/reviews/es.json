@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "name": "M. Carter",
+      "rating": 5,
+      "quote": "Comunicación clara y ayuda profesional cuando mi llave dejó de funcionar.",
+      "city": "Filadelfia"
+    },
+    {
+      "name": "Elena R.",
+      "rating": 5,
+      "quote": "Hicieron las preguntas correctas sobre el vehículo y resolvieron el reemplazo sin complicaciones.",
+      "city": "Sur de Filadelfia"
+    },
+    {
+      "name": "D. Nguyen",
+      "rating": 5,
+      "quote": "Buen servicio móvil y sin promesas exageradas. Justo lo que necesitaba.",
+      "city": "Filadelfia"
+    }
+  ]
+}

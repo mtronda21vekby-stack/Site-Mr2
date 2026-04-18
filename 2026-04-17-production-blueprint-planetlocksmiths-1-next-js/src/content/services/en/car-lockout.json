@@ -1,0 +1,28 @@
+{
+  "slug": "car-lockout",
+  "title": "Car Lockout Service",
+  "excerpt": "Mobile help when your vehicle is locked and the key is not accessible.",
+  "intro": "If the vehicle is locked and the key is inside, missing, or not usable, Planetlocksmiths can help with mobile car lockout service across Philadelphia.",
+  "sections": [
+    {
+      "heading": "What to share",
+      "body": "Send the vehicle make, model, exact location, and whether the key is visible or missing."
+    },
+    {
+      "heading": "Urgent response",
+      "body": "Lockout requests are handled as urgent jobs, with timing based on current availability and location."
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can you help if the key is locked inside?",
+      "answer": "Yes. Car lockout support is one of the core mobile services."
+    },
+    {
+      "question": "Do you guarantee a specific arrival time?",
+      "answer": "No fixed arrival promise is made. Dispatch gives the clearest available timing based on location and workload."
+    }
+  ],
+  "seoTitle": "Car Lockout Service in Philadelphia, PA | Planetlocksmiths",
+  "seoDescription": "Mobile car lockout help in Philadelphia with 24/7 urgent and same-day availability from Planetlocksmiths."
+}

@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "services": "Servicios",
+    "areas": "Zonas",
+    "reviews": "Reseñas",
+    "faq": "FAQ",
+    "contact": "Contacto",
+    "callNow": "Llamar"
+  },
+  "heroTitle": "Servicio de Cerrajería Automotriz en Filadelfia — 24/7",
+  "heroSubtitle": "Si no puedes abrir tu auto, perdiste la llave o necesitas una llave nueva con programación, Planetlocksmiths ofrece servicio móvil automotriz en toda Filadelfia con atención urgente y el mismo día.",
+  "heroPrimaryCta": "Llamar ahora",
+  "heroSecondaryCta": "Solicitar servicio",
+  "heroBadges": ["Servicio móvil 24/7", "Cobertura en Filadelfia", "Llaves y programación"],
+  "heroOrbitWords": ["APERTURA", "LLAVES", "FOBS", "IGNICIÓN", "MÓVIL", "24/7"],
+  "servicesTitle": "Ayuda automotriz donde esté el vehículo",
+  "servicesIntro": "Servicio móvil enfocado en acceso al vehículo, llaves de reemplazo, programación, controles y problemas urgentes.",
+  "featuredServices": [
+    {
+      "title": "Apertura de autos",
+      "excerpt": "Ayuda móvil cuando el vehículo está cerrado y la llave no está accesible.",
+      "slug": "car-lockout",
+      "image": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      "title": "Reemplazo de llaves",
+      "excerpt": "Soluciones para llaves perdidas, rotas o dañadas.",
+      "slug": "car-key-replacement",
+      "image": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      "title": "Programación de llaves",
+      "excerpt": "Soporte para muchas llaves modernas, remotos y fobs.",
+      "slug": "key-programming",
+      "image": "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      "title": "Ayuda con fobs",
+      "excerpt": "Servicio para necesidades relacionadas con acceso y reemplazo de fobs.",
+      "slug": "key-fob-services",
+      "image": "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      "title": "Problemas de ignición",
+      "excerpt": "Soporte para problemas de llave en la ignición y acceso relacionado.",
+      "slug": "ignition-key-issues",
+      "image": "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+      "title": "Servicio móvil urgente",
+      "excerpt": "Respuesta 24/7 para situaciones urgentes con llaves y cerraduras automotrices.",
+      "slug": "automotive-locksmith",
+      "image": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80"
+    }
+  ],
+  "whyTitle": "Por qué Planetlocksmiths",
+  "whyChoose": [
+    "Enfoque móvil solo automotriz",
+    "Respuesta urgente 24/7",
+    "Disponibilidad el mismo día",
+    "Soporte para llaves modernas y fobs",
+    "Comunicación clara desde la solicitud hasta la llegada",
+    "Servicio en toda Filadelfia"
+  ],
+  "emergencyTitle": "¿No puedes abrir el auto o perdiste la llave?",
+  "emergencyText": "Llama para servicio móvil automotriz en Filadelfia. Comparte el vehículo, la ubicación y el problema para preparar el soporte correcto.",
+  "areasTitle": "Zona principal de servicio",
+  "areasText": "Filadelfia es el mercado inicial activo. Se pueden agregar más zonas cercanas cuando la cobertura crezca.",
+  "reviewsTitle": "Notas recientes de clientes",
+  "faqTitle": "Respuestas claras antes de llamar",
+  "contactTitle": "Solicitar servicio móvil",
+  "contactText": "Envía el vehículo, la ubicación y el problema con la llave. Para aperturas urgentes, llamar es lo más rápido."
+}

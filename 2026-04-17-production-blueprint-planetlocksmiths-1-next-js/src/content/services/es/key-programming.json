@@ -1,0 +1,28 @@
+{
+  "slug": "key-programming",
+  "title": "Programación de llaves de auto",
+  "excerpt": "Soporte de programación para muchas llaves, remotos y fobs modernos.",
+  "intro": "Muchos vehículos modernos necesitan programación después de reemplazar una llave, remoto o fob. Planetlocksmiths trabaja con este tipo de servicio en Filadelfia.",
+  "sections": [
+    {
+      "heading": "Los datos del vehículo importan",
+      "body": "Marca, modelo, año y tipo de llave ayudan a determinar qué programación está disponible."
+    },
+    {
+      "heading": "Diseñado para servicio móvil",
+      "body": "Los trabajos de programación se coordinan dentro del flujo móvil automotriz cuando son compatibles."
+    }
+  ],
+  "faq": [
+    {
+      "question": "¿Todas las llaves necesitan programación?",
+      "answer": "No. Muchas llaves modernas sí, pero depende del vehículo y del tipo de llave."
+    },
+    {
+      "question": "¿Pueden programar fobs?",
+      "answer": "El soporte para fobs forma parte del servicio para muchos vehículos."
+    }
+  ],
+  "seoTitle": "Programación de llaves de auto en Filadelfia, PA | Planetlocksmiths",
+  "seoDescription": "Programación móvil de llaves de auto en Filadelfia para muchas llaves modernas, remotos y fobs."
+}
