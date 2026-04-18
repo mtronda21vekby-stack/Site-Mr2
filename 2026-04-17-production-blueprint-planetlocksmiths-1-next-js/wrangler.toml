@@ -1,6 +1,0 @@
-name = "planetlocksmiths"
-compatibility_date = "2026-04-17"
-pages_build_output_dir = ".vercel/output/static"
-
-[vars]
-NEXT_PUBLIC_SITE_URL = "https://planetlocksmiths.com"
