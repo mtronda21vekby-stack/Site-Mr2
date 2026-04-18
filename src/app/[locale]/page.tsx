@@ -11,11 +11,7 @@ import FAQSection from '@/components/sections/FAQSection';
 import ContactSection from '@/components/sections/ContactSection';
 import { services, whyChoose, faq } from '@/lib/site-data';
 
-export default function HomePage({
-  params,
-}: {
-  params: { locale: string };
-}) {
+export default function HomePage() {
   return (
     <>
       <Header />
