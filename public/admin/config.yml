@@ -1,0 +1,202 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+locale: "en"
+
+collections:
+  - name: "settings"
+    label: "Settings"
+    files:
+      - file: "src/content/settings/global.json"
+        label: "Global Settings"
+        name: "global_settings"
+        fields:
+          - { label: "Brand Name", name: "brandName", widget: "string" }
+          - { label: "Primary Phone", name: "phonePrimary", widget: "string" }
+          - { label: "Display Phone", name: "phoneDisplay", widget: "string" }
+          - { label: "Email", name: "email", widget: "string", required: false }
+          - { label: "Service Hours", name: "serviceHours", widget: "string" }
+          - { label: "Primary City", name: "primaryCity", widget: "string" }
+          - { label: "Primary State", name: "primaryState", widget: "string" }
+          - { label: "Country", name: "country", widget: "string" }
+          - { label: "Default Locale", name: "defaultLocale", widget: "select", options: ["en", "es", "ru"] }
+          - { label: "Supported Locales", name: "supportedLocales", widget: "list" }
+          - { label: "Mobile Only", name: "hasPhysicalLocation", widget: "boolean", default: false }
+
+  - name: "home"
+    label: "Home Pages"
+    files:
+      - file: "src/content/home/en.json"
+        label: "Home EN"
+        name: "home_en"
+        fields: &home_fields
+          - label: "Navigation"
+            name: "nav"
+            widget: "object"
+            fields:
+              - { label: "Home", name: "home", widget: "string" }
+              - { label: "Services", name: "services", widget: "string" }
+              - { label: "Areas", name: "areas", widget: "string" }
+              - { label: "Reviews", name: "reviews", widget: "string" }
+              - { label: "FAQ", name: "faq", widget: "string" }
+              - { label: "Contact", name: "contact", widget: "string" }
+              - { label: "Call Now", name: "callNow", widget: "string" }
+          - { label: "Hero Title", name: "heroTitle", widget: "string" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "text" }
+          - { label: "Primary CTA", name: "heroPrimaryCta", widget: "string" }
+          - { label: "Secondary CTA", name: "heroSecondaryCta", widget: "string" }
+          - { label: "Hero Badges", name: "heroBadges", widget: "list" }
+          - { label: "Orbit Words", name: "heroOrbitWords", widget: "list" }
+          - { label: "Services Title", name: "servicesTitle", widget: "string" }
+          - { label: "Services Intro", name: "servicesIntro", widget: "text" }
+          - label: "Featured Services"
+            name: "featuredServices"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Excerpt", name: "excerpt", widget: "text" }
+              - { label: "Slug", name: "slug", widget: "string" }
+              - { label: "Image", name: "image", widget: "string" }
+          - { label: "Why Title", name: "whyTitle", widget: "string" }
+          - { label: "Why Items", name: "whyChoose", widget: "list" }
+          - { label: "Emergency Title", name: "emergencyTitle", widget: "string" }
+          - { label: "Emergency Text", name: "emergencyText", widget: "text" }
+          - { label: "Areas Title", name: "areasTitle", widget: "string" }
+          - { label: "Areas Text", name: "areasText", widget: "text" }
+          - { label: "Reviews Title", name: "reviewsTitle", widget: "string" }
+          - { label: "FAQ Title", name: "faqTitle", widget: "string" }
+          - { label: "Contact Title", name: "contactTitle", widget: "string" }
+          - { label: "Contact Text", name: "contactText", widget: "text" }
+      - file: "src/content/home/es.json"
+        label: "Home ES"
+        name: "home_es"
+        fields: *home_fields
+      - file: "src/content/home/ru.json"
+        label: "Home RU"
+        name: "home_ru"
+        fields: *home_fields
+
+  - name: "services_en"
+    label: "Services EN"
+    folder: "src/content/services/en"
+    create: true
+    slug: "{{slug}}"
+    fields: &service_fields
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Excerpt", name: "excerpt", widget: "text" }
+      - { label: "Intro", name: "intro", widget: "text" }
+      - label: "Sections"
+        name: "sections"
+        widget: "list"
+        fields:
+          - { label: "Heading", name: "heading", widget: "string" }
+          - { label: "Body", name: "body", widget: "text" }
+      - label: "FAQ"
+        name: "faq"
+        widget: "list"
+        fields:
+          - { label: "Question", name: "question", widget: "string" }
+          - { label: "Answer", name: "answer", widget: "text" }
+      - { label: "SEO Title", name: "seoTitle", widget: "string" }
+      - { label: "SEO Description", name: "seoDescription", widget: "text" }
+
+  - name: "services_es"
+    label: "Services ES"
+    folder: "src/content/services/es"
+    create: true
+    slug: "{{slug}}"
+    fields: *service_fields
+
+  - name: "services_ru"
+    label: "Services RU"
+    folder: "src/content/services/ru"
+    create: true
+    slug: "{{slug}}"
+    fields: *service_fields
+
+  - name: "areas_en"
+    label: "Areas EN"
+    folder: "src/content/areas/en"
+    create: true
+    slug: "{{slug}}"
+    fields: &area_fields
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "City", name: "city", widget: "string" }
+      - { label: "State", name: "state", widget: "string" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Intro", name: "intro", widget: "text" }
+      - { label: "Highlights", name: "highlights", widget: "list" }
+      - { label: "Supported Services", name: "supportedServices", widget: "list" }
+      - label: "FAQ"
+        name: "faq"
+        widget: "list"
+        fields:
+          - { label: "Question", name: "question", widget: "string" }
+          - { label: "Answer", name: "answer", widget: "text" }
+      - { label: "SEO Title", name: "seoTitle", widget: "string" }
+      - { label: "SEO Description", name: "seoDescription", widget: "text" }
+
+  - name: "areas_es"
+    label: "Areas ES"
+    folder: "src/content/areas/es"
+    create: true
+    slug: "{{slug}}"
+    fields: *area_fields
+
+  - name: "areas_ru"
+    label: "Areas RU"
+    folder: "src/content/areas/ru"
+    create: true
+    slug: "{{slug}}"
+    fields: *area_fields
+
+  - name: "reviews"
+    label: "Reviews"
+    files:
+      - file: "src/content/reviews/en.json"
+        label: "Reviews EN"
+        name: "reviews_en"
+        fields: &reviews_fields
+          - label: "Reviews"
+            name: "items"
+            widget: "list"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Rating", name: "rating", widget: "number", min: 1, max: 5 }
+              - { label: "Quote", name: "quote", widget: "text" }
+              - { label: "City", name: "city", widget: "string", required: false }
+      - file: "src/content/reviews/es.json"
+        label: "Reviews ES"
+        name: "reviews_es"
+        fields: *reviews_fields
+      - file: "src/content/reviews/ru.json"
+        label: "Reviews RU"
+        name: "reviews_ru"
+        fields: *reviews_fields
+
+  - name: "faq"
+    label: "FAQ"
+    files:
+      - file: "src/content/faq/en.json"
+        label: "FAQ EN"
+        name: "faq_en"
+        fields: &faq_fields
+          - label: "Items"
+            name: "items"
+            widget: "list"
+            fields:
+              - { label: "Question", name: "question", widget: "string" }
+              - { label: "Answer", name: "answer", widget: "text" }
+      - file: "src/content/faq/es.json"
+        label: "FAQ ES"
+        name: "faq_es"
+        fields: *faq_fields
+      - file: "src/content/faq/ru.json"
+        label: "FAQ RU"
+        name: "faq_ru"
+        fields: *faq_fields
