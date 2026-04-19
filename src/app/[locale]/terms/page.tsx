@@ -1,21 +1,27 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getGlobalSettings } from '@/lib/content';
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import { getGlobalSettings } from '@/lib/content'
 
-export default function TermsPage({ params }: { params: { locale: 'en' | 'es' | 'ru' } }) {
-  const global = getGlobalSettings();
+export default async function TermsPage({
+  params,
+}: {
+  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+}) {
+  const { locale } = await params
+  const global = getGlobalSettings()
+
   return (
     <>
       <Header
-        locale={params.locale}
+        locale={locale}
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 text-text">
-        <h1 className="text-3xl font-heading font-semibold mb-6">Terms of Service</h1>
+        <h1 className="mb-6 text-3xl font-heading font-semibold">Terms of Service</h1>
         <p>This page should contain your terms of service. It is provided as a placeholder in this scaffold.</p>
       </main>
-      <Footer locale={params.locale} />
+      <Footer locale={locale} />
     </>
-  );
+  )
 }
