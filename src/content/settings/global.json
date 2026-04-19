@@ -1,0 +1,13 @@
+{
+  "brandName": "Planetlocksmiths",
+  "phonePrimary": "+12155550123",
+  "phoneDisplay": "(215) 555-0123",
+  "email": "info@planetlocksmiths.com",
+  "serviceHours": "24/7",
+  "defaultLocale": "en",
+  "supportedLocales": ["en", "es", "ru"],
+  "primaryCity": "Philadelphia",
+  "primaryState": "PA",
+  "country": "US",
+  "hasPhysicalLocation": false
+}

@@ -1,0 +1,63 @@
+{
+  "heroTitle": "Automotive Locksmith Service Across Philadelphia — 24/7",
+  "heroSubtitle": "Locked out, dealing with a lost key, or need a replacement programmed? Planetlocksmiths provides mobile automotive locksmith service across Philadelphia with urgent and same-day availability.",
+  "heroPrimaryCta": "Call Now",
+  "heroSecondaryCta": "Request Service",
+  "heroBadges": [
+    "24/7 Mobile Service",
+    "Philadelphia Coverage",
+    "Car Keys & Programming"
+  ],
+  "heroOrbitWords": [
+    "Lockout",
+    "Replacement",
+    "Programming",
+    "Fob"
+  ],
+  "featuredServices": [
+    {
+      "title": "Car Lockout",
+      "excerpt": "Fast mobile help when your vehicle is locked and the key is not accessible.",
+      "slug": "car-lockout"
+    },
+    {
+      "title": "Car Key Replacement",
+      "excerpt": "Replacement solutions for lost, broken, or damaged car keys.",
+      "slug": "car-key-replacement"
+    },
+    {
+      "title": "Key Programming",
+      "excerpt": "Programming support for many modern vehicle keys, remotes, and fobs.",
+      "slug": "key-programming"
+    },
+    {
+      "title": "Key Fob Assistance",
+      "excerpt": "Help with fob-related access and replacement needs.",
+      "slug": "key-fob-assistance"
+    },
+    {
+      "title": "Ignition Key Issues",
+      "excerpt": "Support for ignition-related key problems and related access issues.",
+      "slug": "ignition-key-issues"
+    },
+    {
+      "title": "Emergency Mobile Service",
+      "excerpt": "24/7 response for urgent automotive key and lock situations.",
+      "slug": "emergency-mobile-service"
+    }
+  ],
+  "whyChoose": [
+    "Mobile automotive-only focus",
+    "24/7 urgent response",
+    "Same-day service availability",
+    "Modern key and fob support",
+    "Clear communication from request to arrival",
+    "Service across Philadelphia"
+  ],
+  "emergencyTitle": "Need urgent automotive locksmith help?",
+  "emergencyText": "Mobile service across Philadelphia for lockouts, lost keys, replacements, and programming support.",
+  "reviewsTitle": "Reviews",
+  "faqTitle": "Frequently Asked Questions",
+  "contactTitle": "Get in touch",
+  "contactText": "For immediate assistance or to request service, reach out using the form below or call us directly."
+}

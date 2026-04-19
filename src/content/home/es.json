@@ -1,0 +1,63 @@
+{
+  "heroTitle": "Servicio de Cerrajería Automotriz en Filadelfia — 24/7",
+  "heroSubtitle": "Si no puedes abrir tu auto, perdiste la llave o necesitas una llave nueva con programación, Planetlocksmiths ofrece servicio móvil automotriz en toda Filadelfia con atención urgente y el mismo día.",
+  "heroPrimaryCta": "Llámanos ahora",
+  "heroSecondaryCta": "Solicitar servicio",
+  "heroBadges": [
+    "Servicio móvil 24/7",
+    "Cobertura Filadelfia",
+    "Llaves y programación"
+  ],
+  "heroOrbitWords": [
+    "Bloqueo",
+    "Reemplazo",
+    "Programación",
+    "Llaveros"
+  ],
+  "featuredServices": [
+    {
+      "title": "Bloqueo de automóvil",
+      "excerpt": "Ayuda móvil rápida cuando su vehículo está bloqueado y no se puede acceder a la llave.",
+      "slug": "car-lockout"
+    },
+    {
+      "title": "Reemplazo de llave de automóvil",
+      "excerpt": "Soluciones de reemplazo para llaves perdidas, rotas o dañadas.",
+      "slug": "car-key-replacement"
+    },
+    {
+      "title": "Programación de llaves",
+      "excerpt": "Soporte de programación para muchas llaves de vehículos modernos, mandos y llaveros.",
+      "slug": "key-programming"
+    },
+    {
+      "title": "Asistencia con llaveros",
+      "excerpt": "Ayuda con accesos relacionados con llaveros y necesidades de reemplazo.",
+      "slug": "key-fob-assistance"
+    },
+    {
+      "title": "Problemas de llave de encendido",
+      "excerpt": "Soporte para problemas relacionados con la llave de encendido y problemas de acceso relacionados.",
+      "slug": "ignition-key-issues"
+    },
+    {
+      "title": "Servicio móvil de emergencia",
+      "excerpt": "Respuesta 24/7 para situaciones urgentes de llaves y cerraduras automotrices.",
+      "slug": "emergency-mobile-service"
+    }
+  ],
+  "whyChoose": [
+    "Enfoque móvil solo automotriz",
+    "Respuesta urgente 24/7",
+    "Disponibilidad de servicio el mismo día",
+    "Soporte de llaves y llaveros modernos",
+    "Comunicación clara desde la solicitud hasta la llegada",
+    "Servicio en toda Filadelfia"
+  ],
+  "emergencyTitle": "¿Necesitas ayuda urgente de cerrajería automotriz?",
+  "emergencyText": "Servicio móvil en toda Filadelfia para bloqueos, llaves perdidas, reemplazos y soporte de programación.",
+  "reviewsTitle": "Opiniones",
+  "faqTitle": "Preguntas frecuentes",
+  "contactTitle": "Contáctanos",
+  "contactText": "Para asistencia inmediata o para solicitar servicio, contáctanos usando el formulario a continuación o llámanos directamente."
+}

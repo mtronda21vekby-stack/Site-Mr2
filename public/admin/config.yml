@@ -1,0 +1,122 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "settings"
+    label: "Settings"
+    files:
+      - file: "src/content/settings/global.json"
+        label: "Global Settings"
+        name: "global_settings"
+        fields:
+          - { label: "Brand Name", name: "brandName", widget: "string" }
+          - { label: "Primary Phone", name: "phonePrimary", widget: "string" }
+          - { label: "Display Phone", name: "phoneDisplay", widget: "string" }
+          - { label: "Email", name: "email", widget: "string", required: false }
+          - { label: "Service Hours", name: "serviceHours", widget: "string" }
+
+  - name: "home_en"
+    label: "Home EN"
+    files:
+      - file: "src/content/home/en.json"
+        label: "Home English"
+        name: "home_en"
+        fields:
+          - { label: "Hero Title", name: "heroTitle", widget: "string" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "text" }
+          - { label: "Primary CTA", name: "heroPrimaryCta", widget: "string" }
+          - { label: "Secondary CTA", name: "heroSecondaryCta", widget: "string" }
+          - label: "Badges"
+            name: "heroBadges"
+            widget: "list"
+          - label: "Orbit Words"
+            name: "heroOrbitWords"
+            widget: "list"
+          - label: "Featured Services"
+            name: "featuredServices"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Excerpt", name: "excerpt", widget: "text" }
+              - { label: "Slug", name: "slug", widget: "string" }
+          - label: "Why Choose"
+            name: "whyChoose"
+            widget: "list"
+          - { label: "Emergency Title", name: "emergencyTitle", widget: "string" }
+          - { label: "Emergency Text", name: "emergencyText", widget: "text" }
+          - { label: "Reviews Title", name: "reviewsTitle", widget: "string" }
+          - { label: "FAQ Title", name: "faqTitle", widget: "string" }
+          - { label: "Contact Title", name: "contactTitle", widget: "string" }
+          - { label: "Contact Text", name: "contactText", widget: "text" }
+
+  - name: "home_es"
+    label: "Home ES"
+    files:
+      - file: "src/content/home/es.json"
+        label: "Home Spanish"
+        name: "home_es"
+        fields:
+          - { label: "Hero Title", name: "heroTitle", widget: "string" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "text" }
+          - { label: "Primary CTA", name: "heroPrimaryCta", widget: "string" }
+          - { label: "Secondary CTA", name: "heroSecondaryCta", widget: "string" }
+          - label: "Badges"
+            name: "heroBadges"
+            widget: "list"
+          - label: "Orbit Words"
+            name: "heroOrbitWords"
+            widget: "list"
+          - label: "Featured Services"
+            name: "featuredServices"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Excerpt", name: "excerpt", widget: "text" }
+              - { label: "Slug", name: "slug", widget: "string" }
+          - label: "Why Choose"
+            name: "whyChoose"
+            widget: "list"
+          - { label: "Emergency Title", name: "emergencyTitle", widget: "string" }
+          - { label: "Emergency Text", name: "emergencyText", widget: "text" }
+          - { label: "Reviews Title", name: "reviewsTitle", widget: "string" }
+          - { label: "FAQ Title", name: "faqTitle", widget: "string" }
+          - { label: "Contact Title", name: "contactTitle", widget: "string" }
+          - { label: "Contact Text", name: "contactText", widget: "text" }
+
+  - name: "home_ru"
+    label: "Home RU"
+    files:
+      - file: "src/content/home/ru.json"
+        label: "Home Russian"
+        name: "home_ru"
+        fields:
+          - { label: "Hero Title", name: "heroTitle", widget: "string" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "text" }
+          - { label: "Primary CTA", name: "heroPrimaryCta", widget: "string" }
+          - { label: "Secondary CTA", name: "heroSecondaryCta", widget: "string" }
+          - label: "Badges"
+            name: "heroBadges"
+            widget: "list"
+          - label: "Orbit Words"
+            name: "heroOrbitWords"
+            widget: "list"
+          - label: "Featured Services"
+            name: "featuredServices"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Excerpt", name: "excerpt", widget: "text" }
+              - { label: "Slug", name: "slug", widget: "string" }
+          - label: "Why Choose"
+            name: "whyChoose"
+            widget: "list"
+          - { label: "Emergency Title", name: "emergencyTitle", widget: "string" }
+          - { label: "Emergency Text", name: "emergencyText", widget: "text" }
+          - { label: "Reviews Title", name: "reviewsTitle", widget: "string" }
+          - { label: "FAQ Title", name: "faqTitle", widget: "string" }
+          - { label: "Contact Title", name: "contactTitle", widget: "string" }
+          - { label: "Contact Text", name: "contactText", widget: "text" }
