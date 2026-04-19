@@ -1,21 +1,27 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getGlobalSettings } from '@/lib/content';
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import { getGlobalSettings } from '@/lib/content'
 
-export default function ReviewsPage({ params }: { params: { locale: 'en' | 'es' | 'ru' } }) {
-  const global = getGlobalSettings();
+export default async function ReviewsPage({
+  params,
+}: {
+  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+}) {
+  const { locale } = await params
+  const global = getGlobalSettings()
+
   return (
     <>
       <Header
-        locale={params.locale}
+        locale={locale}
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 text-text">
-        <h1 className="text-3xl font-heading font-semibold mb-6">Reviews</h1>
+        <h1 className="mb-6 text-3xl font-heading font-semibold">Reviews</h1>
         <p>This page will eventually show customer reviews. For now it is a placeholder.</p>
       </main>
-      <Footer locale={params.locale} />
+      <Footer locale={locale} />
     </>
-  );
+  )
 }
