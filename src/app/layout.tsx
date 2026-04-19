@@ -23,15 +23,9 @@ export const metadata: Metadata = {
     'Planetlocksmiths provides premium mobile automotive locksmith services across Philadelphia with urgent 24/7 response.',
 };
 
-export default function RootLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { locale: string };
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={params.locale}>
+    <html lang="en">
       <body
         className={`${inter.variable} ${sora.variable} font-inter bg-bg text-text`}
       >
