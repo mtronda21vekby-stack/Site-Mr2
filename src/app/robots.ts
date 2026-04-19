@@ -1,8 +1,13 @@
-export async function GET() {
-  const content = `User-agent: *\nAllow: /`;
-  return new Response(content, {
-    headers: {
-      'Content-Type': 'text/plain',
+import type { MetadataRoute } from 'next'
+
+export default function robots(): MetadataRoute.Robots {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.pages.dev'
+
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
     },
-  });
+    sitemap: `${baseUrl}/sitemap.xml`,
+  }
 }
