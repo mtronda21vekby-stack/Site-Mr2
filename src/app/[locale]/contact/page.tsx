@@ -1,16 +1,24 @@
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import { getGlobalSettings, getHomeContent } from '@/lib/content'
-import ContactSection from '@/components/sections/ContactSection'
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import { getGlobalSettings, getHomeContent } from '@/lib/content';
+import ContactSection from '@/components/sections/ContactSection';
+
+export async function generateStaticParams() {
+  return [
+    { locale: 'en' },
+    { locale: 'es' },
+    { locale: 'ru' },
+  ];
+}
 
 export default async function ContactPage({
   params,
 }: {
-  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+  params: Promise<{ locale: 'en' | 'es' | 'ru' }>;
 }) {
-  const { locale } = await params
-  const global = getGlobalSettings()
-  const home = getHomeContent(locale)
+  const { locale } = await params;
+  const global = getGlobalSettings();
+  const home = getHomeContent(locale);
 
   return (
     <>
@@ -30,5 +38,5 @@ export default async function ContactPage({
       </main>
       <Footer locale={locale} />
     </>
-  )
+  );
 }
