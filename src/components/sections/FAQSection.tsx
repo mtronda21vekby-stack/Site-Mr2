@@ -1,27 +1,19 @@
-import type { FaqItem } from '@/lib/site-data';
+import { Section } from '@/components/ui/Section';
+import { getFaq } from '@/lib/content';
+import type { Locale } from '@/types/common';
 
-export default function FAQSection({ items }: { items: FaqItem[] }) {
+export default function FAQSection({ locale }: { locale: Locale }) {
+  const items = getFaq(locale);
   return (
-    <section id="faq" className="bg-surface py-16">
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <h2 className="font-sora text-2xl font-bold text-text">FAQ</h2>
-        <p className="mt-2 text-sm text-muted">
-          Answers to some of the most common questions we receive.
-        </p>
-        <div className="mt-8 space-y-4">
-          {items.map((faq) => (
-            <details
-              key={faq.question}
-              className="rounded-lg border border-line bg-surface-2 p-4"
-            >
-              <summary className="cursor-pointer select-none text-sm font-medium text-text">
-                {faq.question}
-              </summary>
-              <p className="mt-2 text-sm text-muted">{faq.answer}</p>
-            </details>
-          ))}
-        </div>
+    <Section id="faq" eyebrow="faq" title="Frequently asked questions" description="Useful, local-service answers without keyword stuffing.">
+      <div className="grid gap-4">
+        {items.map((item) => (
+          <details key={item.question} className="rounded-3xl border border-line bg-surface/80 p-6">
+            <summary className="cursor-pointer list-none font-sora text-lg font-bold text-text">{item.question}</summary>
+            <p className="mt-4 text-sm leading-7 text-muted">{item.answer}</p>
+          </details>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }

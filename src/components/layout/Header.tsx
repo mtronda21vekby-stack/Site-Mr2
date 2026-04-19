@@ -1,55 +1,38 @@
 import Link from 'next/link';
-import { callHref } from '@/lib/site-data';
+import LanguageSwitcher from './LanguageSwitcher';
+import { Button } from '@/components/ui/Button';
+import { getGlobalSettings } from '@/lib/content';
+import type { Locale } from '@/types/common';
 
-export default function Header() {
+export default function Header({ locale }: { locale: Locale }) {
+  const settings = getGlobalSettings();
+  const nav = [
+    ['Home', ''],
+    ['Services', '/services'],
+    ['Service Areas', '/areas'],
+    ['Reviews', '/reviews'],
+    ['FAQ', '/faq'],
+    ['Contact', '/contact'],
+  ] as const;
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-line bg-surface/90 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-8">
-        <Link
-          href="/"
-          className="font-sora text-lg font-semibold tracking-wide text-accent-blue"
-        >
-          Planetlocksmiths
+    <header className="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-6">
+        <Link href={`/${locale}`} className="font-sora text-xl font-extrabold tracking-tight text-text">
+          {settings.brandName}
         </Link>
-        <nav className="hidden space-x-6 md:flex">
-          <a
-            href="#services"
-            className="text-sm font-medium text-muted transition-colors hover:text-text"
-          >
-            Services
-          </a>
-          <a
-            href="#why"
-            className="text-sm font-medium text-muted transition-colors hover:text-text"
-          >
-            Why Us
-          </a>
-          <a
-            href="#faq"
-            className="text-sm font-medium text-muted transition-colors hover:text-text"
-          >
-            FAQ
-          </a>
-          <a
-            href="#contact"
-            className="text-sm font-medium text-muted transition-colors hover:text-text"
-          >
-            Contact
-          </a>
+        <nav className="hidden items-center gap-6 lg:flex">
+          {nav.map(([label, href]) => (
+            <Link key={href} href={`/${locale}${href}`} className="text-sm text-muted transition-colors hover:text-text">
+              {label}
+            </Link>
+          ))}
         </nav>
-        <div className="hidden space-x-3 md:flex">
-          <a
-            href={callHref}
-            className="rounded-full bg-accent-blue px-4 py-2 text-sm font-semibold text-bg transition-colors hover:bg-accent-blue/80"
-          >
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher locale={locale} />
+          <Button href={`tel:${settings.phonePrimary}`} className="hidden md:inline-flex">
             Call Now
-          </a>
-          <a
-            href="#contact"
-            className="rounded-full border border-accent-blue px-4 py-2 text-sm font-semibold text-accent-blue transition-colors hover:bg-accent-blue hover:text-bg"
-          >
-            Request Service
-          </a>
+          </Button>
         </div>
       </div>
     </header>

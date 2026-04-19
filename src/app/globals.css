@@ -1,27 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    scroll-behavior: smooth;
-  }
+:root {
+  color-scheme: dark;
+}
 
-  html {
-    -webkit-tap-highlight-color: transparent;
-  }
+html {
+  scroll-behavior: smooth;
+}
 
-  body {
-    @apply bg-bg text-text antialiased min-h-screen;
-    font-feature-settings: 'liga' 1;
-  }
+body {
+  min-height: 100vh;
+  background: #05070B;
+  color: #F5F7FB;
+}
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
+* {
+  border-color: rgba(255,255,255,0.08);
 }

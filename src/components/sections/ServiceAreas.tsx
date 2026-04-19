@@ -1,31 +1,18 @@
-export default function ServiceAreas() {
+import Link from 'next/link';
+import { Section } from '@/components/ui/Section';
+import type { Locale } from '@/types/common';
+
+export default function ServiceAreas({ locale }: { locale: Locale }) {
   return (
-    <section className="bg-surface py-16">
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <h2 className="font-sora text-2xl font-bold text-text">Service Areas</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          Planetlocksmiths proudly serves customers across the Philadelphia
-          region and the surrounding areas. We bring our fully equipped mobile
-          service directly to you, wherever you are within our service zone.
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {[
-            'Center City',
-            'North Philadelphia',
-            'South Philadelphia',
-            'West Philadelphia',
-            'Northeast Philadelphia',
-            'Surrounding suburbs',
-          ].map((area) => (
-            <div
-              key={area}
-              className="rounded-lg border border-line bg-surface-2 p-4 text-sm text-muted"
-            >
-              {area}
-            </div>
-          ))}
+    <Section id="areas" eyebrow="service areas" title="Philadelphia first, scalable for future city pages" description="The site is structured to expand beyond Philadelphia without rebuilding the design system.">
+      <div className="grid gap-5 md:grid-cols-2">
+        <div className="rounded-3xl border border-line bg-surface/80 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent-cyan">Primary area</p>
+          <h3 className="mt-4 font-sora text-3xl font-bold text-text">Philadelphia, PA</h3>
+          <p className="mt-3 text-sm leading-7 text-muted">Mobile automotive locksmith coverage across Philadelphia with room for future service area expansion.</p>
+          <Link href={`/${locale}/areas/philadelphia`} className="mt-5 inline-flex text-sm font-semibold text-accent-blue">Open area page →</Link>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }

@@ -1,38 +1,29 @@
-"use client";
+'use client';
+
 import { motion } from 'framer-motion';
 
-interface OrbitRingProps {
-  radius: string;
-  text: string;
-  speed?: number;
-}
+export type OrbitRingProps = {
+  words: string[];
+  radius: number;
+  tilt: number;
+  duration: number;
+  reverse?: boolean;
+  mouseX: number;
+  mouseY: number;
+};
 
-export default function OrbitRing({
-  radius,
-  text,
-  speed = 30,
-}: OrbitRingProps) {
-  const animationDuration = Math.abs(speed);
-  const animationDirection = speed < 0 ? 'reverse' : 'normal';
-
+export default function OrbitRing({ words, radius, tilt, duration, reverse = false, mouseX, mouseY }: OrbitRingProps) {
   return (
     <motion.div
-      className="absolute left-1/2 top-1/2 flex items-center justify-center"
-      style={{
-        width: radius,
-        height: radius,
-        marginLeft: `calc(${radius} / -2)`,
-        marginTop: `calc(${radius} / -2)`,
-        animation: `spin ${animationDuration}s linear infinite`,
-        animationDirection,
-      }}
+      animate={{ rotate: reverse ? -360 : 360, x: mouseX, y: mouseY }}
+      transition={{ rotate: { repeat: Infinity, duration, ease: 'linear' }, x: { type: 'spring', stiffness: 40, damping: 18 }, y: { type: 'spring', stiffness: 40, damping: 18 } }}
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ transform: `rotateX(${tilt}deg)` }}
     >
-      <div className="relative flex h-full w-full items-center justify-center">
-        <p className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[0.625rem] font-medium uppercase tracking-wide text-muted">
-          {Array.from({ length: 6 })
-            .fill(text)
-            .join('')}
-        </p>
+      <div className="relative rounded-full border border-white/10" style={{ width: radius, height: radius }}>
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bg px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-muted">
+          {words.join(' • ')}
+        </div>
       </div>
     </motion.div>
   );

@@ -1,13 +1,7 @@
 import type { Config } from 'tailwindcss';
 
-import defaultTheme from 'tailwindcss/defaultTheme';
-
 const config: Config = {
-  content: [
-    './src/app/**/*.{ts,tsx}',
-    './src/components/**/*.{ts,tsx}'
-  ],
-  darkMode: 'class',
+  content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -22,11 +16,16 @@ const config: Config = {
         'accent-gold': '#D6A85F',
         'danger-soft': '#FF7A7A'
       },
+      boxShadow: {
+        glow: '0 0 0 1px rgba(255,255,255,0.04), 0 30px 80px rgba(77,162,255,0.18)',
+        card: '0 20px 60px rgba(0,0,0,0.22)'
+      },
       fontFamily: {
-        // Use CSS variables provided by next/font for Sora and Inter.
-        sans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
-        sora: ['var(--font-sora)', ...defaultTheme.fontFamily.sans],
-        inter: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
+        sora: ['Sora', 'Inter', 'system-ui', 'sans-serif'],
+        inter: ['Inter', 'system-ui', 'sans-serif']
+      },
+      backgroundImage: {
+        'planet-core': 'radial-gradient(circle at 35% 30%, rgba(45,226,230,0.22), transparent 28%), radial-gradient(circle at 65% 65%, rgba(214,168,95,0.18), transparent 25%), linear-gradient(145deg, #17223F 0%, #0B1020 45%, #09101C 100%)'
       }
     }
   },

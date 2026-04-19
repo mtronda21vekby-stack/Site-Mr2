@@ -1,28 +1,23 @@
-import type { Service } from '@/lib/site-data';
+import Link from 'next/link';
+import { Section } from '@/components/ui/Section';
+import { Card } from '@/components/ui/Card';
+import { getHomeContent } from '@/lib/content';
+import type { Locale } from '@/types/common';
 
-export default function ServicesGrid({ services }: { services: Service[] }) {
+export default function ServicesGrid({ locale }: { locale: Locale }) {
+  const content = getHomeContent(locale);
   return (
-    <section id="services" className="bg-surface py-16">
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <h2 className="font-sora text-2xl font-bold text-text">Our Services</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          We specialise exclusively in automotive locksmith work. Explore how we
-          can help.
-        </p>
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => (
-            <div
-              key={service.title}
-              className="flex flex-col rounded-lg border border-line bg-surface-2 p-6 shadow-lg shadow-black/20 transition-transform hover:-translate-y-1"
-            >
-              <h3 className="font-sora text-lg font-semibold text-text">
-                {service.title}
-              </h3>
-              <p className="mt-3 text-sm text-muted">{service.description}</p>
-            </div>
-          ))}
-        </div>
+    <Section id="services" eyebrow="featured services" title="Automotive locksmith services" description="Focused, mobile-first service pages built for clarity, search intent, and real customer action.">
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {content.featuredServices.map((service) => (
+          <Card key={service.slug} className="p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent-cyan">{service.slug.replace(/-/g, ' ')}</p>
+            <h3 className="mt-4 font-sora text-2xl font-bold text-text">{service.title}</h3>
+            <p className="mt-3 text-sm leading-7 text-muted">{service.excerpt}</p>
+            <Link href={`/${locale}/services/${service.slug}`} className="mt-6 inline-flex text-sm font-semibold text-accent-blue">View service →</Link>
+          </Card>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }

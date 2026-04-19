@@ -1,6 +1,3 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import MobileStickyCall from '@/components/layout/MobileStickyCall';
 import Hero from '@/components/hero/Hero';
 import ServicesGrid from '@/components/sections/ServicesGrid';
 import WhyChoose from '@/components/sections/WhyChoose';
@@ -9,24 +6,32 @@ import ServiceAreas from '@/components/sections/ServiceAreas';
 import ReviewsSection from '@/components/sections/ReviewsSection';
 import FAQSection from '@/components/sections/FAQSection';
 import ContactSection from '@/components/sections/ContactSection';
-import { services, whyChoose, faq } from '@/lib/site-data';
+import LocalBusinessSchema from '@/components/seo/LocalBusinessSchema';
+import FAQSchema from '@/components/seo/FAQSchema';
+import { getFaq } from '@/lib/content';
+import { isLocale, locales } from '@/lib/i18n';
+import { notFound } from 'next/navigation';
 
-export default function HomePage() {
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleHome({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  if (!isLocale(locale)) notFound();
+  const faq = getFaq(locale);
   return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <ServicesGrid services={services} />
-        <WhyChoose items={whyChoose} />
-        <EmergencyStrip />
-        <ServiceAreas />
-        <ReviewsSection />
-        <FAQSection items={faq} />
-        <ContactSection />
-      </main>
-      <Footer />
-      <MobileStickyCall />
-    </>
+    <main>
+      <LocalBusinessSchema />
+      <FAQSchema items={faq} />
+      <Hero locale={locale} />
+      <ServicesGrid locale={locale} />
+      <WhyChoose locale={locale} />
+      <EmergencyStrip locale={locale} />
+      <ServiceAreas locale={locale} />
+      <ReviewsSection locale={locale} />
+      <FAQSection locale={locale} />
+      <ContactSection locale={locale} />
+    </main>
   );
 }

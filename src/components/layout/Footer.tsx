@@ -1,69 +1,35 @@
-import { callNumber, callHref } from '@/lib/site-data';
+import Link from 'next/link';
+import { getGlobalSettings } from '@/lib/content';
+import type { Locale } from '@/types/common';
 
-export default function Footer() {
+export default function Footer({ locale }: { locale: Locale }) {
+  const settings = getGlobalSettings();
   return (
-    <footer className="border-t border-line bg-surface-2 py-10">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:grid-cols-2 md:grid-cols-4">
+    <footer className="border-t border-line bg-surface/70">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-3 md:px-6">
         <div>
-          <h3 className="mb-3 font-sora text-sm font-semibold text-text">
-            Planetlocksmiths
-          </h3>
-          <p className="text-sm text-muted">
-            Premium mobile automotive locksmiths in Philadelphia.
-          </p>
+          <p className="font-sora text-lg font-bold text-text">{settings.brandName}</p>
+          <p className="mt-3 max-w-sm text-sm leading-6 text-muted">Premium mobile automotive locksmith service across Philadelphia with a controlled, professional customer experience.</p>
         </div>
         <div>
-          <h3 className="mb-3 font-sora text-sm font-semibold text-text">
-            Quick Links
-          </h3>
-          <ul className="space-y-2 text-sm text-muted">
-            <li>
-              <a href="#services" className="transition-colors hover:text-text">
-                Services
-              </a>
-            </li>
-            <li>
-              <a href="#why" className="transition-colors hover:text-text">
-                Why Us
-              </a>
-            </li>
-            <li>
-              <a href="#faq" className="transition-colors hover:text-text">
-                FAQ
-              </a>
-            </li>
-            <li>
-              <a href="#contact" className="transition-colors hover:text-text">
-                Contact
-              </a>
-            </li>
-          </ul>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-cyan">Navigation</p>
+          <div className="mt-4 grid gap-2 text-sm text-muted">
+            <Link href={`/${locale}/services`}>Services</Link>
+            <Link href={`/${locale}/areas`}>Service Areas</Link>
+            <Link href={`/${locale}/reviews`}>Reviews</Link>
+            <Link href={`/${locale}/contact`}>Contact</Link>
+          </div>
         </div>
         <div>
-          <h3 className="mb-3 font-sora text-sm font-semibold text-text">
-            Contact
-          </h3>
-          <p className="text-sm text-muted">Philadelphia, PA</p>
-          <a
-            href={callHref}
-            className="mt-2 block text-sm font-medium text-accent-blue hover:underline"
-          >
-            {callNumber}
-          </a>
-        </div>
-        <div>
-          <h3 className="mb-3 font-sora text-sm font-semibold text-text">
-            Service Area
-          </h3>
-          <p className="text-sm text-muted">
-            We proudly serve the entire Philadelphia region and surrounding
-            areas.
-          </p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-cyan">Contact</p>
+          <div className="mt-4 grid gap-2 text-sm text-muted">
+            <a href={`tel:${settings.phonePrimary}`}>{settings.phoneDisplay}</a>
+            <a href={`mailto:${settings.email}`}>{settings.email}</a>
+            <p>{settings.serviceHours}</p>
+            <p>{settings.primaryCity}, {settings.primaryState}</p>
+          </div>
         </div>
       </div>
-      <p className="mt-8 text-center text-xs text-muted">
-        © {new Date().getFullYear()} Planetlocksmiths. All rights reserved.
-      </p>
     </footer>
   );
 }

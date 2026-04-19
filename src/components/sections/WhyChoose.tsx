@@ -1,24 +1,18 @@
-export default function WhyChoose({ items }: { items: string[] }) {
+import { Section } from '@/components/ui/Section';
+import { getHomeContent } from '@/lib/content';
+import type { Locale } from '@/types/common';
+
+export default function WhyChoose({ locale }: { locale: Locale }) {
+  const content = getHomeContent(locale);
   return (
-    <section id="why" className="bg-surface-2 py-16">
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <h2 className="font-sora text-2xl font-bold text-text">Why Choose Us</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          We go beyond basic locksmithing to deliver premium service and peace of
-          mind.
-        </p>
-        <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <li
-              key={item}
-              className="flex items-start rounded-lg border border-line bg-surface p-5"
-            >
-              <span className="mr-3 mt-1 inline-block h-3 w-3 flex-shrink-0 rounded-full bg-accent-blue"></span>
-              <span className="text-sm text-muted">{item}</span>
-            </li>
-          ))}
-        </ul>
+    <Section id="why" eyebrow="why planetlocksmiths" title="Specific value, not marketing sludge" description="Everything here should read like a trustworthy local service brand, not generic AI website copy.">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {content.whyChoose.map((item) => (
+          <div key={item} className="rounded-3xl border border-line bg-surface-2/80 p-5 text-sm leading-7 text-text">
+            <span className="mr-2 text-accent-gold">•</span>{item}
+          </div>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }
