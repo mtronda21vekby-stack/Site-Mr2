@@ -21,8 +21,8 @@ module.exports = {
       fontFamily: {
         heading: ['Sora', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
-      }
+      },
     },
   },
   plugins: [],
-};
+}
