@@ -1,15 +1,21 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getGlobalSettings, getHomeContent } from '@/lib/content';
-import ContactSection from '@/components/sections/ContactSection';
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import { getGlobalSettings, getHomeContent } from '@/lib/content'
+import ContactSection from '@/components/sections/ContactSection'
 
-export default function ContactPage({ params }: { params: { locale: 'en' | 'es' | 'ru' } }) {
-  const global = getGlobalSettings();
-  const home = getHomeContent(params.locale);
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+}) {
+  const { locale } = await params
+  const global = getGlobalSettings()
+  const home = getHomeContent(locale)
+
   return (
     <>
       <Header
-        locale={params.locale}
+        locale={locale}
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
@@ -19,10 +25,10 @@ export default function ContactPage({ params }: { params: { locale: 'en' | 'es' 
           text={home.contactText}
           phoneNumber={global.phonePrimary}
           phoneDisplay={global.phoneDisplay}
-          locale={params.locale}
+          locale={locale}
         />
       </main>
-      <Footer locale={params.locale} />
+      <Footer locale={locale} />
     </>
-  );
+  )
 }
