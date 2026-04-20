@@ -1,7 +1,10 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { getGlobalSettings } from '@/lib/content'
+
+type Locale = 'en' | 'es' | 'ru'
 
 const copy = {
   en: {
@@ -12,6 +15,9 @@ const copy = {
     cityText:
       'Primary service area for mobile lockout help, key replacement, programming, and urgent automotive locksmith support.',
     cta: 'View area page',
+    metaTitle: 'Service Areas in Philadelphia | Planetlocksmiths',
+    metaDescription:
+      'Mobile automotive locksmith coverage in Philadelphia, PA. Lockout help, key replacement, programming, and urgent automotive service.',
   },
   es: {
     title: 'Zonas de servicio',
@@ -21,6 +27,9 @@ const copy = {
     cityText:
       'Zona principal de servicio para aperturas, reemplazo de llaves, programación y ayuda automotriz urgente.',
     cta: 'Ver zona',
+    metaTitle: 'Zonas de servicio en Filadelfia | Planetlocksmiths',
+    metaDescription:
+      'Cobertura móvil de cerrajería automotriz en Filadelfia, PA. Aperturas, reemplazo de llaves, programación y ayuda urgente.',
   },
   ru: {
     title: 'Районы обслуживания',
@@ -30,6 +39,9 @@ const copy = {
     cityText:
       'Основная зона обслуживания для вскрытия авто, замены ключей, программирования и срочной мобильной помощи.',
     cta: 'Открыть страницу района',
+    metaTitle: 'Районы обслуживания в Филадельфии | Planetlocksmiths',
+    metaDescription:
+      'Покрытие мобильного автомобильного сервиса в Филадельфии, PA. Вскрытие авто, замена ключей, программирование и срочная помощь.',
   },
 } as const
 
@@ -37,10 +49,38 @@ export async function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'es' }, { locale: 'ru' }]
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const meta = copy[locale]
+
+  return {
+    title: meta.metaTitle,
+    description: meta.metaDescription,
+    alternates: {
+      canonical: `/${locale}/areas`,
+    },
+    openGraph: {
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+      url: `/${locale}/areas`,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+    },
+  }
+}
+
 export default async function ServiceAreasPage({
   params,
 }: {
-  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+  params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
   const global = getGlobalSettings()
