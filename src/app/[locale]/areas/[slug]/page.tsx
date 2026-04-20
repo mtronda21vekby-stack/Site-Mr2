@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { getGlobalSettings } from '@/lib/content'
@@ -62,16 +63,42 @@ const areaCopy: Record<
 
 export async function generateStaticParams() {
   const locales: Array<Locale> = ['en', 'es', 'ru']
-  const params: Array<{ locale: string; slug: string }> = []
-
-  for (const locale of locales) {
-    params.push({ locale, slug: 'philadelphia' })
-  }
-
-  return params
+  return locales.map((locale) => ({ locale, slug: 'philadelphia' }))
 }
 
 export const dynamicParams = false
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>
+}): Promise<Metadata> {
+  const { locale, slug } = await params
+  const area = areaCopy[locale]?.[slug]
+
+  const title = area?.title || 'Service Area'
+  const description =
+    area?.intro || 'Mobile automotive locksmith coverage information for Philadelphia.'
+
+  return {
+    title: `${title} | Planetlocksmiths`,
+    description,
+    alternates: {
+      canonical: `/${locale}/areas/${slug}`,
+    },
+    openGraph: {
+      title: `${title} | Planetlocksmiths`,
+      description,
+      url: `/${locale}/areas/${slug}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Planetlocksmiths`,
+      description,
+    },
+  }
+}
 
 export default async function AreaDetailPage({
   params,
@@ -80,7 +107,7 @@ export default async function AreaDetailPage({
 }) {
   const { locale, slug } = await params
   const global = getGlobalSettings()
-  const area = areaCopy[locale][slug]
+  const area = areaCopy[locale]?.[slug]
 
   return (
     <>
@@ -95,7 +122,7 @@ export default async function AreaDetailPage({
             <h1 className="mb-4 text-3xl font-heading font-semibold">{area.title}</h1>
             <p className="mb-8 max-w-3xl text-muted">{area.intro}</p>
 
-            <div className="mb-8 rounded-xl border border-line bg-surface p-6">
+            <div className="mb-8 rounded-2xl border border-line bg-surface p-6">
               <ul className="space-y-3 text-sm leading-6 text-muted">
                 {area.highlights.map((point) => (
                   <li key={point} className="flex gap-3">
