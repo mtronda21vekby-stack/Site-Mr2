@@ -22,11 +22,7 @@ export default async function ContactPage({
 
   return (
     <>
-      <Header
-        locale={locale}
-        phoneDisplay={global.phoneDisplay}
-        phonePrimary={global.phonePrimary}
-      />
+      <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
       <main className="flex flex-col">
         <ContactSection
           title={home.contactTitle}

@@ -10,7 +10,7 @@ export async function generateStaticParams() {
   ];
 }
 
-export default async function FaqPage({
+export default async function FAQPage({
   params,
 }: {
   params: Promise<{ locale: 'en' | 'es' | 'ru' }>;
@@ -20,13 +20,9 @@ export default async function FaqPage({
 
   return (
     <>
-      <Header
-        locale={locale}
-        phoneDisplay={global.phoneDisplay}
-        phonePrimary={global.phonePrimary}
-      />
-      <main className="mx-auto max-w-3xl px-4 py-16 text-text sm:px-6 lg:px-8">
-        <h1 className="mb-6 text-3xl font-heading font-semibold">FAQ</h1>
+      <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 text-text">
+        <h1 className="text-3xl font-heading font-semibold mb-6">FAQ</h1>
         <p>This frequently asked questions page is a placeholder. You can add your FAQ items here.</p>
       </main>
       <Footer locale={locale} />
