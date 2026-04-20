@@ -137,7 +137,7 @@ textarea:focus {
   }
 
   .premium-button-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3 text-sm font-medium text-text backdrop-blur-md;
+    @apply inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-medium text-text backdrop-blur-md;
   }
 
   .premium-button-secondary:hover {
