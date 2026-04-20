@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema'
+import ServiceSchema from '@/components/seo/ServiceSchema'
 import { getGlobalSettings, getHomeContent } from '@/lib/content'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -19,6 +21,7 @@ type ServiceContent = {
   ctaText: string
   ctaPrimary: string
   ctaSecondary: string
+  highlightsLabel: string
 }
 
 const content: Record<Locale, Record<string, ServiceContent>> = {
@@ -47,6 +50,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Call for urgent requests or send a service request with your location and vehicle details.',
       ctaPrimary: 'Call now',
       ctaSecondary: 'Request service',
+      highlightsLabel: 'Service highlights',
     },
     'car-key-replacement': {
       eyebrow: 'Mobile automotive locksmith',
@@ -72,6 +76,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Send the vehicle details with your location so the request can be reviewed accurately.',
       ctaPrimary: 'Call now',
       ctaSecondary: 'Request service',
+      highlightsLabel: 'Service highlights',
     },
     'key-programming': {
       eyebrow: 'Mobile automotive locksmith',
@@ -97,6 +102,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Send the vehicle information and the exact issue to speed up request review.',
       ctaPrimary: 'Call now',
       ctaSecondary: 'Request service',
+      highlightsLabel: 'Service highlights',
     },
     'key-fob-services': {
       eyebrow: 'Mobile automotive locksmith',
@@ -122,6 +128,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Include your vehicle information and a clear description of the issue.',
       ctaPrimary: 'Call now',
       ctaSecondary: 'Request service',
+      highlightsLabel: 'Service highlights',
     },
     'ignition-key-issues': {
       eyebrow: 'Mobile automotive locksmith',
@@ -147,6 +154,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Send the vehicle details and a short description of the problem for faster review.',
       ctaPrimary: 'Call now',
       ctaSecondary: 'Request service',
+      highlightsLabel: 'Service highlights',
     },
     'emergency-mobile-service': {
       eyebrow: 'Mobile automotive locksmith',
@@ -172,6 +180,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Call directly for urgent requests or send your details through the service form.',
       ctaPrimary: 'Call now',
       ctaSecondary: 'Request service',
+      highlightsLabel: 'Service highlights',
     },
   },
   es: {
@@ -199,6 +208,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Llama para solicitudes urgentes o envía tu ubicación y datos del vehículo.',
       ctaPrimary: 'Llamar ahora',
       ctaSecondary: 'Solicitar servicio',
+      highlightsLabel: 'Puntos clave del servicio',
     },
     'car-key-replacement': {
       eyebrow: 'Cerrajería automotriz móvil',
@@ -224,6 +234,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Envía los datos del vehículo y la ubicación para revisar correctamente la solicitud.',
       ctaPrimary: 'Llamar ahora',
       ctaSecondary: 'Solicitar servicio',
+      highlightsLabel: 'Puntos clave del servicio',
     },
     'key-programming': {
       eyebrow: 'Cerrajería automotriz móvil',
@@ -249,6 +260,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Comparte la información del vehículo y el problema exacto.',
       ctaPrimary: 'Llamar ahora',
       ctaSecondary: 'Solicitar servicio',
+      highlightsLabel: 'Puntos clave del servicio',
     },
     'key-fob-services': {
       eyebrow: 'Cerrajería automotriz móvil',
@@ -274,6 +286,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Envía la información del vehículo y una descripción clara del problema.',
       ctaPrimary: 'Llamar ahora',
       ctaSecondary: 'Solicitar servicio',
+      highlightsLabel: 'Puntos clave del servicio',
     },
     'ignition-key-issues': {
       eyebrow: 'Cerrajería automotriz móvil',
@@ -299,6 +312,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Comparte el problema y los datos del vehículo para revisar rápido el caso.',
       ctaPrimary: 'Llamar ahora',
       ctaSecondary: 'Solicitar servicio',
+      highlightsLabel: 'Puntos clave del servicio',
     },
     'emergency-mobile-service': {
       eyebrow: 'Cerrajería automotriz móvil',
@@ -324,6 +338,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Llama directamente o envía tu ubicación y datos del vehículo.',
       ctaPrimary: 'Llamar ahora',
       ctaSecondary: 'Solicitar servicio',
+      highlightsLabel: 'Puntos clave del servicio',
     },
   },
   ru: {
@@ -351,6 +366,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Для срочных заявок звони напрямую или отправь локацию и данные автомобиля.',
       ctaPrimary: 'Позвонить',
       ctaSecondary: 'Оставить заявку',
+      highlightsLabel: 'Ключевые преимущества',
     },
     'car-key-replacement': {
       eyebrow: 'Мобильный автомобильный сервис',
@@ -376,6 +392,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Отправь данные автомобиля и локацию, чтобы заявка была оценена быстрее.',
       ctaPrimary: 'Позвонить',
       ctaSecondary: 'Оставить заявку',
+      highlightsLabel: 'Ключевые преимущества',
     },
     'key-programming': {
       eyebrow: 'Мобильный автомобильный сервис',
@@ -401,6 +418,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Отправь точные данные автомобиля и короткое описание задачи.',
       ctaPrimary: 'Позвонить',
       ctaSecondary: 'Оставить заявку',
+      highlightsLabel: 'Ключевые преимущества',
     },
     'key-fob-services': {
       eyebrow: 'Мобильный автомобильный сервис',
@@ -426,6 +444,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Пришли данные автомобиля и ясное описание проблемы.',
       ctaPrimary: 'Позвонить',
       ctaSecondary: 'Оставить заявку',
+      highlightsLabel: 'Ключевые преимущества',
     },
     'ignition-key-issues': {
       eyebrow: 'Мобильный автомобильный сервис',
@@ -451,6 +470,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Отправь данные автомобиля и короткое описание проблемы.',
       ctaPrimary: 'Позвонить',
       ctaSecondary: 'Оставить заявку',
+      highlightsLabel: 'Ключевые преимущества',
     },
     'emergency-mobile-service': {
       eyebrow: 'Мобильный автомобильный сервис',
@@ -476,6 +496,7 @@ const content: Record<Locale, Record<string, ServiceContent>> = {
         'Звони напрямую или отправляй заявку с локацией и данными автомобиля.',
       ctaPrimary: 'Позвонить',
       ctaSecondary: 'Оставить заявку',
+      highlightsLabel: 'Ключевые преимущества',
     },
   },
 }
@@ -522,11 +543,20 @@ export async function generateMetadata({
       description,
       url: `/${locale}/services/${slug}`,
       type: 'article',
+      images: [
+        {
+          url: '/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: 'Planetlocksmiths',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${title} | Planetlocksmiths`,
       description,
+      images: ['/opengraph-image'],
     },
   }
 }
@@ -540,9 +570,29 @@ export default async function ServiceDetailPage({
   const global = getGlobalSettings()
   const page = content[locale]?.[slug]
   const fallback = getHomeContent(locale).featuredServices.find((item) => item.slug === slug)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+  const serviceUrl = `${siteUrl}/${locale}/services/${slug}`
 
   return (
     <>
+      {page ? (
+        <>
+          <BreadcrumbSchema
+            items={[
+              { name: 'Home', url: `${siteUrl}/${locale}` },
+              { name: 'Services', url: `${siteUrl}/${locale}/services` },
+              { name: page.title, url: serviceUrl },
+            ]}
+          />
+          <ServiceSchema
+            name={page.title}
+            description={page.intro}
+            url={serviceUrl}
+            areaServed="Philadelphia"
+          />
+        </>
+      ) : null}
+
       <Header
         locale={locale}
         phoneDisplay={global.phoneDisplay}
@@ -563,7 +613,7 @@ export default async function ServiceDetailPage({
 
             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
               <section className="rounded-2xl border border-line bg-surface p-6 md:p-8">
-                <h2 className="mb-5 text-xl font-semibold">Service highlights</h2>
+                <h2 className="mb-5 text-xl font-semibold">{page.highlightsLabel}</h2>
                 <ul className="space-y-4">
                   {page.bullets.map((bullet) => (
                     <li key={bullet} className="flex gap-3 text-sm leading-7 text-muted">
