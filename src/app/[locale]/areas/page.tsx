@@ -1,31 +1,76 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getGlobalSettings } from '@/lib/content';
+import Link from 'next/link'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import { getGlobalSettings } from '@/lib/content'
+
+const copy = {
+  en: {
+    title: 'Service Areas',
+    intro:
+      'Planetlocksmiths provides mobile automotive locksmith support across Philadelphia. Additional service areas can be added as the operation expands.',
+    cityTitle: 'Philadelphia, PA',
+    cityText:
+      'Primary service area for mobile lockout help, key replacement, programming, and urgent automotive locksmith support.',
+    cta: 'View area page',
+  },
+  es: {
+    title: 'Zonas de servicio',
+    intro:
+      'Planetlocksmiths ofrece servicio móvil de cerrajería automotriz en Filadelfia. Se pueden añadir más zonas en el futuro.',
+    cityTitle: 'Filadelfia, PA',
+    cityText:
+      'Zona principal de servicio para aperturas, reemplazo de llaves, programación y ayuda automotriz urgente.',
+    cta: 'Ver zona',
+  },
+  ru: {
+    title: 'Районы обслуживания',
+    intro:
+      'Planetlocksmiths оказывает мобильный автомобильный сервис по Филадельфии. В будущем можно добавить новые зоны.',
+    cityTitle: 'Филадельфия, PA',
+    cityText:
+      'Основная зона обслуживания для вскрытия авто, замены ключей, программирования и срочной мобильной помощи.',
+    cta: 'Открыть страницу района',
+  },
+} as const
 
 export async function generateStaticParams() {
-  return [
-    { locale: 'en' },
-    { locale: 'es' },
-    { locale: 'ru' },
-  ];
+  return [{ locale: 'en' }, { locale: 'es' }, { locale: 'ru' }]
 }
 
 export default async function ServiceAreasPage({
   params,
 }: {
-  params: Promise<{ locale: 'en' | 'es' | 'ru' }>;
+  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
 }) {
-  const { locale } = await params;
-  const global = getGlobalSettings();
+  const { locale } = await params
+  const global = getGlobalSettings()
+  const t = copy[locale]
 
   return (
     <>
-      <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
-      <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 text-text">
-        <h1 className="text-3xl font-heading font-semibold mb-6">Service Areas</h1>
-        <p>This page lists areas where we provide service. At launch, service is available across Philadelphia. More locations can be added here in the future.</p>
+      <Header
+        locale={locale}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
+      <main className="mx-auto max-w-5xl px-4 py-16 text-text sm:px-6 lg:px-8">
+        <h1 className="mb-4 text-3xl font-heading font-semibold">{t.title}</h1>
+        <p className="mb-8 max-w-3xl text-muted">{t.intro}</p>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <article className="rounded-xl border border-line bg-surface p-6">
+            <h2 className="mb-3 text-xl font-semibold text-text">{t.cityTitle}</h2>
+            <p className="mb-5 text-sm leading-6 text-muted">{t.cityText}</p>
+            <Link
+              href={`/${locale}/areas/philadelphia`}
+              className="text-sm font-medium text-accent-blue underline"
+            >
+              {t.cta}
+            </Link>
+          </article>
+        </div>
       </main>
       <Footer locale={locale} />
     </>
-  );
+  )
 }
