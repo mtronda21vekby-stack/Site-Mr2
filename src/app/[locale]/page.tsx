@@ -9,6 +9,8 @@ import ReviewsSection from '@/components/sections/ReviewsSection'
 import FaqSection from '@/components/sections/FaqSection'
 import ContactSection from '@/components/sections/ContactSection'
 import TrustStrip from '@/components/sections/TrustStrip'
+import LocalBusinessSchema from '@/components/seo/LocalBusinessSchema'
+import FAQSchema from '@/components/seo/FAQSchema'
 import { getGlobalSettings, getHomeContent, getReviews, getFaq } from '@/lib/content'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -64,11 +66,20 @@ export async function generateMetadata({
       description: meta.description,
       url: `/${locale}`,
       type: 'website',
+      images: [
+        {
+          url: '/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: 'Planetlocksmiths',
+        },
+      ],
     },
     twitter: {
       title: meta.title,
       description: meta.description,
       card: 'summary_large_image',
+      images: ['/opengraph-image'],
     },
   }
 }
@@ -86,6 +97,9 @@ export default async function LocaleHome({
 
   return (
     <>
+      <LocalBusinessSchema locale={locale} />
+      <FAQSchema items={faqs} />
+
       <Header
         locale={locale}
         phoneDisplay={global.phoneDisplay}
