@@ -17,8 +17,7 @@ export default function OpenGraphImage() {
           display: 'flex',
           position: 'relative',
           overflow: 'hidden',
-          background:
-            'linear-gradient(180deg, #05070B 0%, #0B1020 100%)',
+          background: 'linear-gradient(180deg, #05070B 0%, #0B1020 100%)',
           color: '#F5F7FB',
           fontFamily: 'Inter, sans-serif',
         }}
@@ -86,7 +85,7 @@ export default function OpenGraphImage() {
         >
           <div
             style={{
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
               borderRadius: 9999,
               border: '1px solid rgba(255,255,255,0.10)',
