@@ -1,10 +1,17 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema'
 import { getGlobalSettings } from '@/lib/content'
+
+type Locale = 'en' | 'es' | 'ru'
 
 const copy = {
   en: {
     title: 'Privacy Policy',
+    metaTitle: 'Privacy Policy | Planetlocksmiths',
+    metaDescription:
+      'Privacy policy for Planetlocksmiths, including how contact form and service request information may be used.',
     sections: [
       {
         heading: 'Information you submit',
@@ -26,6 +33,9 @@ const copy = {
   },
   es: {
     title: 'Política de privacidad',
+    metaTitle: 'Política de Privacidad | Planetlocksmiths',
+    metaDescription:
+      'Política de privacidad de Planetlocksmiths para solicitudes de servicio y datos enviados por formulario.',
     sections: [
       {
         heading: 'Información enviada',
@@ -47,6 +57,9 @@ const copy = {
   },
   ru: {
     title: 'Политика конфиденциальности',
+    metaTitle: 'Политика Конфиденциальности | Planetlocksmiths',
+    metaDescription:
+      'Политика конфиденциальности Planetlocksmiths для заявок на сервис и данных, отправленных через форму.',
     sections: [
       {
         heading: 'Какие данные вы отправляете',
@@ -72,33 +85,89 @@ export async function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'es' }, { locale: 'ru' }]
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const page = copy[locale]
+
+  return {
+    title: page.metaTitle,
+    description: page.metaDescription,
+    alternates: {
+      canonical: `/${locale}/privacy`,
+    },
+    openGraph: {
+      title: page.metaTitle,
+      description: page.metaDescription,
+      url: `/${locale}/privacy`,
+      type: 'website',
+      images: [
+        {
+          url: '/opengraph-image',
+          width: 1200,
+          height: 630,
+          alt: 'Planetlocksmiths',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: page.metaTitle,
+      description: page.metaDescription,
+      images: ['/opengraph-image'],
+    },
+  }
+}
+
 export default async function PrivacyPage({
   params,
 }: {
-  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+  params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
   const global = getGlobalSettings()
-  const t = copy[locale]
+  const page = copy[locale]
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
 
   return (
     <>
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: `${siteUrl}/${locale}` },
+          { name: page.title, url: `${siteUrl}/${locale}/privacy` },
+        ]}
+      />
+
       <Header
         locale={locale}
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
-      <main className="mx-auto max-w-4xl px-4 py-16 text-text sm:px-6 lg:px-8">
-        <h1 className="mb-8 text-3xl font-heading font-semibold">{t.title}</h1>
-        <div className="space-y-8">
-          {t.sections.map((section) => (
-            <section key={section.heading}>
-              <h2 className="mb-2 text-xl font-semibold text-text">{section.heading}</h2>
-              <p className="text-sm leading-7 text-muted">{section.body}</p>
-            </section>
-          ))}
+
+      <main className="bg-bg py-16 md:py-20">
+        <div className="section-frame">
+          <div className="premium-shell px-6 py-8 md:px-8 md:py-10">
+            <div className="max-w-4xl">
+              <p className="premium-label mb-4">Legal</p>
+              <h1 className="mb-8 text-3xl font-heading font-semibold text-text md:text-5xl">
+                {page.title}
+              </h1>
+              <div className="grid gap-5">
+                {page.sections.map((section) => (
+                  <section key={section.heading} className="premium-card-soft p-5">
+                    <h2 className="mb-2 text-lg font-semibold text-text">{section.heading}</h2>
+                    <p className="text-sm leading-7 text-muted">{section.body}</p>
+                  </section>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </main>
+
       <Footer locale={locale} />
     </>
   )
