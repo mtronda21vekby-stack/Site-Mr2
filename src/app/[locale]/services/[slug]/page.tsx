@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -495,6 +496,41 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>
+}): Promise<Metadata> {
+  const { locale, slug } = await params
+  const page = content[locale]?.[slug]
+  const fallback = getHomeContent(locale).featuredServices.find((item) => item.slug === slug)
+
+  const title = page?.title || fallback?.title || 'Automotive Locksmith Service'
+  const description =
+    page?.intro ||
+    fallback?.excerpt ||
+    'Mobile automotive locksmith support across Philadelphia.'
+
+  return {
+    title: `${title} | Planetlocksmiths`,
+    description,
+    alternates: {
+      canonical: `/${locale}/services/${slug}`,
+    },
+    openGraph: {
+      title: `${title} | Planetlocksmiths`,
+      description,
+      url: `/${locale}/services/${slug}`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Planetlocksmiths`,
+      description,
+    },
+  }
+}
+
 export default async function ServiceDetailPage({
   params,
 }: {
@@ -502,7 +538,7 @@ export default async function ServiceDetailPage({
 }) {
   const { locale, slug } = await params
   const global = getGlobalSettings()
-  const page = content[locale][slug]
+  const page = content[locale]?.[slug]
   const fallback = getHomeContent(locale).featuredServices.find((item) => item.slug === slug)
 
   return (
