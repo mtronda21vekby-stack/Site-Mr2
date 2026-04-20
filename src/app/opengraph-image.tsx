@@ -38,7 +38,7 @@ export default function OpenGraphImage() {
             top: 90,
             width: 340,
             height: 340,
-            borderRadius: '9999px',
+            borderRadius: 9999,
             background:
               'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.10), transparent 20%), linear-gradient(145deg, rgba(17,25,46,0.96), rgba(5,7,11,0.98))',
             boxShadow:
@@ -54,7 +54,7 @@ export default function OpenGraphImage() {
             top: 56,
             width: 408,
             height: 408,
-            borderRadius: '9999px',
+            borderRadius: 9999,
             border: '1px solid rgba(77,162,255,0.35)',
             transform: 'rotateX(70deg)',
           }}
@@ -67,7 +67,7 @@ export default function OpenGraphImage() {
             top: 82,
             width: 356,
             height: 356,
-            borderRadius: '9999px',
+            borderRadius: 9999,
             border: '1px solid rgba(45,226,230,0.18)',
             transform: 'rotateX(70deg) rotateZ(14deg)',
           }}
@@ -81,12 +81,14 @@ export default function OpenGraphImage() {
             justifyContent: 'center',
             padding: '72px 72px',
             width: '100%',
+            height: '100%',
           }}
         >
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
+              alignSelf: 'flex-start',
               borderRadius: 9999,
               border: '1px solid rgba(255,255,255,0.10)',
               background: 'rgba(255,255,255,0.04)',
@@ -97,7 +99,6 @@ export default function OpenGraphImage() {
               textTransform: 'uppercase',
               padding: '10px 18px',
               marginBottom: 28,
-              width: 'fit-content',
             }}
           >
             Mobile automotive locksmith
