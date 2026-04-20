@@ -1,237 +1,480 @@
+import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { getGlobalSettings, getHomeContent } from '@/lib/content'
 
 type Locale = 'en' | 'es' | 'ru'
 
-type ServiceCopy = {
+type ServiceContent = {
+  eyebrow: string
   title: string
   intro: string
-  points: string[]
-  closing: string
+  bullets: string[]
+  processTitle: string
+  process: string[]
+  noteTitle: string
+  note: string
+  ctaTitle: string
+  ctaText: string
+  ctaPrimary: string
+  ctaSecondary: string
 }
 
-const serviceCopy: Record<Locale, Record<string, ServiceCopy>> = {
+const content: Record<Locale, Record<string, ServiceContent>> = {
   en: {
     'car-lockout': {
-      title: 'Car Lockout Service',
+      eyebrow: 'Mobile automotive locksmith',
+      title: 'Car Lockout Service in Philadelphia',
       intro:
-        'Fast mobile help when your vehicle is locked and the key is not accessible.',
-      points: [
+        'Fast mobile help when your vehicle is locked and the key is not accessible. Planetlocksmiths handles lockout requests across Philadelphia with clear communication and mobile dispatch.',
+      bullets: [
         'Mobile response across Philadelphia.',
-        'Clear communication from request to arrival.',
-        'Support for urgent and same-day availability based on scheduling.',
+        'Urgent and same-day request handling based on availability.',
+        'Clear communication from intake to arrival.',
       ],
-      closing:
-        'If you are locked out and need mobile automotive help, contact Planetlocksmiths for service availability.',
+      processTitle: 'How this service usually works',
+      process: [
+        'You send your location, vehicle make/model, and the issue.',
+        'The request is reviewed and service availability is confirmed.',
+        'A mobile visit is arranged if the request fits current coverage and scheduling.',
+      ],
+      noteTitle: 'What helps us review faster',
+      note:
+        'Your exact location, vehicle make/model, and whether the key is inside the car or not.',
+      ctaTitle: 'Need mobile lockout help?',
+      ctaText:
+        'Call for urgent requests or send a service request with your location and vehicle details.',
+      ctaPrimary: 'Call now',
+      ctaSecondary: 'Request service',
     },
     'car-key-replacement': {
-      title: 'Car Key Replacement',
+      eyebrow: 'Mobile automotive locksmith',
+      title: 'Car Key Replacement in Philadelphia',
       intro:
-        'Replacement solutions for lost, broken, or damaged automotive keys.',
-      points: [
-        'Support for many common replacement scenarios.',
+        'Replacement solutions for lost, broken, or damaged car keys. Mobile service is available across Philadelphia depending on the vehicle and request type.',
+      bullets: [
+        'Support for lost and damaged key scenarios.',
         'Mobile service to your location.',
-        'Vehicle details help confirm service requirements before dispatch.',
+        'Vehicle details help confirm compatibility before dispatch.',
       ],
-      closing:
-        'If your key is lost or damaged, request service and include your vehicle make, model, and location.',
+      processTitle: 'How this service usually works',
+      process: [
+        'You submit your vehicle information and describe the key issue.',
+        'The request is reviewed for service fit and availability.',
+        'Mobile service is scheduled if the request can be handled on-site.',
+      ],
+      noteTitle: 'What helps us review faster',
+      note:
+        'Vehicle year, make, model, and whether you still have an existing working key.',
+      ctaTitle: 'Need a replacement key?',
+      ctaText:
+        'Send the vehicle details with your location so the request can be reviewed accurately.',
+      ctaPrimary: 'Call now',
+      ctaSecondary: 'Request service',
     },
     'key-programming': {
-      title: 'Key Programming',
+      eyebrow: 'Mobile automotive locksmith',
+      title: 'Car Key Programming in Philadelphia',
       intro:
-        'Programming support for many modern vehicle keys, remotes, and fobs.',
-      points: [
-        'Automotive-focused programming support.',
-        'Mobile service for compatible vehicles.',
-        'Same-day requests may be available depending on scheduling.',
+        'Programming support for many modern vehicle keys, remotes, and fobs. This service is mobile and focused on automotive requests across Philadelphia.',
+      bullets: [
+        'Support for many modern key and remote systems.',
+        'Mobile programming service for compatible vehicles.',
+        'Same-day availability may be possible depending on workload.',
       ],
-      closing:
-        'For programming requests, include your vehicle information so the job can be reviewed properly.',
+      processTitle: 'How this service usually works',
+      process: [
+        'You send the vehicle details and explain what needs programming.',
+        'Compatibility and service fit are reviewed.',
+        'A mobile service visit is arranged if supported.',
+      ],
+      noteTitle: 'What helps us review faster',
+      note:
+        'Vehicle year, make, model, and whether this is a new key, spare key, or fob issue.',
+      ctaTitle: 'Need programming support?',
+      ctaText:
+        'Send the vehicle information and the exact issue to speed up request review.',
+      ctaPrimary: 'Call now',
+      ctaSecondary: 'Request service',
     },
     'key-fob-services': {
-      title: 'Key Fob Services',
+      eyebrow: 'Mobile automotive locksmith',
+      title: 'Key Fob Services in Philadelphia',
       intro:
-        'Help with key fob access issues, replacement needs, and related support.',
-      points: [
-        'Mobile help for access-related fob issues.',
-        'Service based on vehicle type and request details.',
+        'Help with key fob access issues, replacement needs, and related automotive access support.',
+      bullets: [
+        'Mobile help for common fob-related access problems.',
         'Philadelphia coverage with mobile dispatch.',
+        'Request review depends on the vehicle and issue type.',
       ],
-      closing:
-        'If your key fob is not working correctly, send your vehicle details and the issue you are seeing.',
+      processTitle: 'How this service usually works',
+      process: [
+        'You describe the fob issue and provide vehicle details.',
+        'The request is reviewed for compatibility and availability.',
+        'Mobile service is arranged if the job fits current coverage.',
+      ],
+      noteTitle: 'What helps us review faster',
+      note:
+        'Whether the issue is battery-related, access-related, damage-related, or replacement-related.',
+      ctaTitle: 'Need key fob help?',
+      ctaText:
+        'Include your vehicle information and a clear description of the issue.',
+      ctaPrimary: 'Call now',
+      ctaSecondary: 'Request service',
     },
     'ignition-key-issues': {
-      title: 'Ignition Key Issues',
+      eyebrow: 'Mobile automotive locksmith',
+      title: 'Ignition Key Issues in Philadelphia',
       intro:
-        'Support for ignition-related key problems and access issues connected to the vehicle key system.',
-      points: [
-        'Review of common ignition-related key problems.',
-        'Mobile service where applicable.',
-        'Urgent service may be available depending on current load.',
+        'Support for ignition-related key problems and access issues tied to the vehicle key system.',
+      bullets: [
+        'Review of common ignition-related key issues.',
+        'Mobile service where the request fits field support.',
+        'Urgent service depends on current availability.',
       ],
-      closing:
-        'Describe the ignition issue and your vehicle details when requesting service so the case can be reviewed accurately.',
+      processTitle: 'How this service usually works',
+      process: [
+        'You describe the ignition issue and provide vehicle details.',
+        'The request is reviewed for field-service fit.',
+        'A mobile visit is scheduled if the case can be supported on-site.',
+      ],
+      noteTitle: 'What helps us review faster',
+      note:
+        'Tell us whether the key is stuck, not turning, damaged, or causing access/start issues.',
+      ctaTitle: 'Need help with ignition-related key issues?',
+      ctaText:
+        'Send the vehicle details and a short description of the problem for faster review.',
+      ctaPrimary: 'Call now',
+      ctaSecondary: 'Request service',
     },
     'emergency-mobile-service': {
-      title: 'Emergency Mobile Service',
+      eyebrow: 'Mobile automotive locksmith',
+      title: 'Emergency Mobile Locksmith Service in Philadelphia',
       intro:
-        '24/7 mobile response for urgent automotive key and lock situations.',
-      points: [
+        '24/7 mobile response for urgent automotive key and lock situations across Philadelphia.',
+      bullets: [
         'Urgent request intake available 24/7.',
-        'Mobile-only service across Philadelphia.',
-        'Same-day support may be available depending on demand.',
+        'Mobile-only support across Philadelphia.',
+        'Same-day help depends on active demand and routing.',
       ],
-      closing:
-        'For urgent help, call directly or submit your request with location and vehicle details.',
+      processTitle: 'How this service usually works',
+      process: [
+        'You call or submit an urgent request.',
+        'Location, vehicle details, and issue are reviewed immediately.',
+        'Mobile dispatch is arranged if service is available.',
+      ],
+      noteTitle: 'What helps us review faster',
+      note:
+        'Exact location, vehicle make/model, and whether this is a lockout, lost key, programming, or ignition-related issue.',
+      ctaTitle: 'Need urgent automotive help?',
+      ctaText:
+        'Call directly for urgent requests or send your details through the service form.',
+      ctaPrimary: 'Call now',
+      ctaSecondary: 'Request service',
     },
   },
   es: {
     'car-lockout': {
-      title: 'Apertura de auto',
+      eyebrow: 'Cerrajería automotriz móvil',
+      title: 'Apertura de auto en Filadelfia',
       intro:
         'Ayuda móvil rápida cuando el vehículo está cerrado y no tienes acceso a la llave.',
-      points: [
+      bullets: [
         'Respuesta móvil en Filadelfia.',
+        'Solicitudes urgentes y el mismo día según disponibilidad.',
         'Comunicación clara desde la solicitud hasta la llegada.',
-        'Atención urgente o el mismo día según agenda.',
       ],
-      closing:
-        'Si no puedes abrir tu auto, contacta a Planetlocksmiths para confirmar disponibilidad.',
+      processTitle: 'Cómo suele funcionar',
+      process: [
+        'Envías ubicación, marca/modelo del vehículo y el problema.',
+        'Se revisa la solicitud y la disponibilidad.',
+        'Se agenda la visita móvil si el caso encaja con la cobertura actual.',
+      ],
+      noteTitle: 'Qué ayuda a revisar más rápido',
+      note:
+        'Tu ubicación exacta, marca/modelo del vehículo y si la llave quedó dentro del auto.',
+      ctaTitle: '¿Necesitas ayuda para abrir tu auto?',
+      ctaText:
+        'Llama para solicitudes urgentes o envía tu ubicación y datos del vehículo.',
+      ctaPrimary: 'Llamar ahora',
+      ctaSecondary: 'Solicitar servicio',
     },
     'car-key-replacement': {
-      title: 'Reemplazo de llave de auto',
+      eyebrow: 'Cerrajería automotriz móvil',
+      title: 'Reemplazo de llave de auto en Filadelfia',
       intro:
-        'Soluciones para llaves automotrices perdidas, rotas o dañadas.',
-      points: [
+        'Soluciones para llaves perdidas, rotas o dañadas con servicio móvil según el vehículo y la solicitud.',
+      bullets: [
         'Soporte para escenarios comunes de reemplazo.',
         'Servicio móvil hasta tu ubicación.',
-        'Los datos del vehículo ayudan a validar el servicio antes del envío.',
+        'Los datos del vehículo ayudan a confirmar compatibilidad.',
       ],
-      closing:
-        'Si perdiste tu llave o está dañada, envía la marca, modelo y ubicación del vehículo.',
+      processTitle: 'Cómo suele funcionar',
+      process: [
+        'Envías la información del vehículo y el problema.',
+        'Se revisa compatibilidad y disponibilidad.',
+        'Se agenda visita móvil si el caso puede resolverse en sitio.',
+      ],
+      noteTitle: 'Qué ayuda a revisar más rápido',
+      note:
+        'Año, marca, modelo y si aún tienes una llave funcional.',
+      ctaTitle: '¿Necesitas reemplazo de llave?',
+      ctaText:
+        'Envía los datos del vehículo y la ubicación para revisar correctamente la solicitud.',
+      ctaPrimary: 'Llamar ahora',
+      ctaSecondary: 'Solicitar servicio',
     },
     'key-programming': {
-      title: 'Programación de llave',
+      eyebrow: 'Cerrajería automotriz móvil',
+      title: 'Programación de llave en Filadelfia',
       intro:
-        'Programación para muchas llaves, controles y fobs modernos.',
-      points: [
-        'Soporte enfocado en automóviles.',
+        'Programación para muchas llaves, controles y fobs modernos con servicio móvil automotriz.',
+      bullets: [
+        'Soporte para muchos sistemas modernos.',
         'Servicio móvil para vehículos compatibles.',
-        'Las solicitudes el mismo día dependen de disponibilidad.',
+        'La disponibilidad el mismo día depende de la carga de trabajo.',
       ],
-      closing:
-        'Para programación, incluye la información del vehículo para revisar el trabajo correctamente.',
+      processTitle: 'Cómo suele funcionar',
+      process: [
+        'Envías la información del vehículo y lo que necesitas programar.',
+        'Se revisa compatibilidad y alcance del trabajo.',
+        'Se agenda visita móvil si el vehículo es compatible.',
+      ],
+      noteTitle: 'Qué ayuda a revisar más rápido',
+      note:
+        'Año, marca, modelo y si se trata de una llave nueva, copia o problema de fob.',
+      ctaTitle: '¿Necesitas programación?',
+      ctaText:
+        'Comparte la información del vehículo y el problema exacto.',
+      ctaPrimary: 'Llamar ahora',
+      ctaSecondary: 'Solicitar servicio',
     },
     'key-fob-services': {
-      title: 'Servicios de key fob',
+      eyebrow: 'Cerrajería automotriz móvil',
+      title: 'Servicios de key fob en Filadelfia',
       intro:
-        'Ayuda con problemas de acceso, reemplazo y soporte relacionado con key fobs.',
-      points: [
-        'Asistencia móvil para problemas de acceso.',
-        'Servicio según tipo de vehículo y detalles de la solicitud.',
-        'Cobertura móvil en Filadelfia.',
+        'Ayuda con problemas de acceso, reemplazo y soporte relacionado con key fobs automotrices.',
+      bullets: [
+        'Ayuda móvil para problemas comunes de acceso.',
+        'Cobertura en Filadelfia.',
+        'La solicitud se revisa según vehículo y tipo de problema.',
       ],
-      closing:
-        'Si tu key fob no funciona bien, comparte los datos del vehículo y el problema exacto.',
+      processTitle: 'Cómo suele funcionar',
+      process: [
+        'Describes el problema y compartes los datos del vehículo.',
+        'Se revisa compatibilidad y disponibilidad.',
+        'Se agenda visita móvil si aplica.',
+      ],
+      noteTitle: 'Qué ayuda a revisar más rápido',
+      note:
+        'Aclarar si el problema es de acceso, daño, batería o reemplazo.',
+      ctaTitle: '¿Necesitas ayuda con tu key fob?',
+      ctaText:
+        'Envía la información del vehículo y una descripción clara del problema.',
+      ctaPrimary: 'Llamar ahora',
+      ctaSecondary: 'Solicitar servicio',
     },
     'ignition-key-issues': {
-      title: 'Problemas con llave de encendido',
+      eyebrow: 'Cerrajería automotriz móvil',
+      title: 'Problemas con llave de encendido en Filadelfia',
       intro:
         'Soporte para problemas de llave relacionados con encendido y acceso del vehículo.',
-      points: [
+      bullets: [
         'Revisión de problemas comunes relacionados con encendido.',
         'Servicio móvil cuando aplica.',
-        'La atención urgente depende de la carga de trabajo.',
+        'La atención urgente depende de disponibilidad.',
       ],
-      closing:
-        'Describe el problema de encendido y los datos del vehículo al solicitar servicio.',
+      processTitle: 'Cómo suele funcionar',
+      process: [
+        'Explicas el problema y compartes los datos del vehículo.',
+        'Se revisa si el caso puede atenderse en campo.',
+        'Se agenda visita si la solicitud encaja con el servicio.',
+      ],
+      noteTitle: 'Qué ayuda a revisar más rápido',
+      note:
+        'Indica si la llave no gira, se queda atascada, está dañada o causa problemas de arranque.',
+      ctaTitle: '¿Necesitas ayuda con la llave de encendido?',
+      ctaText:
+        'Comparte el problema y los datos del vehículo para revisar rápido el caso.',
+      ctaPrimary: 'Llamar ahora',
+      ctaSecondary: 'Solicitar servicio',
     },
     'emergency-mobile-service': {
-      title: 'Servicio móvil urgente',
+      eyebrow: 'Cerrajería automotriz móvil',
+      title: 'Servicio móvil urgente en Filadelfia',
       intro:
-        'Respuesta móvil 24/7 para situaciones urgentes relacionadas con llaves y cerraduras automotrices.',
-      points: [
+        'Respuesta móvil 24/7 para situaciones urgentes con llaves y cerraduras automotrices.',
+      bullets: [
         'Recepción de solicitudes urgentes 24/7.',
         'Servicio solo móvil en Filadelfia.',
-        'Apoyo el mismo día según demanda.',
+        'La ayuda el mismo día depende de la demanda activa.',
       ],
-      closing:
-        'Para ayuda urgente, llama directamente o envía la ubicación y los datos del vehículo.',
+      processTitle: 'Cómo suele funcionar',
+      process: [
+        'Llamas o envías una solicitud urgente.',
+        'Se revisan ubicación, vehículo y problema.',
+        'Se organiza el envío móvil si hay disponibilidad.',
+      ],
+      noteTitle: 'Qué ayuda a revisar más rápido',
+      note:
+        'Ubicación exacta, marca/modelo del vehículo y tipo de problema principal.',
+      ctaTitle: '¿Necesitas ayuda urgente?',
+      ctaText:
+        'Llama directamente o envía tu ubicación y datos del vehículo.',
+      ctaPrimary: 'Llamar ahora',
+      ctaSecondary: 'Solicitar servicio',
     },
   },
   ru: {
     'car-lockout': {
-      title: 'Открытие автомобиля',
+      eyebrow: 'Мобильный автомобильный сервис',
+      title: 'Открытие автомобиля в Филадельфии',
       intro:
         'Быстрая мобильная помощь, когда автомобиль закрыт и доступа к ключу нет.',
-      points: [
+      bullets: [
         'Выезд по Филадельфии.',
+        'Срочные и same-day заявки по возможности.',
         'Понятная коммуникация от заявки до приезда.',
-        'Срочные и same-day заявки — по расписанию и загрузке.',
       ],
-      closing:
-        'Если машина закрыта и нужен выездной сервис, свяжись с Planetlocksmiths для подтверждения доступности.',
+      processTitle: 'Как обычно проходит услуга',
+      process: [
+        'Ты отправляешь локацию, марку/модель и описание проблемы.',
+        'Заявка проверяется по доступности и типу работ.',
+        'Если сервис подходит, согласовывается мобильный выезд.',
+      ],
+      noteTitle: 'Что помогает быстрее принять заявку',
+      note:
+        'Точная локация, марка/модель автомобиля и информация о том, внутри ли ключ.',
+      ctaTitle: 'Нужно открыть машину?',
+      ctaText:
+        'Для срочных заявок звони напрямую или отправь локацию и данные автомобиля.',
+      ctaPrimary: 'Позвонить',
+      ctaSecondary: 'Оставить заявку',
     },
     'car-key-replacement': {
-      title: 'Замена ключа автомобиля',
+      eyebrow: 'Мобильный автомобильный сервис',
+      title: 'Замена ключа автомобиля в Филадельфии',
       intro:
-        'Решения для утерянных, сломанных или поврежденных автомобильных ключей.',
-      points: [
+        'Решения для утерянных, сломанных или поврежденных ключей с выездным сервисом по Филадельфии.',
+      bullets: [
         'Поддержка типовых сценариев замены.',
-        'Мобильный выезд к клиенту.',
-        'Данные автомобиля помогают заранее оценить заявку.',
+        'Выезд к клиенту.',
+        'Данные автомобиля помогают заранее понять совместимость.',
       ],
-      closing:
-        'Если ключ потерян или поврежден, отправь марку, модель и локацию автомобиля.',
+      processTitle: 'Как обычно проходит услуга',
+      process: [
+        'Ты отправляешь информацию по автомобилю и описываешь проблему.',
+        'Проверяется доступность и применимость сервиса.',
+        'Если задача подходит, согласовывается выезд.',
+      ],
+      noteTitle: 'Что помогает быстрее принять заявку',
+      note:
+        'Год, марка, модель и наличие рабочего ключа, если он есть.',
+      ctaTitle: 'Нужна замена ключа?',
+      ctaText:
+        'Отправь данные автомобиля и локацию, чтобы заявка была оценена быстрее.',
+      ctaPrimary: 'Позвонить',
+      ctaSecondary: 'Оставить заявку',
     },
     'key-programming': {
-      title: 'Программирование ключа',
+      eyebrow: 'Мобильный автомобильный сервис',
+      title: 'Программирование ключа в Филадельфии',
       intro:
-        'Поддержка программирования для многих современных ключей, пультов и брелоков.',
-      points: [
-        'Фокус на автомобильных ключах.',
+        'Поддержка программирования для современных ключей, брелоков и пультов с выездом по Филадельфии.',
+      bullets: [
+        'Работа с современными автомобильными системами.',
         'Выездной сервис для совместимых автомобилей.',
-        'Same-day заявки возможны по загрузке.',
+        'Same-day заявки — по текущей загрузке.',
       ],
-      closing:
-        'Для программирования укажи данные автомобиля, чтобы заявка была оценена корректно.',
+      processTitle: 'Как обычно проходит услуга',
+      process: [
+        'Ты присылаешь данные автомобиля и суть задачи.',
+        'Проверяется совместимость и формат работы.',
+        'При подтверждении согласовывается выезд.',
+      ],
+      noteTitle: 'Что помогает быстрее принять заявку',
+      note:
+        'Год, марка, модель и уточнение: новый ключ, запасной ключ или проблема с брелоком.',
+      ctaTitle: 'Нужно программирование?',
+      ctaText:
+        'Отправь точные данные автомобиля и короткое описание задачи.',
+      ctaPrimary: 'Позвонить',
+      ctaSecondary: 'Оставить заявку',
     },
     'key-fob-services': {
-      title: 'Услуги по брелокам',
+      eyebrow: 'Мобильный автомобильный сервис',
+      title: 'Услуги по брелокам в Филадельфии',
       intro:
-        'Помощь с проблемами доступа, заменой и сопутствующими задачами по key fob.',
-      points: [
-        'Выездная помощь при проблемах с доступом.',
-        'Сервис зависит от автомобиля и деталей заявки.',
+        'Помощь с проблемами доступа, заменой и задачами, связанными с автомобильными брелоками.',
+      bullets: [
+        'Выездная помощь по типовым проблемам с доступом.',
         'Покрытие по Филадельфии.',
+        'Заявка рассматривается по автомобилю и типу проблемы.',
       ],
-      closing:
-        'Если брелок работает некорректно, отправь информацию по автомобилю и описание проблемы.',
+      processTitle: 'Как обычно проходит услуга',
+      process: [
+        'Ты описываешь проблему и указываешь данные автомобиля.',
+        'Проверяется совместимость и доступность сервиса.',
+        'Если кейс подходит, согласовывается выезд.',
+      ],
+      noteTitle: 'Что помогает быстрее принять заявку',
+      note:
+        'Уточни, это проблема доступа, повреждения, батарейки или замены брелока.',
+      ctaTitle: 'Нужна помощь с брелоком?',
+      ctaText:
+        'Пришли данные автомобиля и ясное описание проблемы.',
+      ctaPrimary: 'Позвонить',
+      ctaSecondary: 'Оставить заявку',
     },
     'ignition-key-issues': {
-      title: 'Проблемы с ключом зажигания',
+      eyebrow: 'Мобильный автомобильный сервис',
+      title: 'Проблемы с ключом зажигания в Филадельфии',
       intro:
         'Помощь при проблемах с ключом, связанным с зажиганием и доступом автомобиля.',
-      points: [
+      bullets: [
         'Разбор типовых проблем с зажиганием.',
-        'Выездной сервис там, где это применимо.',
-        'Срочные заявки зависят от текущей загрузки.',
+        'Выездной сервис там, где это возможно.',
+        'Срочный сервис зависит от текущей загрузки.',
       ],
-      closing:
-        'При обращении опиши проблему с зажиганием и укажи данные автомобиля.',
+      processTitle: 'Как обычно проходит услуга',
+      process: [
+        'Ты описываешь проблему и отправляешь данные автомобиля.',
+        'Проверяется, подходит ли кейс под выездной формат.',
+        'Если подходит, согласовывается выезд.',
+      ],
+      noteTitle: 'Что помогает быстрее принять заявку',
+      note:
+        'Напиши, если ключ застрял, не проворачивается, поврежден или вызывает проблемы запуска.',
+      ctaTitle: 'Нужна помощь с ключом зажигания?',
+      ctaText:
+        'Отправь данные автомобиля и короткое описание проблемы.',
+      ctaPrimary: 'Позвонить',
+      ctaSecondary: 'Оставить заявку',
     },
     'emergency-mobile-service': {
-      title: 'Срочный мобильный сервис',
+      eyebrow: 'Мобильный автомобильный сервис',
+      title: 'Срочный мобильный сервис в Филадельфии',
       intro:
         'Мобильный ответ 24/7 для срочных ситуаций с автомобильными ключами и замками.',
-      points: [
-        'Прием срочных обращений 24/7.',
-        'Только выездной сервис по Филадельфии.',
-        'Same-day поддержка возможна по нагрузке.',
+      bullets: [
+        'Прием срочных заявок 24/7.',
+        'Только выездной формат по Филадельфии.',
+        'Same-day помощь зависит от текущего спроса.',
       ],
-      closing:
-        'Для срочной помощи звони напрямую или отправляй заявку с локацией и данными автомобиля.',
+      processTitle: 'Как обычно проходит услуга',
+      process: [
+        'Ты звонишь или отправляешь срочную заявку.',
+        'Проверяются локация, автомобиль и суть проблемы.',
+        'Если доступно, организуется мобильный выезд.',
+      ],
+      noteTitle: 'Что помогает быстрее принять заявку',
+      note:
+        'Точная локация, марка/модель автомобиля и тип основной проблемы.',
+      ctaTitle: 'Нужна срочная помощь?',
+      ctaText:
+        'Звони напрямую или отправляй заявку с локацией и данными автомобиля.',
+      ctaPrimary: 'Позвонить',
+      ctaSecondary: 'Оставить заявку',
     },
   },
 }
@@ -259,9 +502,8 @@ export default async function ServiceDetailPage({
 }) {
   const { locale, slug } = await params
   const global = getGlobalSettings()
-  const home = getHomeContent(locale)
-  const fallback = home.featuredServices.find((s) => s.slug === slug)
-  const content = serviceCopy[locale][slug]
+  const page = content[locale][slug]
+  const fallback = getHomeContent(locale).featuredServices.find((item) => item.slug === slug)
 
   return (
     <>
@@ -270,24 +512,70 @@ export default async function ServiceDetailPage({
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
-      <main className="mx-auto max-w-4xl px-4 py-16 text-text sm:px-6 lg:px-8">
-        {content ? (
+      <main className="mx-auto max-w-6xl px-4 py-16 text-text sm:px-6 lg:px-8">
+        {page ? (
           <>
-            <h1 className="mb-4 text-3xl font-heading font-semibold">{content.title}</h1>
-            <p className="mb-8 max-w-3xl text-muted">{content.intro}</p>
-
-            <div className="mb-8 rounded-xl border border-line bg-surface p-6">
-              <ul className="space-y-3 text-sm leading-6 text-muted">
-                {content.points.map((point) => (
-                  <li key={point} className="flex gap-3">
-                    <span className="mt-2 h-2 w-2 rounded-full bg-accent-blue" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="mb-10 max-w-4xl">
+              <p className="mb-3 text-xs uppercase tracking-[0.24em] text-accent-cyan">
+                {page.eyebrow}
+              </p>
+              <h1 className="mb-4 text-3xl font-heading font-semibold md:text-5xl">
+                {page.title}
+              </h1>
+              <p className="max-w-3xl text-base leading-7 text-muted">{page.intro}</p>
             </div>
 
-            <p className="text-sm leading-7 text-muted">{content.closing}</p>
+            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+              <section className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+                <h2 className="mb-5 text-xl font-semibold">Service highlights</h2>
+                <ul className="space-y-4">
+                  {page.bullets.map((bullet) => (
+                    <li key={bullet} className="flex gap-3 text-sm leading-7 text-muted">
+                      <span className="mt-2 h-2 w-2 rounded-full bg-accent-blue" />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="rounded-2xl border border-line bg-surface-2 p-6 md:p-8">
+                <h2 className="mb-5 text-xl font-semibold">{page.processTitle}</h2>
+                <ol className="space-y-4">
+                  {page.process.map((step, index) => (
+                    <li key={step} className="flex gap-4">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line text-sm text-text">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm leading-7 text-muted">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </div>
+
+            <section className="mt-8 rounded-2xl border border-line bg-surface p-6 md:p-8">
+              <h2 className="mb-3 text-xl font-semibold">{page.noteTitle}</h2>
+              <p className="text-sm leading-7 text-muted">{page.note}</p>
+            </section>
+
+            <section className="mt-8 rounded-2xl border border-accent-blue/30 bg-gradient-to-br from-surface to-surface-2 p-6 md:p-8">
+              <h2 className="mb-3 text-2xl font-heading font-semibold">{page.ctaTitle}</h2>
+              <p className="mb-6 max-w-2xl text-sm leading-7 text-muted">{page.ctaText}</p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={`tel:${global.phonePrimary}`}
+                  className="rounded-full bg-accent-blue px-6 py-3 text-center text-sm font-medium text-black transition-colors hover:brightness-110"
+                >
+                  {page.ctaPrimary}
+                </a>
+                <Link
+                  href={`/${locale}/contact`}
+                  className="rounded-full border border-line px-6 py-3 text-center text-sm text-text transition-colors hover:bg-white/5"
+                >
+                  {page.ctaSecondary}
+                </Link>
+              </div>
+            </section>
           </>
         ) : fallback ? (
           <>
