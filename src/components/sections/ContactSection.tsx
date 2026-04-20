@@ -199,169 +199,180 @@ export default function ContactSection({
   }
 
   return (
-    <section className="bg-surface py-16">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-        <div className="rounded-2xl border border-line bg-surface-2 p-6 md:p-8">
-          <h2 className="mb-4 text-2xl font-heading font-semibold text-text">{title}</h2>
-          <p className="mb-6 text-sm leading-7 text-muted">{text}</p>
+    <section className="bg-surface/30 py-18 md:py-24">
+      <div className="section-frame">
+        <div className="premium-shell overflow-hidden px-6 py-8 md:px-8 md:py-10">
+          <div className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr]">
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.025] p-6 md:p-8">
+              <p className="premium-label mb-4">Request intake</p>
+              <h2 className="mb-4 text-3xl font-heading font-semibold text-text">{title}</h2>
+              <p className="mb-6 text-sm leading-7 text-muted">{text}</p>
 
-          <div className="space-y-4">
-            <div className="rounded-xl border border-line bg-bg p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-accent-cyan">Direct call</p>
-              <a
-                href={`tel:${phoneNumber}`}
-                className="mt-2 block text-lg font-semibold text-text"
-              >
-                {phoneDisplay}
-              </a>
+              <div className="space-y-4">
+                <div className="premium-card-soft p-4">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-accent-cyan">
+                    Direct call
+                  </p>
+                  <a
+                    href={`tel:${phoneNumber}`}
+                    className="mt-2 block text-xl font-semibold text-text"
+                  >
+                    {phoneDisplay}
+                  </a>
+                </div>
+
+                <div className="premium-card-soft p-4">
+                  <p className="text-sm leading-7 text-muted">{t.labels.trust}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-xl border border-line bg-bg p-4">
-              <p className="text-sm text-muted">{t.labels.trust}</p>
-            </div>
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-[28px] border border-white/10 bg-white/[0.02] p-6 md:p-8"
+            >
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="flex flex-col">
+                  <label htmlFor="name" className="mb-1 text-xs font-medium text-muted">
+                    {t.labels.name} <span className="text-muted">({t.labels.optional})</span>
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-text placeholder:text-muted"
+                    placeholder={t.placeholders.name}
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="phone" className="mb-1 text-xs font-medium text-muted">
+                    {t.labels.phone} <span className="text-danger-soft">*</span>
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-text placeholder:text-muted"
+                    placeholder={t.placeholders.phone}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col sm:col-span-2">
+                  <label htmlFor="service" className="mb-1 text-xs font-medium text-muted">
+                    {t.labels.service} <span className="text-danger-soft">*</span>
+                  </label>
+                  <select
+                    id="service"
+                    name="service"
+                    value={formData.service}
+                    onChange={handleChange}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-text"
+                    required
+                  >
+                    <option value="">—</option>
+                    {serviceOptions.map((service) => (
+                      <option key={service} value={service}>
+                        {service}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="vehicle" className="mb-1 text-xs font-medium text-muted">
+                    {t.labels.vehicle}
+                  </label>
+                  <input
+                    id="vehicle"
+                    name="vehicle"
+                    type="text"
+                    value={formData.vehicle}
+                    onChange={handleChange}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-text placeholder:text-muted"
+                    placeholder={t.placeholders.vehicle}
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="location" className="mb-1 text-xs font-medium text-muted">
+                    {t.labels.location}
+                  </label>
+                  <input
+                    id="location"
+                    name="location"
+                    type="text"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-text placeholder:text-muted"
+                    placeholder={t.placeholders.location}
+                  />
+                </div>
+
+                <div className="flex flex-col sm:col-span-2">
+                  <label htmlFor="message" className="mb-1 text-xs font-medium text-muted">
+                    {t.labels.message}
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={5}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-text placeholder:text-muted"
+                    placeholder={t.placeholders.message}
+                  />
+                </div>
+
+                <div className="hidden">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    value={formData.website}
+                    onChange={handleChange}
+                    autoComplete="off"
+                    tabIndex={-1}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2 sm:col-span-2 sm:flex-row">
+                  <button
+                    type="submit"
+                    disabled={status === 'submitting'}
+                    className="premium-button-primary"
+                  >
+                    {status === 'submitting' ? t.labels.submitting : t.labels.submit}
+                  </button>
+                  <a
+                    href={`tel:${phoneNumber}`}
+                    className="premium-button-secondary"
+                  >
+                    {t.labels.call} {phoneDisplay}
+                  </a>
+                </div>
+
+                {status === 'success' && (
+                  <p className="pt-2 text-sm text-accent-gold sm:col-span-2">
+                    {t.labels.success}
+                  </p>
+                )}
+
+                {errorMessage && (
+                  <p className="pt-2 text-sm text-danger-soft sm:col-span-2">
+                    {errorMessage}
+                  </p>
+                )}
+              </div>
+            </form>
           </div>
         </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border border-line bg-bg p-6 md:p-8"
-        >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col">
-              <label htmlFor="name" className="mb-1 text-xs font-medium text-muted">
-                {t.labels.name} <span className="text-muted">({t.labels.optional})</span>
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={formData.name}
-                onChange={handleChange}
-                className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none"
-                placeholder={t.placeholders.name}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="phone" className="mb-1 text-xs font-medium text-muted">
-                {t.labels.phone} <span className="text-danger-soft">*</span>
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none"
-                placeholder={t.placeholders.phone}
-                required
-              />
-            </div>
-
-            <div className="flex flex-col sm:col-span-2">
-              <label htmlFor="service" className="mb-1 text-xs font-medium text-muted">
-                {t.labels.service} <span className="text-danger-soft">*</span>
-              </label>
-              <select
-                id="service"
-                name="service"
-                value={formData.service}
-                onChange={handleChange}
-                className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-text focus:border-accent-blue focus:outline-none"
-                required
-              >
-                <option value="">—</option>
-                {serviceOptions.map((service) => (
-                  <option key={service} value={service}>
-                    {service}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="vehicle" className="mb-1 text-xs font-medium text-muted">
-                {t.labels.vehicle}
-              </label>
-              <input
-                id="vehicle"
-                name="vehicle"
-                type="text"
-                value={formData.vehicle}
-                onChange={handleChange}
-                className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none"
-                placeholder={t.placeholders.vehicle}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label htmlFor="location" className="mb-1 text-xs font-medium text-muted">
-                {t.labels.location}
-              </label>
-              <input
-                id="location"
-                name="location"
-                type="text"
-                value={formData.location}
-                onChange={handleChange}
-                className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none"
-                placeholder={t.placeholders.location}
-              />
-            </div>
-
-            <div className="flex flex-col sm:col-span-2">
-              <label htmlFor="message" className="mb-1 text-xs font-medium text-muted">
-                {t.labels.message}
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows={5}
-                className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none"
-                placeholder={t.placeholders.message}
-              />
-            </div>
-
-            <div className="hidden">
-              <label htmlFor="website">Website</label>
-              <input
-                id="website"
-                name="website"
-                type="text"
-                value={formData.website}
-                onChange={handleChange}
-                autoComplete="off"
-                tabIndex={-1}
-              />
-            </div>
-
-            <div className="flex flex-col gap-3 pt-2 sm:col-span-2 sm:flex-row">
-              <button
-                type="submit"
-                disabled={status === 'submitting'}
-                className="rounded-full bg-accent-blue px-6 py-3 text-sm font-semibold text-black transition hover:brightness-110 disabled:opacity-60"
-              >
-                {status === 'submitting' ? t.labels.submitting : t.labels.submit}
-              </button>
-              <a
-                href={`tel:${phoneNumber}`}
-                className="rounded-full border border-line px-6 py-3 text-center text-sm font-medium text-text transition hover:bg-white/5"
-              >
-                {t.labels.call} {phoneDisplay}
-              </a>
-            </div>
-
-            {status === 'success' && (
-              <p className="pt-2 text-sm text-accent-gold sm:col-span-2">{t.labels.success}</p>
-            )}
-
-            {errorMessage && (
-              <p className="pt-2 text-sm text-danger-soft sm:col-span-2">{errorMessage}</p>
-            )}
-          </div>
-        </form>
       </div>
     </section>
   )
