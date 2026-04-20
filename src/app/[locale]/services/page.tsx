@@ -1,7 +1,10 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { getGlobalSettings, getHomeContent } from '@/lib/content'
+
+type Locale = 'en' | 'es' | 'ru'
 
 const copy = {
   en: {
@@ -9,18 +12,27 @@ const copy = {
     intro:
       'Planetlocksmiths provides mobile automotive locksmith support across Philadelphia, including lockout help, key replacement, programming, and urgent mobile response.',
     cta: 'Learn more',
+    metaTitle: 'Automotive Locksmith Services in Philadelphia | Planetlocksmiths',
+    metaDescription:
+      'Mobile automotive locksmith services in Philadelphia, including car lockout help, key replacement, key programming, and urgent mobile service.',
   },
   es: {
     title: 'Servicios de cerrajería automotriz',
     intro:
       'Planetlocksmiths ofrece servicio móvil de cerrajería automotriz en Filadelfia, incluyendo aperturas, reemplazo de llaves, programación y asistencia urgente.',
     cta: 'Ver más',
+    metaTitle: 'Servicios de cerrajería automotriz en Filadelfia | Planetlocksmiths',
+    metaDescription:
+      'Servicios móviles de cerrajería automotriz en Filadelfia: aperturas, reemplazo de llaves, programación y asistencia urgente.',
   },
   ru: {
     title: 'Автомобильные ключные услуги',
     intro:
       'Planetlocksmiths оказывает мобильные автомобильные ключные услуги по Филадельфии: вскрытие авто, замена ключей, программирование и срочный выезд.',
     cta: 'Подробнее',
+    metaTitle: 'Автомобильные ключные услуги в Филадельфии | Planetlocksmiths',
+    metaDescription:
+      'Мобильные автомобильные ключные услуги в Филадельфии: вскрытие авто, замена ключей, программирование и срочная помощь.',
   },
 } as const
 
@@ -28,10 +40,38 @@ export async function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'es' }, { locale: 'ru' }]
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const meta = copy[locale]
+
+  return {
+    title: meta.metaTitle,
+    description: meta.metaDescription,
+    alternates: {
+      canonical: `/${locale}/services`,
+    },
+    openGraph: {
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+      url: `/${locale}/services`,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: meta.metaTitle,
+      description: meta.metaDescription,
+    },
+  }
+}
+
 export default async function ServicesPage({
   params,
 }: {
-  params: Promise<{ locale: 'en' | 'es' | 'ru' }>
+  params: Promise<{ locale: Locale }>
 }) {
   const { locale } = await params
   const global = getGlobalSettings()
