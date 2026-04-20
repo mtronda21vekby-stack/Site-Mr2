@@ -1,14 +1,27 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'),
-  title: 'Planetlocksmiths',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'Planetlocksmiths',
+    template: '%s',
+  },
   description: 'Mobile automotive locksmith service across Philadelphia, PA.',
+  applicationName: 'Planetlocksmiths',
+  authors: [{ name: 'Planetlocksmiths' }],
+  creator: 'Planetlocksmiths',
+  publisher: 'Planetlocksmiths',
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title: 'Planetlocksmiths',
     description: 'Mobile automotive locksmith service across Philadelphia, PA.',
-    url: '/',
+    url: siteUrl,
     siteName: 'Planetlocksmiths',
     type: 'website',
   },
@@ -19,6 +32,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
   },
 }
 
