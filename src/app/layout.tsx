@@ -24,11 +24,20 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Planetlocksmiths',
     type: 'website',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Planetlocksmiths',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Planetlocksmiths',
     description: 'Mobile automotive locksmith service across Philadelphia, PA.',
+    images: ['/opengraph-image'],
   },
   icons: {
     icon: '/favicon.ico',
