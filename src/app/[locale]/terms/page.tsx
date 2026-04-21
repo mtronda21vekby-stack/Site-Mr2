@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema'
 import { getGlobalSettings } from '@/lib/content'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -9,9 +8,6 @@ type Locale = 'en' | 'es' | 'ru'
 const copy = {
   en: {
     title: 'Terms of Service',
-    metaTitle: 'Terms of Service | Planetlocksmiths',
-    metaDescription:
-      'Terms of service for Planetlocksmiths mobile automotive locksmith support in Philadelphia.',
     sections: [
       {
         heading: 'Service scope',
@@ -30,12 +26,12 @@ const copy = {
         body: 'The customer is responsible for providing accurate contact information, service location, and vehicle details needed to review the request.',
       },
     ],
+    metaTitle: 'Terms of Service | Planetlocksmiths',
+    metaDescription:
+      'Terms of service for Planetlocksmiths mobile automotive locksmith website and service request intake.',
   },
   es: {
     title: 'Términos del servicio',
-    metaTitle: 'Términos del Servicio | Planetlocksmiths',
-    metaDescription:
-      'Términos del servicio de Planetlocksmiths para soporte móvil de cerrajería automotriz en Filadelfia.',
     sections: [
       {
         heading: 'Alcance del servicio',
@@ -54,12 +50,12 @@ const copy = {
         body: 'El cliente debe proporcionar información de contacto, ubicación y datos del vehículo correctos para revisar la solicitud.',
       },
     ],
+    metaTitle: 'Términos del servicio | Planetlocksmiths',
+    metaDescription:
+      'Términos del servicio para el sitio y las solicitudes de Planetlocksmiths.',
   },
   ru: {
     title: 'Условия сервиса',
-    metaTitle: 'Условия Сервиса | Planetlocksmiths',
-    metaDescription:
-      'Условия сервиса Planetlocksmiths для мобильной автомобильной ключной помощи в Филадельфии.',
     sections: [
       {
         heading: 'Объем сервиса',
@@ -78,6 +74,9 @@ const copy = {
         body: 'Клиент обязан предоставить корректные контакты, точную локацию и данные автомобиля, необходимые для оценки заявки.',
       },
     ],
+    metaTitle: 'Условия сервиса | Planetlocksmiths',
+    metaDescription:
+      'Условия сервиса для сайта и приема заявок Planetlocksmiths.',
   },
 } as const
 
@@ -91,33 +90,24 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
   const { locale } = await params
-  const page = copy[locale]
+  const meta = copy[locale]
 
   return {
-    title: page.metaTitle,
-    description: page.metaDescription,
+    title: meta.metaTitle,
+    description: meta.metaDescription,
     alternates: {
       canonical: `/${locale}/terms`,
     },
     openGraph: {
-      title: page.metaTitle,
-      description: page.metaDescription,
+      title: meta.metaTitle,
+      description: meta.metaDescription,
       url: `/${locale}/terms`,
-      type: 'website',
-      images: [
-        {
-          url: '/opengraph-image',
-          width: 1200,
-          height: 630,
-          alt: 'Planetlocksmiths',
-        },
-      ],
+      type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
-      title: page.metaTitle,
-      description: page.metaDescription,
-      images: ['/opengraph-image'],
+      title: meta.metaTitle,
+      description: meta.metaDescription,
     },
   }
 }
@@ -129,45 +119,34 @@ export default async function TermsPage({
 }) {
   const { locale } = await params
   const global = getGlobalSettings()
-  const page = copy[locale]
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+  const t = copy[locale]
 
   return (
     <>
-      <BreadcrumbSchema
-        items={[
-          { name: 'Home', url: `${siteUrl}/${locale}` },
-          { name: page.title, url: `${siteUrl}/${locale}/terms` },
-        ]}
-      />
-
       <Header
         locale={locale}
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
-
-      <main className="bg-bg py-16 md:py-20">
-        <div className="section-frame">
-          <div className="premium-shell px-6 py-8 md:px-8 md:py-10">
-            <div className="max-w-4xl">
-              <p className="premium-label mb-4">Legal</p>
-              <h1 className="mb-8 text-3xl font-heading font-semibold text-text md:text-5xl">
-                {page.title}
-              </h1>
-              <div className="grid gap-5">
-                {page.sections.map((section) => (
-                  <section key={section.heading} className="premium-card-soft p-5">
-                    <h2 className="mb-2 text-lg font-semibold text-text">{section.heading}</h2>
-                    <p className="text-sm leading-7 text-muted">{section.body}</p>
-                  </section>
-                ))}
-              </div>
-            </div>
-          </div>
+      <main className="mx-auto max-w-4xl px-4 py-16 text-text sm:px-6 lg:px-8">
+        <p className="mb-3 text-xs uppercase tracking-[0.24em] text-accent-cyan">
+          Legal
+        </p>
+        <h1 className="mb-8 text-3xl font-heading font-semibold md:text-5xl">
+          {t.title}
+        </h1>
+        <div className="space-y-8">
+          {t.sections.map((section) => (
+            <section
+              key={section.heading}
+              className="rounded-2xl border border-line bg-surface p-6"
+            >
+              <h2 className="mb-2 text-xl font-semibold text-text">{section.heading}</h2>
+              <p className="text-sm leading-7 text-muted">{section.body}</p>
+            </section>
+          ))}
         </div>
       </main>
-
       <Footer locale={locale} />
     </>
   )
