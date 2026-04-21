@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema'
-import FAQSchema from '@/components/seo/FAQSchema'
 import { getGlobalSettings } from '@/lib/content'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -10,9 +8,6 @@ type Locale = 'en' | 'es' | 'ru'
 const copy = {
   en: {
     title: 'Frequently Asked Questions',
-    metaTitle: 'FAQ | Planetlocksmiths Philadelphia Automotive Locksmith',
-    metaDescription:
-      'Common questions about Planetlocksmiths mobile automotive locksmith service in Philadelphia, including 24/7 requests, service area, and key support.',
     items: [
       {
         q: 'Do you provide service 24/7?',
@@ -39,12 +34,12 @@ const copy = {
         a: 'Yes. Automotive key and programming support is part of the service offering.',
       },
     ],
+    metaTitle: 'FAQ | Planetlocksmiths',
+    metaDescription:
+      'Frequently asked questions about Planetlocksmiths mobile automotive locksmith service in Philadelphia, including coverage, lockouts, keys, and urgent requests.',
   },
   es: {
     title: 'Preguntas frecuentes',
-    metaTitle: 'FAQ | Planetlocksmiths Cerrajería Automotriz en Filadelfia',
-    metaDescription:
-      'Preguntas frecuentes sobre Planetlocksmiths, servicio móvil de cerrajería automotriz en Filadelfia.',
     items: [
       {
         q: '¿Trabajan 24/7?',
@@ -71,12 +66,12 @@ const copy = {
         a: 'Sí. La programación y soporte de llaves modernas forma parte del servicio.',
       },
     ],
+    metaTitle: 'Preguntas frecuentes | Planetlocksmiths',
+    metaDescription:
+      'Preguntas frecuentes sobre Planetlocksmiths y su servicio móvil de cerrajería automotriz en Filadelfia.',
   },
   ru: {
     title: 'Частые вопросы',
-    metaTitle: 'FAQ | Planetlocksmiths Автомобильный Сервис в Филадельфии',
-    metaDescription:
-      'Частые вопросы о Planetlocksmiths — мобильном автомобильном ключном сервисе в Филадельфии.',
     items: [
       {
         q: 'Вы работаете 24/7?',
@@ -103,6 +98,9 @@ const copy = {
         a: 'Да. Поддержка современных ключей и брелоков входит в спектр услуг.',
       },
     ],
+    metaTitle: 'FAQ | Planetlocksmiths',
+    metaDescription:
+      'Частые вопросы о мобильном автомобильном ключном сервисе Planetlocksmiths в Филадельфии.',
   },
 } as const
 
@@ -116,33 +114,24 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
   const { locale } = await params
-  const page = copy[locale]
+  const meta = copy[locale]
 
   return {
-    title: page.metaTitle,
-    description: page.metaDescription,
+    title: meta.metaTitle,
+    description: meta.metaDescription,
     alternates: {
       canonical: `/${locale}/faq`,
     },
     openGraph: {
-      title: page.metaTitle,
-      description: page.metaDescription,
+      title: meta.metaTitle,
+      description: meta.metaDescription,
       url: `/${locale}/faq`,
-      type: 'website',
-      images: [
-        {
-          url: '/opengraph-image',
-          width: 1200,
-          height: 630,
-          alt: 'Planetlocksmiths',
-        },
-      ],
+      type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
-      title: page.metaTitle,
-      description: page.metaDescription,
-      images: ['/opengraph-image'],
+      title: meta.metaTitle,
+      description: meta.metaDescription,
     },
   }
 }
@@ -154,64 +143,36 @@ export default async function FaqPage({
 }) {
   const { locale } = await params
   const global = getGlobalSettings()
-  const page = copy[locale]
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+  const t = copy[locale]
 
   return (
     <>
-      <BreadcrumbSchema
-        items={[
-          { name: 'Home', url: `${siteUrl}/${locale}` },
-          { name: page.title, url: `${siteUrl}/${locale}/faq` },
-        ]}
-      />
-      <FAQSchema
-        items={page.items.map((item) => ({
-          question: item.q,
-          answer: item.a,
-        }))}
-      />
-
       <Header
         locale={locale}
         phoneDisplay={global.phoneDisplay}
         phonePrimary={global.phonePrimary}
       />
-
-      <main className="bg-bg py-16 md:py-20">
-        <div className="section-frame">
-          <div className="max-w-4xl">
-            <p className="premium-label mb-4">FAQ</p>
-            <h1 className="mb-6 text-3xl font-heading font-semibold text-text md:text-5xl">
-              {page.title}
-            </h1>
-
-            <div className="grid gap-4">
-              {page.items.map((item, idx) => (
-                <details
-                  key={`${item.q}-${idx}`}
-                  className="premium-card-soft group overflow-hidden p-5 md:p-6"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
-                    <span className="text-base font-semibold text-text md:text-lg">
-                      {item.q}
-                    </span>
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-text transition group-open:rotate-45">
-                      +
-                    </span>
-                  </summary>
-
-                  <div className="mt-4 h-px w-full bg-white/10" />
-                  <p className="pt-4 text-sm leading-7 text-muted md:text-[15px]">
-                    {item.a}
-                  </p>
-                </details>
-              ))}
-            </div>
-          </div>
+      <main className="mx-auto max-w-4xl px-4 py-16 text-text sm:px-6 lg:px-8">
+        <p className="mb-3 text-xs uppercase tracking-[0.24em] text-accent-cyan">
+          Support information
+        </p>
+        <h1 className="mb-8 text-3xl font-heading font-semibold md:text-5xl">
+          {t.title}
+        </h1>
+        <div className="space-y-4">
+          {t.items.map((item) => (
+            <details
+              key={item.q}
+              className="rounded-2xl border border-line bg-surface p-5"
+            >
+              <summary className="cursor-pointer list-none text-base font-medium text-text">
+                {item.q}
+              </summary>
+              <p className="mt-3 text-sm leading-7 text-muted">{item.a}</p>
+            </details>
+          ))}
         </div>
       </main>
-
       <Footer locale={locale} />
     </>
   )
