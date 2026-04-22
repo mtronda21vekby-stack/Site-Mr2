@@ -10,30 +10,37 @@ export default function AdminShell({ children }: AdminShellProps) {
     <div
       style={{
         minHeight: '100vh',
-        display: 'flex',
         background: '#05070B',
         color: '#F5F7FB',
         fontFamily: 'Inter, sans-serif',
       }}
     >
-      <AdminSidebar />
-
-      <main
+      <div
         style={{
-          flex: 1,
-          padding: 24,
-          boxSizing: 'border-box',
+          display: 'grid',
+          gridTemplateColumns: '1fr',
         }}
       >
-        <div
+        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          <AdminSidebar />
+        </div>
+
+        <main
           style={{
-            maxWidth: 1280,
-            margin: '0 auto',
+            padding: 16,
+            boxSizing: 'border-box',
           }}
         >
-          {children}
-        </div>
-      </main>
+          <div
+            style={{
+              maxWidth: 1280,
+              margin: '0 auto',
+            }}
+          >
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
