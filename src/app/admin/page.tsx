@@ -1,25 +1,57 @@
+import AdminCard from '@/components/admin/AdminCard'
+import AdminHeader from '@/components/admin/AdminHeader'
+
 export default function AdminPage() {
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: '#05070B',
-        color: '#F5F7FB',
-        padding: '48px 24px',
-        fontFamily: 'Inter, sans-serif',
-      }}
-    >
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
-        <p style={{ color: '#95A0B8', margin: 0, fontSize: 14 }}>
-          Planetlocksmiths Admin
-        </p>
-        <h1 style={{ margin: '8px 0 16px', fontSize: 40, lineHeight: 1.1 }}>
-          Admin Panel
-        </h1>
-        <p style={{ color: '#95A0B8', fontSize: 18, lineHeight: 1.7 }}>
-          Admin route is live. Next step is connecting Supabase auth and real content editing.
-        </p>
+    <>
+      <AdminHeader
+        title="Dashboard"
+        subtitle="Planetlocksmiths / Admin"
+      />
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: 16,
+        }}
+      >
+        <AdminCard
+          href="/admin/settings"
+          title="Settings"
+          description="Brand, phone, email, service hours, and global project settings."
+        />
+
+        <AdminCard
+          href="/admin/home"
+          title="Home"
+          description="Homepage hero, CTA blocks, featured services, and homepage copy."
+        />
+
+        <AdminCard
+          href="/admin/services"
+          title="Services"
+          description="Manage service pages, SEO fields, content sections, and publish states."
+        />
+
+        <AdminCard
+          href="/admin/areas"
+          title="Areas"
+          description="Manage city and service-area pages with localized content."
+        />
+
+        <AdminCard
+          href="/admin/reviews"
+          title="Reviews"
+          description="Create, edit, order, and publish customer reviews."
+        />
+
+        <AdminCard
+          href="/admin/faq"
+          title="FAQ"
+          description="Manage frequently asked questions by locale and page type."
+        />
       </div>
-    </main>
+    </>
   )
 }
