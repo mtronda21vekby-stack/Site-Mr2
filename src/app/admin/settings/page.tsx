@@ -12,7 +12,7 @@ export default function AdminSettingsPage() {
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <div style={{ marginBottom: 20 }}>
           <a
-            href="/admin"
+            href="/admin/direct"
             style={{
               display: 'inline-block',
               marginBottom: 10,
