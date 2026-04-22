@@ -1,11 +1,93 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getSupabaseClient } from '@/lib/supabase/client'
+
 export default function AdminDashboardPage() {
+  const router = useRouter()
+  const supabase = getSupabaseClient()
+
+  const [isChecking, setIsChecking] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session) {
+        router.replace('/admin/login')
+        return
+      }
+
+      if (isMounted) {
+        setIsChecking(false)
+      }
+    }
+
+    checkSession()
+
+    return () => {
+      isMounted = false
+    }
+  }, [router, supabase])
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.replace('/admin/login')
+    router.refresh()
+  }
+
+  if (isChecking) {
+    return (
+      <main
+        style={{
+          minHeight: '100vh',
+          background: '#05070B',
+          color: '#F5F7FB',
+          padding: '24px 16px 40px',
+          fontFamily: 'Inter, sans-serif',
+        }}
+      >
+        <p>Loading admin...</p>
+      </main>
+    )
+  }
+
   const items = [
-    ['Settings', '/admin/settings', 'Brand, phone, email, service hours'],
-    ['Home', '/admin/home', 'Homepage content and hero copy'],
-    ['Services', '/admin/services', 'Service pages and SEO content'],
-    ['Areas', '/admin/areas', 'City and area pages'],
-    ['Reviews', '/admin/reviews', 'Customer reviews'],
-    ['FAQ', '/admin/faq', 'Questions and answers'],
+    {
+      title: 'Settings',
+      href: '/admin/settings',
+      description: 'Brand, phone, email, and service hours',
+    },
+    {
+      title: 'Home',
+      href: '/admin/home',
+      description: 'Hero section, badges, and homepage content',
+    },
+    {
+      title: 'Services',
+      href: '/admin/services',
+      description: 'Service pages and localized content',
+    },
+    {
+      title: 'Areas',
+      href: '/admin/areas',
+      description: 'Philadelphia and future city pages',
+    },
+    {
+      title: 'Reviews',
+      href: '/admin/reviews',
+      description: 'Customer reviews management',
+    },
+    {
+      title: 'FAQ',
+      href: '/admin/faq',
+      description: 'Questions and answers by locale',
+    },
   ]
 
   return (
@@ -19,13 +101,61 @@ export default function AdminDashboardPage() {
       }}
     >
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ marginBottom: 20 }}>
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
-            Planetlocksmiths / Admin
-          </p>
-          <h1 style={{ margin: '8px 0 0', fontSize: 32, lineHeight: 1.1 }}>
-            Dashboard
-          </h1>
+        <div
+          style={{
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div>
+            <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
+              Planetlocksmiths / Admin
+            </p>
+            <h1 style={{ margin: '8px 0 0', fontSize: 32, lineHeight: 1.1 }}>
+              Dashboard
+            </h1>
+          </div>
+
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <a
+              href="/en"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: 44,
+                padding: '0 16px',
+                borderRadius: 12,
+                textDecoration: 'none',
+                color: '#05070B',
+                background: '#4DA2FF',
+                fontWeight: 700,
+              }}
+            >
+              Open site
+            </a>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              style={{
+                minHeight: 44,
+                padding: '0 16px',
+                borderRadius: 12,
+                border: '1px solid rgba(255,255,255,0.10)',
+                background: 'transparent',
+                color: '#F5F7FB',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div
@@ -35,10 +165,10 @@ export default function AdminDashboardPage() {
             gap: 14,
           }}
         >
-          {items.map(([title, href, description]) => (
+          {items.map((item) => (
             <a
-              key={href}
-              href={href}
+              key={item.href}
+              href={item.href}
               style={{
                 display: 'block',
                 textDecoration: 'none',
@@ -50,7 +180,7 @@ export default function AdminDashboardPage() {
               }}
             >
               <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.2 }}>
-                {title}
+                {item.title}
               </h2>
               <p
                 style={{
@@ -60,7 +190,7 @@ export default function AdminDashboardPage() {
                   lineHeight: 1.6,
                 }}
               >
-                {description}
+                {item.description}
               </p>
             </a>
           ))}
