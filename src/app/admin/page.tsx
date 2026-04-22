@@ -12,44 +12,39 @@ export default function AdminPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: 16,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: 14,
         }}
       >
         <AdminCard
           href="/admin/settings"
           title="Settings"
-          description="Brand, phone, email, service hours, and global project settings."
+          description="Brand, phone, email, hours, and global website settings."
         />
-
         <AdminCard
           href="/admin/home"
           title="Home"
-          description="Homepage hero, CTA blocks, featured services, and homepage copy."
+          description="Hero section, CTA blocks, homepage texts, and badges."
         />
-
         <AdminCard
           href="/admin/services"
           title="Services"
-          description="Manage service pages, SEO fields, content sections, and publish states."
+          description="Manage service pages, content blocks, and SEO fields."
         />
-
         <AdminCard
           href="/admin/areas"
           title="Areas"
-          description="Manage city and service-area pages with localized content."
+          description="Manage city pages and location coverage content."
         />
-
         <AdminCard
           href="/admin/reviews"
           title="Reviews"
-          description="Create, edit, order, and publish customer reviews."
+          description="Add, edit, sort, and publish customer reviews."
         />
-
         <AdminCard
           href="/admin/faq"
           title="FAQ"
-          description="Manage frequently asked questions by locale and page type."
+          description="Manage questions and answers by locale and page."
         />
       </div>
     </>
