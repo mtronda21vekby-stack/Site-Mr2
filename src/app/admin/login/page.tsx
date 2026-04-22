@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
@@ -13,6 +13,26 @@ export default function AdminLoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session && isMounted) {
+        router.replace('/admin/direct')
+      }
+    }
+
+    checkSession()
+
+    return () => {
+      isMounted = false
+    }
+  }, [router, supabase])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -33,7 +53,7 @@ export default function AdminLoginPage() {
     }
 
     setSuccessMessage('Signed in successfully')
-    router.push('/admin')
+    router.replace('/admin/direct')
     router.refresh()
   }
 
@@ -88,7 +108,7 @@ export default function AdminLoginPage() {
             lineHeight: 1.6,
           }}
         >
-          Secure administrator access for content and website management.
+          Secure administrator access for website management.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
