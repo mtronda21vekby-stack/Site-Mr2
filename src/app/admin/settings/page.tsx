@@ -1,4 +1,71 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getSupabaseClient } from '@/lib/supabase/client'
+
+type SettingsState = {
+  brandName: string
+  phonePrimary: string
+  phoneDisplay: string
+  email: string
+  serviceHours: string
+}
+
 export default function AdminSettingsPage() {
+  const router = useRouter()
+  const supabase = getSupabaseClient()
+
+  const [isChecking, setIsChecking] = useState(true)
+  const [form, setForm] = useState<SettingsState>({
+    brandName: 'Planetlocksmiths',
+    phonePrimary: '+1 (267) 000-0000',
+    phoneDisplay: '(267) 000-0000',
+    email: 'hello@planetlocksmiths.com',
+    serviceHours: '24/7 Mobile Service',
+  })
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session) {
+        router.replace('/admin/login')
+        return
+      }
+
+      if (isMounted) {
+        setIsChecking(false)
+      }
+    }
+
+    checkSession()
+
+    return () => {
+      isMounted = false
+    }
+  }, [router, supabase])
+
+  if (isChecking) {
+    return (
+      <main
+        style={{
+          minHeight: '100vh',
+          background: '#05070B',
+          color: '#F5F7FB',
+          padding: '24px 16px 40px',
+          fontFamily: 'Inter, sans-serif',
+        }}
+      >
+        <p>Loading settings...</p>
+      </main>
+    )
+  }
+
   return (
     <main
       style={{
@@ -42,11 +109,45 @@ export default function AdminSettingsPage() {
             padding: 18,
           }}
         >
-          <Field label="Brand Name" defaultValue="Planetlocksmiths" />
-          <Field label="Primary Phone" defaultValue="+1 (267) 000-0000" />
-          <Field label="Display Phone" defaultValue="(267) 000-0000" />
-          <Field label="Email" defaultValue="hello@planetlocksmiths.com" />
-          <Field label="Service Hours" defaultValue="24/7 Mobile Service" />
+          <Field
+            label="Brand Name"
+            value={form.brandName}
+            onChange={(value) =>
+              setForm((prev) => ({ ...prev, brandName: value }))
+            }
+          />
+
+          <Field
+            label="Primary Phone"
+            value={form.phonePrimary}
+            onChange={(value) =>
+              setForm((prev) => ({ ...prev, phonePrimary: value }))
+            }
+          />
+
+          <Field
+            label="Display Phone"
+            value={form.phoneDisplay}
+            onChange={(value) =>
+              setForm((prev) => ({ ...prev, phoneDisplay: value }))
+            }
+          />
+
+          <Field
+            label="Email"
+            value={form.email}
+            onChange={(value) =>
+              setForm((prev) => ({ ...prev, email: value }))
+            }
+          />
+
+          <Field
+            label="Service Hours"
+            value={form.serviceHours}
+            onChange={(value) =>
+              setForm((prev) => ({ ...prev, serviceHours: value }))
+            }
+          />
 
           <button
             type="button"
@@ -71,16 +172,19 @@ export default function AdminSettingsPage() {
 
 function Field({
   label,
-  defaultValue,
+  value,
+  onChange,
 }: {
   label: string
-  defaultValue: string
+  value: string
+  onChange: (value: string) => void
 }) {
   return (
     <label style={{ display: 'grid', gap: 8 }}>
       <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
       <input
-        defaultValue={defaultValue}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         style={{
           width: '100%',
           minHeight: 50,
