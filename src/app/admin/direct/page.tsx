@@ -1,38 +1,53 @@
 export default function AdminDashboardPage() {
+  const items = [
+    {
+      title: 'Settings',
+      href: '/admin/settings',
+      description: 'Brand, phone, email, and service hours',
+    },
+    {
+      title: 'Home',
+      href: '/admin/home',
+      description: 'Hero section, badges, and homepage content',
+    },
+    {
+      title: 'Services',
+      href: '/admin/services',
+      description: 'Service pages and localized content',
+    },
+    {
+      title: 'Areas',
+      href: '/admin/areas',
+      description: 'Philadelphia and future city pages',
+    },
+    {
+      title: 'Reviews',
+      href: '/admin/reviews',
+      description: 'Customer reviews management',
+    },
+    {
+      title: 'FAQ',
+      href: '/admin/faq',
+      description: 'Questions and answers by locale',
+    },
+  ]
+
   return (
     <main
       style={{
         minHeight: '100vh',
         background: '#05070B',
         color: '#F5F7FB',
-        padding: '24px 16px 40px',
+        padding: '20px 16px 40px',
         fontFamily: 'Inter, sans-serif',
       }}
     >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: '0 auto',
-        }}
-      >
-        <div style={{ marginBottom: 24 }}>
-          <p
-            style={{
-              margin: 0,
-              color: '#95A0B8',
-              fontSize: 13,
-            }}
-          >
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
             Planetlocksmiths / Admin
           </p>
-
-          <h1
-            style={{
-              margin: '8px 0 0',
-              fontSize: 34,
-              lineHeight: 1.1,
-            }}
-          >
+          <h1 style={{ margin: '8px 0 0', fontSize: 32, lineHeight: 1.1 }}>
             Dashboard
           </h1>
         </div>
@@ -44,17 +59,10 @@ export default function AdminDashboardPage() {
             gap: 14,
           }}
         >
-          {[
-            ['Settings', '/admin/settings'],
-            ['Home', '/admin/home'],
-            ['Services', '/admin/services'],
-            ['Areas', '/admin/areas'],
-            ['Reviews', '/admin/reviews'],
-            ['FAQ', '/admin/faq'],
-          ].map(([title, href]) => (
+          {items.map((item) => (
             <a
-              key={title}
-              href={href}
+              key={item.href}
+              href={item.href}
               style={{
                 display: 'block',
                 textDecoration: 'none',
@@ -65,16 +73,9 @@ export default function AdminDashboardPage() {
                 padding: 18,
               }}
             >
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: 20,
-                  lineHeight: 1.2,
-                }}
-              >
-                {title}
+              <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.2 }}>
+                {item.title}
               </h2>
-
               <p
                 style={{
                   margin: '10px 0 0',
@@ -83,7 +84,7 @@ export default function AdminDashboardPage() {
                   lineHeight: 1.6,
                 }}
               >
-                Open section
+                {item.description}
               </p>
             </a>
           ))}
