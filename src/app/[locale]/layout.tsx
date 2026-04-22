@@ -1,12 +1,29 @@
-import type { Locale } from '@/components/layout/Header';
+import type { ReactNode } from 'react'
+import { notFound } from 'next/navigation'
+
+const locales = ['en', 'es', 'ru'] as const
+type Locale = (typeof locales)[number]
+
+function isValidLocale(value: string): value is Locale {
+  return locales.includes(value as Locale)
+}
+
+export async function generateStaticParams() {
+  return locales.map((locale) => ({ locale }))
+}
 
 export default async function LocaleLayout({
   children,
   params,
 }: {
-  children: React.ReactNode;
-  params: Promise<{ locale: Locale }>;
+  children: ReactNode
+  params: Promise<{ locale: string }>
 }) {
-  await params;
-  return <>{children}</>;
+  const { locale } = await params
+
+  if (!isValidLocale(locale)) {
+    notFound()
+  }
+
+  return <>{children}</>
 }
