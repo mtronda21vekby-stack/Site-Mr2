@@ -1,35 +1,11 @@
 export default function AdminDashboardPage() {
   const items = [
-    {
-      title: 'Settings',
-      href: '/admin/settings',
-      description: 'Brand, phone, email, and service hours',
-    },
-    {
-      title: 'Home',
-      href: '/admin/home',
-      description: 'Hero section, badges, and homepage content',
-    },
-    {
-      title: 'Services',
-      href: '/admin/services',
-      description: 'Service pages and localized content',
-    },
-    {
-      title: 'Areas',
-      href: '/admin/areas',
-      description: 'Philadelphia and future city pages',
-    },
-    {
-      title: 'Reviews',
-      href: '/admin/reviews',
-      description: 'Customer reviews management',
-    },
-    {
-      title: 'FAQ',
-      href: '/admin/faq',
-      description: 'Questions and answers by locale',
-    },
+    ['Settings', '/admin/settings', 'Brand, phone, email, service hours'],
+    ['Home', '/admin/home', 'Homepage content and hero copy'],
+    ['Services', '/admin/services', 'Service pages and SEO content'],
+    ['Areas', '/admin/areas', 'City and area pages'],
+    ['Reviews', '/admin/reviews', 'Customer reviews'],
+    ['FAQ', '/admin/faq', 'Questions and answers'],
   ]
 
   return (
@@ -59,10 +35,10 @@ export default function AdminDashboardPage() {
             gap: 14,
           }}
         >
-          {items.map((item) => (
+          {items.map(([title, href, description]) => (
             <a
-              key={item.href}
-              href={item.href}
+              key={href}
+              href={href}
               style={{
                 display: 'block',
                 textDecoration: 'none',
@@ -74,7 +50,7 @@ export default function AdminDashboardPage() {
               }}
             >
               <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.2 }}>
-                {item.title}
+                {title}
               </h2>
               <p
                 style={{
@@ -84,7 +60,7 @@ export default function AdminDashboardPage() {
                   lineHeight: 1.6,
                 }}
               >
-                {item.description}
+                {description}
               </p>
             </a>
           ))}
