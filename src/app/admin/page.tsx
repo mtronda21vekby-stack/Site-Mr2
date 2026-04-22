@@ -1,52 +1,98 @@
-import AdminCard from '@/components/admin/AdminCard'
-import AdminHeader from '@/components/admin/AdminHeader'
-
 export default function AdminPage() {
   return (
-    <>
-      <AdminHeader
-        title="Dashboard"
-        subtitle="Planetlocksmiths / Admin"
-      />
-
+    <main
+      style={{
+        minHeight: '100vh',
+        background: '#05070B',
+        color: '#F5F7FB',
+        padding: '24px 16px 40px',
+        fontFamily: 'Inter, sans-serif',
+      }}
+    >
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 14,
+          maxWidth: 1200,
+          margin: '0 auto',
         }}
       >
-        <AdminCard
-          href="/admin/settings"
-          title="Settings"
-          description="Brand, phone, email, hours, and global website settings."
-        />
-        <AdminCard
-          href="/admin/home"
-          title="Home"
-          description="Hero section, CTA blocks, homepage texts, and badges."
-        />
-        <AdminCard
-          href="/admin/services"
-          title="Services"
-          description="Manage service pages, content blocks, and SEO fields."
-        />
-        <AdminCard
-          href="/admin/areas"
-          title="Areas"
-          description="Manage city pages and location coverage content."
-        />
-        <AdminCard
-          href="/admin/reviews"
-          title="Reviews"
-          description="Add, edit, sort, and publish customer reviews."
-        />
-        <AdminCard
-          href="/admin/faq"
-          title="FAQ"
-          description="Manage questions and answers by locale and page."
-        />
+        <div
+          style={{
+            marginBottom: 24,
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              color: '#95A0B8',
+              fontSize: 13,
+            }}
+          >
+            Planetlocksmiths / Admin
+          </p>
+
+          <h1
+            style={{
+              margin: '8px 0 0',
+              fontSize: 34,
+              lineHeight: 1.1,
+            }}
+          >
+            Dashboard
+          </h1>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 14,
+          }}
+        >
+          {[
+            ['Settings', '/admin/settings'],
+            ['Home', '/admin/home'],
+            ['Services', '/admin/services'],
+            ['Areas', '/admin/areas'],
+            ['Reviews', '/admin/reviews'],
+            ['FAQ', '/admin/faq'],
+          ].map(([title, href]) => (
+            <a
+              key={title}
+              href={href}
+              style={{
+                display: 'block',
+                textDecoration: 'none',
+                color: '#F5F7FB',
+                background: '#0B1020',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 18,
+                padding: 18,
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 20,
+                  lineHeight: 1.2,
+                }}
+              >
+                {title}
+              </h2>
+
+              <p
+                style={{
+                  margin: '10px 0 0',
+                  color: '#95A0B8',
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                }}
+              >
+                Open section
+              </p>
+            </a>
+          ))}
+        </div>
       </div>
-    </>
+    </main>
   )
 }
