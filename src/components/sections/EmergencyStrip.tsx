@@ -1,31 +1,19 @@
-import type { Locale } from '@/components/layout/Header'
+import type { Locale } from '@/components/layout/Header';
 
 interface EmergencyStripProps {
-  title: string
-  text: string
-  phoneNumber: string
-  phoneDisplay: string
-  locale: Locale
+  title: string;
+  text: string;
+  phoneNumber: string;
+  phoneDisplay: string;
+  locale: Locale;
 }
 
-const copy = {
-  en: {
-    call: 'Call now',
-    request: 'Request service',
-    note: 'Urgent request intake is available 24/7.',
-  },
-  es: {
-    call: 'Llamar ahora',
-    request: 'Solicitar servicio',
-    note: 'Las solicitudes urgentes se aceptan 24/7.',
-  },
-  ru: {
-    call: 'Позвонить',
-    request: 'Оставить заявку',
-    note: 'Срочные заявки принимаются 24/7.',
-  },
-} as const
-
+/**
+ * The emergency strip is a full-width call-to-action banner that encourages
+ * customers to call immediately when they need urgent assistance. It uses a
+ * contrasting background and simple layout for maximum visibility. The text
+ * and button labels can be localised via the home content JSON.
+ */
 export default function EmergencyStrip({
   title,
   text,
@@ -33,46 +21,31 @@ export default function EmergencyStrip({
   phoneDisplay,
   locale,
 }: EmergencyStripProps) {
-  const t = copy[locale]
-
   return (
-    <section className="bg-bg py-10 md:py-14">
-      <div className="section-frame">
-        <div className="premium-shell premium-glow overflow-hidden px-6 py-7 md:px-8 md:py-8">
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-            <div>
-              <p className="premium-label mb-4">Urgent mobile response</p>
-              <h2 className="text-2xl font-heading font-semibold text-text md:text-3xl">
-                {title}
-              </h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-                {text}
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 lg:items-end">
-              <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
-                <a
-                  href={`tel:${phoneNumber}`}
-                  className="premium-button-primary"
-                >
-                  {t.call} {phoneDisplay}
-                </a>
-                <a
-                  href={`/${locale}/contact`}
-                  className="premium-button-secondary"
-                >
-                  {t.request}
-                </a>
-              </div>
-
-              <div className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs uppercase tracking-[0.16em] text-accent-cyan">
-                {t.note}
-              </div>
-            </div>
-          </div>
+    <section className="bg-accent-blue py-8 text-black">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 sm:flex-row sm:gap-8 sm:px-6 lg:px-8">
+        <div className="max-w-lg text-center sm:text-left">
+          <h2 className="text-xl font-heading font-semibold mb-2">
+            {title}
+          </h2>
+          <p className="text-sm text-black/80">{text}</p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <a
+            href={`tel:${phoneNumber}`}
+            className="inline-block rounded-full bg-black px-6 py-3 text-sm font-medium text-accent-blue transition-colors hover:bg-black/80"
+          >
+            Call {phoneDisplay}
+          </a>
+          {/* Also link to the contact page for non-urgent requests */}
+          <a
+            href={`/${locale}/contact`}
+            className="inline-block rounded-full border border-black px-6 py-3 text-sm font-medium text-black transition-colors hover:bg-black/10"
+          >
+            Request service
+          </a>
         </div>
       </div>
     </section>
-  )
+  );
 }

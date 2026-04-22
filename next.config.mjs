@@ -1,7 +1,13 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+
+initOpenNextCloudflareForDev();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typedRoutes: false,
-}
+  experimental: {
+    typedRoutes: false,
+  },
+};
 
-export default nextConfig
+export default nextConfig;
