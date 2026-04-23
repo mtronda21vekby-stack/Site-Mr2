@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
 import AdminSidebar from './AdminSidebar'
+import AdminTopbar from './AdminTopbar'
 
-type AdminShellProps = {
+export default function AdminShell({
+  children,
+}: {
   children: ReactNode
-}
-
-export default function AdminShell({ children }: AdminShellProps) {
+}) {
   return (
     <div
       style={{
@@ -17,29 +18,53 @@ export default function AdminShell({ children }: AdminShellProps) {
     >
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
+          display: 'flex',
+          alignItems: 'stretch',
+          minHeight: '100vh',
         }}
       >
-        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <AdminSidebar />
-        </div>
-
-        <main
+        <div
           style={{
-            padding: 16,
-            boxSizing: 'border-box',
+            display: 'none',
+          }}
+          className="admin-sidebar-mobile-hidden"
+        />
+
+        <div
+          style={{
+            display: 'flex',
+            width: '100%',
+            minHeight: '100vh',
           }}
         >
           <div
             style={{
-              maxWidth: 1280,
-              margin: '0 auto',
+              display: 'none',
+            }}
+          />
+
+          <div
+            style={{
+              width: 260,
+              flexShrink: 0,
             }}
           >
-            {children}
+            <AdminSidebar />
           </div>
-        </main>
+
+          <main
+            style={{
+              flex: 1,
+              padding: 20,
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+              <AdminTopbar />
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   )
