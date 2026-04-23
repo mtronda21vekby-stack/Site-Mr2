@@ -46,6 +46,11 @@ export default function AdminDashboardPage() {
 
   const links = [
     {
+      title: 'Orders',
+      href: '/admin/orders',
+      description: 'Incoming leads, statuses, admin notes, assignment',
+    },
+    {
       title: 'Settings',
       href: '/admin/settings',
       description: 'Global brand, phones, email, service hours',
@@ -109,6 +114,11 @@ export default function AdminDashboardPage() {
           marginBottom: 18,
         }}
       >
+        <AdminStatCard
+          title="Orders"
+          value="Live"
+          note="Public contact requests now land in the admin panel."
+        />
         <AdminStatCard
           title="Settings"
           value="Live"
