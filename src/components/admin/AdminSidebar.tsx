@@ -1,28 +1,49 @@
 'use client'
 
-const items = [
-  { href: '/admin/direct', label: 'Dashboard' },
-  { href: '/admin/settings', label: 'Settings' },
-  { href: '/admin/home', label: 'Home' },
-  { href: '/admin/reviews', label: 'Reviews' },
-  { href: '/admin/faq', label: 'FAQ' },
-  { href: '/admin/services', label: 'Services' },
-  { href: '/admin/areas', label: 'Areas' },
+import { usePathname } from 'next/navigation'
+
+const groups = [
+  {
+    title: 'Core',
+    items: [
+      { href: '/admin/direct', label: 'Dashboard' },
+      { href: '/admin/settings', label: 'Settings' },
+    ],
+  },
+  {
+    title: 'Content',
+    items: [
+      { href: '/admin/home', label: 'Home' },
+      { href: '/admin/reviews', label: 'Reviews' },
+      { href: '/admin/faq', label: 'FAQ' },
+      { href: '/admin/services', label: 'Services' },
+      { href: '/admin/areas', label: 'Areas' },
+    ],
+  },
 ]
 
 export default function AdminSidebar() {
+  const pathname = usePathname()
+
   return (
     <aside
       style={{
-        width: 260,
-        minWidth: 260,
-        background: '#0B1020',
+        width: 280,
+        minWidth: 280,
+        background:
+          'linear-gradient(180deg, rgba(11,16,32,1) 0%, rgba(7,11,20,1) 100%)',
         borderRight: '1px solid rgba(255,255,255,0.08)',
         padding: 18,
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ marginBottom: 18 }}>
+      <div
+        style={{
+          marginBottom: 20,
+          paddingBottom: 16,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
         <p
           style={{
             margin: 0,
@@ -34,39 +55,88 @@ export default function AdminSidebar() {
         >
           Planetlocksmiths
         </p>
+
         <h2
           style={{
-            margin: '8px 0 0',
+            margin: '8px 0 8px',
             color: '#F5F7FB',
             fontSize: 24,
             lineHeight: 1.1,
           }}
         >
-          Admin
+          Control Panel
         </h2>
+
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            color: '#A9D0FF',
+            fontSize: 12,
+            fontWeight: 700,
+          }}
+        >
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 999,
+              background: '#2DE2E6',
+              display: 'inline-block',
+            }}
+          />
+          LIVE ADMIN
+        </div>
       </div>
 
-      <nav style={{ display: 'grid', gap: 10 }}>
-        {items.map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            style={{
-              display: 'block',
-              textDecoration: 'none',
-              color: '#F5F7FB',
-              background: '#11192E',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: 12,
-              padding: '12px 14px',
-              fontSize: 15,
-              lineHeight: 1.3,
-            }}
-          >
-            {item.label}
-          </a>
+      <div style={{ display: 'grid', gap: 18 }}>
+        {groups.map((group) => (
+          <div key={group.title}>
+            <p
+              style={{
+                margin: '0 0 8px',
+                color: '#95A0B8',
+                fontSize: 12,
+                textTransform: 'uppercase',
+                letterSpacing: 0.8,
+              }}
+            >
+              {group.title}
+            </p>
+
+            <div style={{ display: 'grid', gap: 8 }}>
+              {group.items.map((item) => {
+                const active =
+                  pathname === item.href || pathname.startsWith(`${item.href}/`)
+
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    style={{
+                      display: 'block',
+                      textDecoration: 'none',
+                      color: active ? '#05070B' : '#F5F7FB',
+                      background: active ? '#4DA2FF' : '#11192E',
+                      border: active
+                        ? '1px solid rgba(77,162,255,0.60)'
+                        : '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: 12,
+                      padding: '12px 14px',
+                      fontSize: 15,
+                      lineHeight: 1.3,
+                      fontWeight: active ? 700 : 500,
+                    }}
+                  >
+                    {item.label}
+                  </a>
+                )
+              })}
+            </div>
+          </div>
         ))}
-      </nav>
+      </div>
     </aside>
   )
 }
