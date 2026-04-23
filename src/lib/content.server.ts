@@ -81,11 +81,39 @@ type ServiceRow = {
   is_published: boolean | null
 }
 
+type AreaRow = {
+  id: string
+  locale: string
+  slug: string
+  city: string | null
+  state: string | null
+  title: string | null
+  intro: string | null
+  highlights: string[] | null
+  supported_services: string[] | null
+  seo_title: string | null
+  seo_description: string | null
+  sort_order: number | null
+  is_published: boolean | null
+}
+
 export type ServiceContent = {
   slug: string
   title: string
   excerpt: string
   intro: string
+  seoTitle: string
+  seoDescription: string
+}
+
+export type AreaContent = {
+  slug: string
+  city: string
+  state: string
+  title: string
+  intro: string
+  highlights: string[]
+  supportedServices: string[]
   seoTitle: string
   seoDescription: string
 }
@@ -151,7 +179,6 @@ export async function getHomeContentFromSource(locale: Locale): Promise<HomeCont
     const row = (result.data?.[0] ?? null) as HomePageRow | null
 
     if (!row) {
-      console.error(`home_pages row not found for locale: ${locale}`)
       return fileFallback
     }
 
@@ -261,7 +288,6 @@ export async function getServicePageFromSource(
 
   const fileHome = getFileHomeContent(locale)
   const fileFallback = fileHome.featuredServices.find((item) => item.slug === slug)
-
   const supabase = getSupabaseServerClient()
 
   if (!supabase) {
@@ -339,5 +365,57 @@ export async function getServicePageFromSource(
       seoTitle: fileFallback.title,
       seoDescription: fileFallback.excerpt,
     }
+  }
+}
+
+export async function getAreaPageFromSource(
+  locale: Locale,
+  slug: string
+): Promise<AreaContent | null> {
+  noStore()
+
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    return null
+  }
+
+  try {
+    const result = await (supabase.from('areas') as any)
+      .select(
+        'id, locale, slug, city, state, title, intro, highlights, supported_services, seo_title, seo_description, sort_order, is_published'
+      )
+      .eq('locale', locale)
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .limit(1)
+
+    if (result.error) {
+      console.error('areas select error:', result.error)
+      return null
+    }
+
+    const row = (result.data?.[0] ?? null) as AreaRow | null
+
+    if (!row) {
+      return null
+    }
+
+    return {
+      slug: row.slug,
+      city: row.city ?? '',
+      state: row.state ?? '',
+      title: row.title ?? '',
+      intro: row.intro ?? '',
+      highlights: Array.isArray(row.highlights) ? row.highlights : [],
+      supportedServices: Array.isArray(row.supported_services)
+        ? row.supported_services
+        : [],
+      seoTitle: row.seo_title ?? row.title ?? '',
+      seoDescription: row.seo_description ?? row.intro ?? '',
+    }
+  } catch (error) {
+    console.error('getAreaPageFromSource failed:', error)
+    return null
   }
 }
