@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { unstable_noStore as noStore } from 'next/cache'
 import {
   getGlobalSettings as getFileGlobalSettings,
   getHomeContent as getFileHomeContent,
@@ -31,7 +32,24 @@ type SiteSettingsRow = {
   service_hours: string | null
 }
 
+type HomePageRow = {
+  id: string
+  locale: string
+  hero_title: string | null
+  hero_subtitle: string | null
+  hero_primary_cta: string | null
+  hero_secondary_cta: string | null
+  emergency_title: string | null
+  emergency_text: string | null
+  reviews_title: string | null
+  faq_title: string | null
+  contact_title: string | null
+  contact_text: string | null
+}
+
 export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
+  noStore()
+
   const fileFallback = getFileGlobalSettings()
   const supabase = getSupabaseServerClient()
 
@@ -58,19 +76,67 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
       email: row.email ?? fileFallback.email,
       serviceHours: row.service_hours ?? fileFallback.serviceHours,
     }
-  } catch {
+  } catch (error) {
+    console.error('getGlobalSettingsFromSource failed:', error)
     return fileFallback
   }
 }
 
 export async function getHomeContentFromSource(locale: Locale): Promise<HomeContent> {
-  return getFileHomeContent(locale)
+  noStore()
+
+  const fileFallback = getFileHomeContent(locale)
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    return fileFallback
+  }
+
+  try {
+    const result = await (supabase.from('home_pages') as any)
+      .select(
+        'id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, emergency_title, emergency_text, reviews_title, faq_title, contact_title, contact_text'
+      )
+      .eq('locale', locale)
+      .limit(1)
+
+    if (result.error) {
+      console.error('home_pages select error:', result.error)
+      return fileFallback
+    }
+
+    const row = (result.data?.[0] ?? null) as HomePageRow | null
+
+    if (!row) {
+      console.error(`home_pages row not found for locale: ${locale}`)
+      return fileFallback
+    }
+
+    return {
+      ...fileFallback,
+      heroTitle: row.hero_title ?? fileFallback.heroTitle,
+      heroSubtitle: row.hero_subtitle ?? fileFallback.heroSubtitle,
+      heroPrimaryCta: row.hero_primary_cta ?? fileFallback.heroPrimaryCta,
+      heroSecondaryCta: row.hero_secondary_cta ?? fileFallback.heroSecondaryCta,
+      emergencyTitle: row.emergency_title ?? fileFallback.emergencyTitle,
+      emergencyText: row.emergency_text ?? fileFallback.emergencyText,
+      reviewsTitle: row.reviews_title ?? fileFallback.reviewsTitle,
+      faqTitle: row.faq_title ?? fileFallback.faqTitle,
+      contactTitle: row.contact_title ?? fileFallback.contactTitle,
+      contactText: row.contact_text ?? fileFallback.contactText,
+    }
+  } catch (error) {
+    console.error('getHomeContentFromSource failed:', error)
+    return fileFallback
+  }
 }
 
 export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]> {
+  noStore()
   return getFileReviews(locale)
 }
 
 export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
+  noStore()
   return getFileFaq(locale)
 }
