@@ -47,6 +47,18 @@ type HomePageRow = {
   contact_text: string | null
 }
 
+type ReviewRow = {
+  id: string
+  locale: string
+  name: string | null
+  rating: number | null
+  quote: string | null
+  date: string | null
+  city: string | null
+  sort_order: number | null
+  is_published: boolean | null
+}
+
 export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
   noStore()
 
@@ -133,7 +145,43 @@ export async function getHomeContentFromSource(locale: Locale): Promise<HomeCont
 
 export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]> {
   noStore()
-  return getFileReviews(locale)
+
+  const fileFallback = getFileReviews(locale)
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    return fileFallback
+  }
+
+  try {
+    const result = await (supabase.from('reviews') as any)
+      .select('id, locale, name, rating, quote, date, city, sort_order, is_published')
+      .eq('locale', locale)
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+
+    if (result.error) {
+      console.error('reviews select error:', result.error)
+      return fileFallback
+    }
+
+    const rows = Array.isArray(result.data) ? (result.data as ReviewRow[]) : []
+
+    if (!rows.length) {
+      return fileFallback
+    }
+
+    return rows.map((row) => ({
+      name: row.name ?? '',
+      rating: row.rating ?? 5,
+      quote: row.quote ?? '',
+      date: row.date ?? undefined,
+      city: row.city ?? undefined,
+    }))
+  } catch (error) {
+    console.error('getReviewsFromSource failed:', error)
+    return fileFallback
+  }
 }
 
 export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
