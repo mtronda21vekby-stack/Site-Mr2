@@ -7,6 +7,7 @@ const groups = [
     title: 'Core',
     items: [
       { href: '/admin/direct', label: 'Dashboard' },
+      { href: '/admin/orders', label: 'Orders' },
       { href: '/admin/settings', label: 'Settings' },
     ],
   },
