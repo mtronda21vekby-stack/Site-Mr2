@@ -14,6 +14,8 @@ import {
   getFaqFromSource,
 } from '@/lib/content.server'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
   return [
     { locale: 'en' },
