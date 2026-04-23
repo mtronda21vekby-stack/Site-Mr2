@@ -59,6 +59,15 @@ type ReviewRow = {
   is_published: boolean | null
 }
 
+type FaqRow = {
+  id: string
+  locale: string
+  question: string | null
+  answer: string | null
+  sort_order: number | null
+  is_published: boolean | null
+}
+
 export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
   noStore()
 
@@ -186,5 +195,38 @@ export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]
 
 export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
   noStore()
-  return getFileFaq(locale)
+
+  const fileFallback = getFileFaq(locale)
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    return fileFallback
+  }
+
+  try {
+    const result = await (supabase.from('faq_items') as any)
+      .select('id, locale, question, answer, sort_order, is_published')
+      .eq('locale', locale)
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+
+    if (result.error) {
+      console.error('faq_items select error:', result.error)
+      return fileFallback
+    }
+
+    const rows = Array.isArray(result.data) ? (result.data as FaqRow[]) : []
+
+    if (!rows.length) {
+      return fileFallback
+    }
+
+    return rows.map((row) => ({
+      question: row.question ?? '',
+      answer: row.answer ?? '',
+    }))
+  } catch (error) {
+    console.error('getFaqFromSource failed:', error)
+    return fileFallback
+  }
 }
