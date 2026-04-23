@@ -1,28 +1,27 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 export default function AdminLoginPage() {
   const router = useRouter()
-  const supabase = getSupabaseClient()
+  const supabase = useMemo(() => getSupabaseClient(), [])
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
-    let isMounted = true
+    let mounted = true
 
     async function checkSession() {
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
+        data: { user },
+      } = await supabase.auth.getUser()
 
-      if (session && isMounted) {
+      if (user && mounted) {
         router.replace('/admin/direct')
       }
     }
@@ -30,14 +29,13 @@ export default function AdminLoginPage() {
     checkSession()
 
     return () => {
-      isMounted = false
+      mounted = false
     }
   }, [router, supabase])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrorMessage('')
-    setSuccessMessage('')
     setIsSubmitting(true)
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -52,7 +50,6 @@ export default function AdminLoginPage() {
       return
     }
 
-    setSuccessMessage('Signed in successfully')
     router.replace('/admin/direct')
     router.refresh()
   }
@@ -63,7 +60,8 @@ export default function AdminLoginPage() {
         minHeight: '100vh',
         display: 'grid',
         placeItems: 'center',
-        background: '#05070B',
+        background:
+          'radial-gradient(circle at top, rgba(77,162,255,0.10), transparent 30%), #05070B',
         color: '#F5F7FB',
         padding: 20,
         fontFamily: 'Inter, sans-serif',
@@ -72,48 +70,54 @@ export default function AdminLoginPage() {
       <div
         style={{
           width: '100%',
-          maxWidth: 460,
-          background: '#0B1020',
+          maxWidth: 520,
+          background: 'rgba(11,16,32,0.88)',
           border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 24,
-          padding: 22,
+          borderRadius: 28,
+          padding: 24,
           boxSizing: 'border-box',
+          backdropFilter: 'blur(12px)',
         }}
       >
-        <p
-          style={{
-            margin: 0,
-            color: '#95A0B8',
-            fontSize: 14,
-          }}
-        >
-          Planetlocksmiths Admin
-        </p>
+        <div style={{ marginBottom: 18 }}>
+          <p
+            style={{
+              margin: 0,
+              color: '#95A0B8',
+              fontSize: 12,
+              textTransform: 'uppercase',
+              letterSpacing: 0.8,
+            }}
+          >
+            Planetlocksmiths
+          </p>
 
-        <h1
-          style={{
-            margin: '8px 0 14px',
-            fontSize: 32,
-            lineHeight: 1.1,
-          }}
-        >
-          Sign in
-        </h1>
+          <h1
+            style={{
+              margin: '10px 0 8px',
+              fontSize: 34,
+              lineHeight: 1.05,
+            }}
+          >
+            Secure Admin Access
+          </h1>
 
-        <p
-          style={{
-            margin: '0 0 20px',
-            color: '#95A0B8',
-            fontSize: 15,
-            lineHeight: 1.6,
-          }}
-        >
-          Secure administrator access for website management.
-        </p>
+          <p
+            style={{
+              margin: 0,
+              color: '#95A0B8',
+              fontSize: 15,
+              lineHeight: 1.6,
+            }}
+          >
+            Sign in to manage live website content, localized pages, reviews,
+            FAQ, and services.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
           <label style={{ display: 'grid', gap: 8 }}>
-            <span style={{ color: '#95A0B8', fontSize: 14 }}>Email</span>
+            <span style={{ color: '#95A0B8', fontSize: 14 }}>Admin Email</span>
             <input
               type="email"
               inputMode="email"
@@ -155,22 +159,6 @@ export default function AdminLoginPage() {
             </div>
           ) : null}
 
-          {successMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(77,162,255,0.25)',
-                background: 'rgba(77,162,255,0.08)',
-                color: '#A9D0FF',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {successMessage}
-            </div>
-          ) : null}
-
           <button
             type="submit"
             disabled={isSubmitting}
@@ -179,7 +167,7 @@ export default function AdminLoginPage() {
               opacity: isSubmitting ? 0.7 : 1,
             }}
           >
-            {isSubmitting ? 'Signing in...' : 'Continue'}
+            {isSubmitting ? 'Signing in...' : 'Enter Control Panel'}
           </button>
         </form>
       </div>
@@ -189,7 +177,7 @@ export default function AdminLoginPage() {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  minHeight: 50,
+  minHeight: 52,
   borderRadius: 14,
   border: '1px solid rgba(255,255,255,0.10)',
   background: '#11192E',
@@ -202,12 +190,12 @@ const inputStyle: React.CSSProperties = {
 }
 
 const buttonStyle: React.CSSProperties = {
-  minHeight: 50,
+  minHeight: 52,
   borderRadius: 14,
   border: 'none',
   background: '#4DA2FF',
   color: '#05070B',
-  fontWeight: 700,
+  fontWeight: 800,
   fontSize: 16,
   cursor: 'pointer',
 }
