@@ -4,15 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
-type SiteSettingsRow = {
-  id: string
-  brand_name: string
-  phone_primary: string
-  phone_display: string
-  email: string
-  service_hours: string
-}
-
 type SettingsForm = {
   id: string
   brandName: string
@@ -22,106 +13,103 @@ type SettingsForm = {
   serviceHours: string
 }
 
-const initialForm: SettingsForm = {
+const defaultForm: SettingsForm = {
   id: '',
-  brandName: '',
-  phonePrimary: '',
-  phoneDisplay: '',
-  email: '',
-  serviceHours: '',
+  brandName: 'Planetlocksmiths',
+  phonePrimary: '+1 (267) 000-0000',
+  phoneDisplay: '(267) 000-0000',
+  email: 'hello@planetlocksmiths.com',
+  serviceHours: '24/7 Mobile Service',
 }
 
 export default function AdminSettingsPage() {
   const router = useRouter()
-  const supabase = useMemo(() => getSupabaseClient(), [])
+  const supabase: any = useMemo(() => getSupabaseClient() as any, [])
 
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
-  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [form, setForm] = useState<SettingsForm>(defaultForm)
+  const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-  const [form, setForm] = useState<SettingsForm>(initialForm)
 
   useEffect(() => {
-    let isMounted = true
+    let mounted = true
 
     async function boot() {
-      setErrorMessage('')
-      setSuccessMessage('')
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-
-      if (sessionError) {
-        if (isMounted) {
-          setErrorMessage(sessionError.message)
-          setIsCheckingSession(false)
-          setIsLoadingData(false)
-        }
-        return
-      }
-
-      if (!session) {
-        router.replace('/admin/login')
-        return
-      }
-
-      if (isMounted) {
-        setIsCheckingSession(false)
-      }
-
-      await loadSettings(isMounted)
-    }
-
-    async function loadSettings(mounted: boolean) {
       try {
-        const settingsTable = supabase.from('site_settings') as any
+        setErrorMessage('')
+        setSuccessMessage('')
 
-        const { data, error } = await settingsTable
-          .select('*')
-          .limit(1)
-          .single()
+        const sessionResult = await supabase.auth.getSession()
+        const session = sessionResult?.data?.session
 
-        if (error) {
-          if (mounted) {
-            setErrorMessage(error.message)
-            setIsLoadingData(false)
-          }
+        if (!session) {
+          router.replace('/admin/login')
           return
         }
 
-        const row = data as SiteSettingsRow | null
+        const row = await ensureSettingsRow()
 
-        if (mounted && row) {
-          setForm({
-            id: row.id ?? '',
-            brandName: row.brand_name ?? '',
-            phonePrimary: row.phone_primary ?? '',
-            phoneDisplay: row.phone_display ?? '',
-            email: row.email ?? '',
-            serviceHours: row.service_hours ?? '',
-          })
-        }
+        if (!mounted) return
 
-        if (mounted) {
-          setIsLoadingData(false)
-        }
+        setForm({
+          id: row.id ?? '',
+          brandName: row.brand_name ?? defaultForm.brandName,
+          phonePrimary: row.phone_primary ?? defaultForm.phonePrimary,
+          phoneDisplay: row.phone_display ?? defaultForm.phoneDisplay,
+          email: row.email ?? defaultForm.email,
+          serviceHours: row.service_hours ?? defaultForm.serviceHours,
+        })
       } catch (error) {
+        if (!mounted) return
+        setErrorMessage(
+          error instanceof Error ? error.message : 'Failed to load settings'
+        )
+      } finally {
         if (mounted) {
-          setErrorMessage(
-            error instanceof Error ? error.message : 'Failed to load settings'
-          )
-          setIsLoadingData(false)
+          setIsBooting(false)
         }
       }
+    }
+
+    async function ensureSettingsRow() {
+      const existingResult = await supabase
+        .from('site_settings')
+        .select('id, brand_name, phone_primary, phone_display, email, service_hours')
+        .limit(1)
+        .maybeSingle()
+
+      if (existingResult.error) {
+        throw new Error(existingResult.error.message)
+      }
+
+      if (existingResult.data) {
+        return existingResult.data
+      }
+
+      const insertResult = await supabase
+        .from('site_settings')
+        .insert({
+          brand_name: defaultForm.brandName,
+          phone_primary: defaultForm.phonePrimary,
+          phone_display: defaultForm.phoneDisplay,
+          email: defaultForm.email,
+          service_hours: defaultForm.serviceHours,
+        })
+        .select('id, brand_name, phone_primary, phone_display, email, service_hours')
+        .single()
+
+      if (insertResult.error) {
+        throw new Error(insertResult.error.message)
+      }
+
+      return insertResult.data
     }
 
     boot()
 
     return () => {
-      isMounted = false
+      mounted = false
     }
   }, [router, supabase])
 
@@ -132,40 +120,35 @@ export default function AdminSettingsPage() {
     setSuccessMessage('')
 
     if (!form.id) {
-      setErrorMessage('Settings row is missing')
+      setErrorMessage('Settings row not found')
       return
     }
 
     setIsSaving(true)
 
     try {
-      const settingsTable = supabase.from('site_settings') as any
-
-      const payload = {
-        brand_name: form.brandName.trim(),
-        phone_primary: form.phonePrimary.trim(),
-        phone_display: form.phoneDisplay.trim(),
-        email: form.email.trim(),
-        service_hours: form.serviceHours.trim(),
-      }
-
-      const { error } = await settingsTable
-        .update(payload)
+      const updateResult = await supabase
+        .from('site_settings')
+        .update({
+          brand_name: form.brandName.trim(),
+          phone_primary: form.phonePrimary.trim(),
+          phone_display: form.phoneDisplay.trim(),
+          email: form.email.trim(),
+          service_hours: form.serviceHours.trim(),
+        })
         .eq('id', form.id)
 
-      setIsSaving(false)
-
-      if (error) {
-        setErrorMessage(error.message)
-        return
+      if (updateResult.error) {
+        throw new Error(updateResult.error.message)
       }
 
       setSuccessMessage('Settings saved successfully')
     } catch (error) {
-      setIsSaving(false)
       setErrorMessage(
         error instanceof Error ? error.message : 'Failed to save settings'
       )
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -179,7 +162,7 @@ export default function AdminSettingsPage() {
     }))
   }
 
-  if (isCheckingSession || isLoadingData) {
+  if (isBooting) {
     return (
       <main
         style={{
