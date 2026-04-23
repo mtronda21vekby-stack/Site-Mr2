@@ -23,48 +23,32 @@ export default function AdminShell({
           minHeight: '100vh',
         }}
       >
-        <div
-          style={{
-            display: 'none',
-          }}
-          className="admin-sidebar-mobile-hidden"
-        />
+        <AdminSidebar />
 
-        <div
+        <main
           style={{
-            display: 'flex',
-            width: '100%',
-            minHeight: '100vh',
+            flex: 1,
+            padding: 20,
+            boxSizing: 'border-box',
+            background:
+              'radial-gradient(circle at top right, rgba(77,162,255,0.08), transparent 30%), #05070B',
           }}
         >
-          <div
-            style={{
-              display: 'none',
-            }}
-          />
-
-          <div
-            style={{
-              width: 260,
-              flexShrink: 0,
-            }}
-          >
-            <AdminSidebar />
-          </div>
-
-          <main
-            style={{
-              flex: 1,
-              padding: 20,
-              boxSizing: 'border-box',
-            }}
-          >
-            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+            <div
+              style={{
+                background: 'rgba(11,16,32,0.78)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 20,
+                padding: 18,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
               <AdminTopbar />
               {children}
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   )
