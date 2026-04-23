@@ -68,6 +68,28 @@ type FaqRow = {
   is_published: boolean | null
 }
 
+type ServiceRow = {
+  id: string
+  locale: string
+  slug: string
+  title: string | null
+  excerpt: string | null
+  intro: string | null
+  seo_title: string | null
+  seo_description: string | null
+  sort_order: number | null
+  is_published: boolean | null
+}
+
+export type ServiceContent = {
+  slug: string
+  title: string
+  excerpt: string
+  intro: string
+  seoTitle: string
+  seoDescription: string
+}
+
 export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
   noStore()
 
@@ -228,5 +250,94 @@ export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
   } catch (error) {
     console.error('getFaqFromSource failed:', error)
     return fileFallback
+  }
+}
+
+export async function getServicePageFromSource(
+  locale: Locale,
+  slug: string
+): Promise<ServiceContent | null> {
+  noStore()
+
+  const fileHome = getFileHomeContent(locale)
+  const fileFallback = fileHome.featuredServices.find((item) => item.slug === slug)
+
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    if (!fileFallback) return null
+
+    return {
+      slug: fileFallback.slug,
+      title: fileFallback.title,
+      excerpt: fileFallback.excerpt,
+      intro: fileFallback.excerpt,
+      seoTitle: fileFallback.title,
+      seoDescription: fileFallback.excerpt,
+    }
+  }
+
+  try {
+    const result = await (supabase.from('services') as any)
+      .select(
+        'id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published'
+      )
+      .eq('locale', locale)
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .limit(1)
+
+    if (result.error) {
+      console.error('services select error:', result.error)
+
+      if (!fileFallback) return null
+
+      return {
+        slug: fileFallback.slug,
+        title: fileFallback.title,
+        excerpt: fileFallback.excerpt,
+        intro: fileFallback.excerpt,
+        seoTitle: fileFallback.title,
+        seoDescription: fileFallback.excerpt,
+      }
+    }
+
+    const row = (result.data?.[0] ?? null) as ServiceRow | null
+
+    if (!row) {
+      if (!fileFallback) return null
+
+      return {
+        slug: fileFallback.slug,
+        title: fileFallback.title,
+        excerpt: fileFallback.excerpt,
+        intro: fileFallback.excerpt,
+        seoTitle: fileFallback.title,
+        seoDescription: fileFallback.excerpt,
+      }
+    }
+
+    return {
+      slug: row.slug,
+      title: row.title ?? fileFallback?.title ?? '',
+      excerpt: row.excerpt ?? fileFallback?.excerpt ?? '',
+      intro: row.intro ?? row.excerpt ?? fileFallback?.excerpt ?? '',
+      seoTitle: row.seo_title ?? row.title ?? fileFallback?.title ?? '',
+      seoDescription:
+        row.seo_description ?? row.excerpt ?? fileFallback?.excerpt ?? '',
+    }
+  } catch (error) {
+    console.error('getServicePageFromSource failed:', error)
+
+    if (!fileFallback) return null
+
+    return {
+      slug: fileFallback.slug,
+      title: fileFallback.title,
+      excerpt: fileFallback.excerpt,
+      intro: fileFallback.excerpt,
+      seoTitle: fileFallback.title,
+      seoDescription: fileFallback.excerpt,
+    }
   }
 }
