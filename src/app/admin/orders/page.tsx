@@ -215,12 +215,7 @@ export default function AdminOrdersPage() {
               gap: 14,
             }}
           >
-            <div
-              style={{
-                display: 'grid',
-                gap: 8,
-              }}
-            >
+            <div style={{ display: 'grid', gap: 8 }}>
               <strong style={{ fontSize: 18 }}>
                 {row.service_needed || 'Order'}
               </strong>
@@ -253,12 +248,7 @@ export default function AdminOrdersPage() {
               ) : null}
             </div>
 
-            <div
-              style={{
-                display: 'grid',
-                gap: 12,
-              }}
-            >
+            <div style={{ display: 'grid', gap: 12 }}>
               <label style={{ display: 'grid', gap: 8 }}>
                 <span style={{ fontSize: 14, color: '#95A0B8' }}>Status</span>
                 <select
