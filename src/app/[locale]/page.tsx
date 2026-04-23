@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from 'next/cache'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Hero from '@/components/hero/Hero'
@@ -15,6 +16,7 @@ import {
 } from '@/lib/content.server'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function generateStaticParams() {
   return [
@@ -29,6 +31,8 @@ export default async function LocaleHome({
 }: {
   params: Promise<{ locale: 'en' | 'es' | 'ru' }>
 }) {
+  noStore()
+
   const { locale } = await params
 
   const [home, global, reviews, faqs] = await Promise.all([
