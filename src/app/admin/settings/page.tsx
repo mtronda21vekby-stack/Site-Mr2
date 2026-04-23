@@ -4,6 +4,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
+type SiteSettingsRow = {
+  id: string
+  brand_name: string | null
+  phone_primary: string | null
+  phone_display: string | null
+  email: string | null
+  service_hours: string | null
+}
+
 type SettingsForm = {
   id: string
   brandName: string
@@ -24,7 +33,7 @@ const defaultForm: SettingsForm = {
 
 export default function AdminSettingsPage() {
   const router = useRouter()
-  const supabase: any = useMemo(() => getSupabaseClient() as any, [])
+  const supabase = useMemo(() => getSupabaseClient() as any, [])
 
   const [form, setForm] = useState<SettingsForm>(defaultForm)
   const [isBooting, setIsBooting] = useState(true)
@@ -48,7 +57,20 @@ export default function AdminSettingsPage() {
           return
         }
 
-        const row = await ensureSettingsRow()
+        const settingsTable = supabase.from('site_settings') as any
+        const result = await settingsTable
+          .select('id, brand_name, phone_primary, phone_display, email, service_hours')
+          .limit(1)
+
+        if (result.error) {
+          throw new Error(result.error.message)
+        }
+
+        const row = (result.data?.[0] ?? null) as SiteSettingsRow | null
+
+        if (!row) {
+          throw new Error('No row found in site_settings table')
+        }
 
         if (!mounted) return
 
@@ -72,40 +94,6 @@ export default function AdminSettingsPage() {
       }
     }
 
-    async function ensureSettingsRow() {
-      const existingResult = await supabase
-        .from('site_settings')
-        .select('id, brand_name, phone_primary, phone_display, email, service_hours')
-        .limit(1)
-        .maybeSingle()
-
-      if (existingResult.error) {
-        throw new Error(existingResult.error.message)
-      }
-
-      if (existingResult.data) {
-        return existingResult.data
-      }
-
-      const insertResult = await supabase
-        .from('site_settings')
-        .insert({
-          brand_name: defaultForm.brandName,
-          phone_primary: defaultForm.phonePrimary,
-          phone_display: defaultForm.phoneDisplay,
-          email: defaultForm.email,
-          service_hours: defaultForm.serviceHours,
-        })
-        .select('id, brand_name, phone_primary, phone_display, email, service_hours')
-        .single()
-
-      if (insertResult.error) {
-        throw new Error(insertResult.error.message)
-      }
-
-      return insertResult.data
-    }
-
     boot()
 
     return () => {
@@ -127,8 +115,9 @@ export default function AdminSettingsPage() {
     setIsSaving(true)
 
     try {
-      const updateResult = await supabase
-        .from('site_settings')
+      const settingsTable = supabase.from('site_settings') as any
+
+      const updateResult = await settingsTable
         .update({
           brand_name: form.brandName.trim(),
           phone_primary: form.phonePrimary.trim(),
