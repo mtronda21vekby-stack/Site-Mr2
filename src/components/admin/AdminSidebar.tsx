@@ -1,39 +1,44 @@
-const navItems = [
-  { label: 'Dashboard', href: '/admin' },
-  { label: 'Settings', href: '/admin/settings' },
-  { label: 'Home', href: '/admin/home' },
-  { label: 'Services', href: '/admin/services' },
-  { label: 'Areas', href: '/admin/areas' },
-  { label: 'Reviews', href: '/admin/reviews' },
-  { label: 'FAQ', href: '/admin/faq' },
-  { label: 'Media', href: '/admin/media' },
+'use client'
+
+const items = [
+  { href: '/admin/direct', label: 'Dashboard' },
+  { href: '/admin/settings', label: 'Settings' },
+  { href: '/admin/home', label: 'Home' },
+  { href: '/admin/reviews', label: 'Reviews' },
+  { href: '/admin/faq', label: 'FAQ' },
+  { href: '/admin/services', label: 'Services' },
+  { href: '/admin/areas', label: 'Areas' },
 ]
 
 export default function AdminSidebar() {
   return (
     <aside
       style={{
-        padding: 14,
+        width: 260,
+        minWidth: 260,
+        background: '#0B1020',
+        borderRight: '1px solid rgba(255,255,255,0.08)',
+        padding: 18,
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ marginBottom: 14 }}>
+      <div style={{ marginBottom: 18 }}>
         <p
           style={{
             margin: 0,
             color: '#95A0B8',
             fontSize: 12,
-            letterSpacing: 0.4,
             textTransform: 'uppercase',
+            letterSpacing: 0.8,
           }}
         >
           Planetlocksmiths
         </p>
         <h2
           style={{
-            margin: '6px 0 0',
+            margin: '8px 0 0',
             color: '#F5F7FB',
-            fontSize: 22,
+            fontSize: 24,
             lineHeight: 1.1,
           }}
         >
@@ -41,32 +46,21 @@ export default function AdminSidebar() {
         </h2>
       </div>
 
-      <nav
-        style={{
-          display: 'flex',
-          gap: 10,
-          overflowX: 'auto',
-          paddingBottom: 4,
-        }}
-      >
-        {navItems.map((item) => (
+      <nav style={{ display: 'grid', gap: 10 }}>
+        {items.map((item) => (
           <a
             key={item.href}
             href={item.href}
             style={{
-              whiteSpace: 'nowrap',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 42,
-              padding: '0 14px',
-              borderRadius: 12,
+              display: 'block',
+              textDecoration: 'none',
               color: '#F5F7FB',
               background: '#11192E',
-              textDecoration: 'none',
-              fontSize: 14,
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 12,
+              padding: '12px 14px',
+              fontSize: 15,
               lineHeight: 1.3,
-              border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
             {item.label}
