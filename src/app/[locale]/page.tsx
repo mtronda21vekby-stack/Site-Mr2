@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from 'next/cache'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
+import CinematicBackground from '@/components/layout/CinematicBackground'
 import Hero from '@/components/hero/Hero'
 import ServicesGrid from '@/components/sections/ServicesGrid'
 import WhyChoose from '@/components/sections/WhyChoose'
@@ -10,6 +11,7 @@ import ReviewsSection from '@/components/sections/ReviewsSection'
 import FaqSection from '@/components/sections/FaqSection'
 import ContactSection from '@/components/sections/ContactSection'
 import CustomerInfoSection from '@/components/sections/CustomerInfoSection'
+import ServiceDepthSection from '@/components/sections/ServiceDepthSection'
 import {
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
@@ -49,6 +51,7 @@ export default async function LocaleHome({
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
+      <CinematicBackground />
       <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
 
       <main className="flex flex-col">
@@ -63,6 +66,7 @@ export default async function LocaleHome({
         />
 
         <ServicesGrid services={services} locale={locale} />
+        <ServiceDepthSection locale={locale} />
         <CustomerInfoSection locale={locale} />
         <WhyChoose items={home.whyChoose} />
 
@@ -76,7 +80,6 @@ export default async function LocaleHome({
 
         {featuredAreas.length ? (
           <section className="relative overflow-hidden bg-transparent py-16 sm:py-20">
-            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_50%,rgba(77,162,255,0.1),transparent_26rem),radial-gradient(circle_at_84%_8%,rgba(214,168,95,0.08),transparent_22rem)]" />
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-3xl">
