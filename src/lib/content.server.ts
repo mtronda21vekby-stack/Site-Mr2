@@ -97,6 +97,21 @@ type AreaRow = {
   is_published: boolean | null
 }
 
+type SiteContentBlockRow = {
+  id: string
+  locale: string
+  page_key: string
+  slot: string
+  eyebrow: string | null
+  title: string | null
+  body: string | null
+  items: unknown
+  cta_label: string | null
+  cta_href: string | null
+  sort_order: number | null
+  is_published: boolean | null
+}
+
 export type ServiceContent = {
   slug: string
   title: string
@@ -116,6 +131,78 @@ export type AreaContent = {
   supportedServices: string[]
   seoTitle: string
   seoDescription: string
+}
+
+export type SiteContentBlock = {
+  id: string
+  locale: Locale
+  pageKey: string
+  slot: string
+  eyebrow: string
+  title: string
+  body: string
+  items: string[]
+  ctaLabel: string
+  ctaHref: string
+  sortOrder: number
+}
+
+function normalizeItems(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean)
+  }
+
+  return []
+}
+
+export async function getContentBlocksFromSource(
+  locale: Locale,
+  pageKey: string,
+  slot?: string
+): Promise<SiteContentBlock[]> {
+  noStore()
+
+  const supabase = getSupabaseServerClient()
+  if (!supabase) return []
+
+  try {
+    let query = (supabase.from('site_content_blocks') as any)
+      .select('id, locale, page_key, slot, eyebrow, title, body, items, cta_label, cta_href, sort_order, is_published')
+      .eq('locale', locale)
+      .eq('page_key', pageKey)
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+
+    if (slot) {
+      query = query.eq('slot', slot)
+    }
+
+    const result = await query
+
+    if (result.error) {
+      console.error('site_content_blocks select error:', result.error)
+      return []
+    }
+
+    const rows = Array.isArray(result.data) ? (result.data as SiteContentBlockRow[]) : []
+
+    return rows.map((row) => ({
+      id: row.id,
+      locale: row.locale as Locale,
+      pageKey: row.page_key,
+      slot: row.slot,
+      eyebrow: row.eyebrow ?? '',
+      title: row.title ?? '',
+      body: row.body ?? '',
+      items: normalizeItems(row.items),
+      ctaLabel: row.cta_label ?? '',
+      ctaHref: row.cta_href ?? '',
+      sortOrder: Number(row.sort_order ?? 0),
+    }))
+  } catch (error) {
+    console.error('getContentBlocksFromSource failed:', error)
+    return []
+  }
 }
 
 export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
