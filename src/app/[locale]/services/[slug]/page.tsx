@@ -9,10 +9,12 @@ import JsonLd from '@/components/seo/JsonLd'
 import ContactSection from '@/components/sections/ContactSection'
 import FaqSection from '@/components/sections/FaqSection'
 import {
+  getContentBlocksFromSource,
   getFaqFromSource,
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
   getServicePageFromSource,
+  type SiteContentBlock,
 } from '@/lib/content.server'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -20,54 +22,24 @@ type Locale = 'en' | 'es' | 'ru'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: Locale; slug: string }>
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
   const service = await getServicePageFromSource(locale, slug)
 
-  if (!service) {
-    return {
-      title: 'Service Not Found | Planetlocksmiths',
-      robots: { index: false, follow: false },
-    }
-  }
+  if (!service) return { title: 'Service Not Found | Planetlocksmiths', robots: { index: false, follow: false } }
 
   const url = `${siteUrl}/${locale}/services/${service.slug}`
   const title = service.seoTitle || service.title
   const description = service.seoDescription || service.excerpt
 
-  return {
-    title,
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: 'website',
-      url,
-      title,
-      description,
-      siteName: 'Planetlocksmiths',
-    },
-  }
+  return { title, description, alternates: { canonical: url }, openGraph: { type: 'website', url, title, description, siteName: 'Planetlocksmiths' } }
 }
 
-const labels: Record<Locale, {
-  serviceEyebrow: string
-  overview: string
-  details: string
-  readiness: string
-  price: string
-  authorization: string
-  process: string
-  processItems: string[]
-}> = {
+const labels: Record<Locale, { serviceEyebrow: string; overview: string; readiness: string; price: string; authorization: string; process: string; processItems: string[] }> = {
   en: {
     serviceEyebrow: 'Automotive locksmith service',
     overview: 'Service overview',
-    details: 'Service details from admin',
     readiness: 'Information customers should prepare',
     price: 'What affects price and timing',
     authorization: 'Authorization and safety',
@@ -77,7 +49,6 @@ const labels: Record<Locale, {
   es: {
     serviceEyebrow: 'Servicio de cerrajería automotriz',
     overview: 'Resumen del servicio',
-    details: 'Detalles desde la administración',
     readiness: 'Información que el cliente debe preparar',
     price: 'Qué afecta precio y tiempo',
     authorization: 'Autorización y seguridad',
@@ -87,7 +58,6 @@ const labels: Record<Locale, {
   ru: {
     serviceEyebrow: 'Автомобильная locksmith-услуга',
     overview: 'Описание услуги',
-    details: 'Детали из админки',
     readiness: 'Что клиенту подготовить',
     price: 'Что влияет на цену и сроки',
     authorization: 'Авторизация и безопасность',
@@ -96,21 +66,19 @@ const labels: Record<Locale, {
   },
 }
 
-export default async function ServiceDetailPage({
-  params,
-}: {
-  params: Promise<{ locale: Locale; slug: string }>
-}) {
+export default async function ServiceDetailPage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
   noStore()
 
   const { locale, slug } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
 
-  const [global, home, service, faq] = await Promise.all([
+  const [global, home, service, faq, commonBlocks, serviceBlocks] = await Promise.all([
     getGlobalSettingsFromSource(),
     getHomeContentFromSource(locale),
     getServicePageFromSource(locale, slug),
     getFaqFromSource(locale),
+    getContentBlocksFromSource(locale, 'service-detail'),
+    getContentBlocksFromSource(locale, `service:${slug}`),
   ])
 
   if (!service) notFound()
@@ -120,33 +88,18 @@ export default async function ServiceDetailPage({
   const pageUrl = `${siteUrl}/${locale}/services/${service.slug}`
   const primaryCta = home.heroPrimaryCta || global.phoneDisplay
   const secondaryCta = home.heroSecondaryCta || home.contactTitle || 'Request service'
+  const blockBySlot = new Map([...commonBlocks, ...serviceBlocks].map((block) => [block.slot, block]))
+  const heroBlock = blockBySlot.get('hero')
+  const overviewBlock = blockBySlot.get('overview')
+  const readinessBlock = blockBySlot.get('readiness')
+  const pricingBlock = blockBySlot.get('pricing')
+  const authorizationBlock = blockBySlot.get('authorization')
+  const processBlock = blockBySlot.get('process')
+  const processItems = processBlock?.items.length ? processBlock.items : copy.processItems
 
   const jsonLd = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Service',
-      '@id': `${pageUrl}#service`,
-      name: service.title,
-      description: service.seoDescription || service.excerpt,
-      url: pageUrl,
-      provider: {
-        '@type': 'AutomotiveBusiness',
-        name: global.brandName,
-        telephone: global.phoneDisplay,
-        url: `${siteUrl}/${locale}`,
-      },
-      areaServed: 'Philadelphia, Pennsylvania and nearby coverage areas',
-      serviceType: service.title,
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/${locale}` },
-        { '@type': 'ListItem', position: 2, name: 'Services', item: `${siteUrl}/${locale}/services` },
-        { '@type': 'ListItem', position: 3, name: service.title, item: pageUrl },
-      ],
-    },
+    { '@context': 'https://schema.org', '@type': 'Service', '@id': `${pageUrl}#service`, name: service.title, description: service.seoDescription || service.excerpt, url: pageUrl, provider: { '@type': 'AutomotiveBusiness', name: global.brandName, telephone: global.phoneDisplay, url: `${siteUrl}/${locale}` }, areaServed: 'Philadelphia, Pennsylvania and nearby coverage areas', serviceType: service.title },
+    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/${locale}` }, { '@type': 'ListItem', position: 2, name: 'Services', item: `${siteUrl}/${locale}/services` }, { '@type': 'ListItem', position: 3, name: service.title, item: pageUrl }] },
   ]
 
   return (
@@ -159,12 +112,12 @@ export default async function ServiceDetailPage({
         <article className="mx-auto max-w-7xl">
           <section className="grid gap-8 rounded-[2rem] border border-white/10 bg-white/[0.05] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">
             <div>
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">{copy.serviceEyebrow}</p>
-              <h1 className="max-w-5xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-7xl">{service.title}</h1>
-              {service.excerpt ? <p className="mt-6 max-w-3xl text-base leading-8 text-muted sm:text-lg">{service.excerpt}</p> : null}
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">{heroBlock?.eyebrow || copy.serviceEyebrow}</p>
+              <h1 className="max-w-5xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-7xl">{heroBlock?.title || service.title}</h1>
+              {heroBlock?.body || service.excerpt ? <p className="mt-6 max-w-3xl text-base leading-8 text-muted sm:text-lg">{heroBlock?.body || service.excerpt}</p> : null}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition hover:brightness-110">{primaryCta}</a>
-                <a href="#request-service" className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-accent-gold transition hover:bg-accent-gold/15">{secondaryCta}</a>
+                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition hover:brightness-110">{heroBlock?.ctaLabel || primaryCta}</a>
+                <a href={heroBlock?.ctaHref || '#request-service'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-accent-gold transition hover:bg-accent-gold/15">{secondaryCta}</a>
               </div>
             </div>
 
@@ -177,25 +130,24 @@ export default async function ServiceDetailPage({
 
           <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_23rem]">
             <div className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 backdrop-blur-xl sm:p-8">
-              <p className="mb-5 text-xs font-bold uppercase tracking-[0.26em] text-accent-gold">{service.seoTitle || copy.overview}</p>
-              {paragraphs.length ? (
-                <div className="space-y-5 text-base leading-8 text-muted">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
-              ) : (
-                <p className="text-base leading-8 text-muted">{service.seoDescription || service.excerpt}</p>
-              )}
+              <p className="mb-5 text-xs font-bold uppercase tracking-[0.26em] text-accent-gold">{overviewBlock?.eyebrow || service.seoTitle || copy.overview}</p>
+              {overviewBlock?.title ? <h2 className="mb-5 text-3xl font-semibold tracking-[-0.035em] text-text">{overviewBlock.title}</h2> : null}
+              {overviewBlock?.body ? <p className="text-base leading-8 text-muted">{overviewBlock.body}</p> : paragraphs.length ? <div className="space-y-5 text-base leading-8 text-muted">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div> : <p className="text-base leading-8 text-muted">{service.seoDescription || service.excerpt}</p>}
             </div>
 
             <aside className="grid gap-4">
-              <InfoCard title={copy.readiness} text="Vehicle make, model, year, current location, urgency, and whether all keys are lost help make the request actionable." />
-              <InfoCard title={copy.price} text="Final pricing can depend on vehicle security system, key type, programming requirements, parts availability, distance, timing, and job complexity." />
-              <InfoCard title={copy.authorization} text="Customers may be asked to confirm authorization to access or service the vehicle before work begins." />
+              <InfoCard block={readinessBlock} title={copy.readiness} text="Vehicle make, model, year, current location, urgency, and whether all keys are lost help make the request actionable." />
+              <InfoCard block={pricingBlock} title={copy.price} text="Final pricing can depend on vehicle security system, key type, programming requirements, parts availability, distance, timing, and job complexity." />
+              <InfoCard block={authorizationBlock} title={copy.authorization} text="Customers may be asked to confirm authorization to access or service the vehicle before work begins." />
             </aside>
           </section>
 
           <section className="mt-8 rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 backdrop-blur-xl sm:p-8">
-            <p className="mb-6 text-xs font-bold uppercase tracking-[0.26em] text-accent-cyan">{copy.process}</p>
+            <p className="mb-6 text-xs font-bold uppercase tracking-[0.26em] text-accent-cyan">{processBlock?.eyebrow || copy.process}</p>
+            {processBlock?.title ? <h2 className="mb-6 text-3xl font-semibold tracking-[-0.035em] text-text">{processBlock.title}</h2> : null}
+            {processBlock?.body ? <p className="mb-6 max-w-3xl text-sm leading-7 text-muted">{processBlock.body}</p> : null}
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {copy.processItems.map((item, index) => (
+              {processItems.map((item, index) => (
                 <div key={item} className="rounded-[1.25rem] border border-white/10 bg-black/20 p-4">
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-blue text-sm font-bold text-black">{index + 1}</span>
                   <p className="mt-4 text-sm leading-7 text-muted">{item}</p>
@@ -206,7 +158,6 @@ export default async function ServiceDetailPage({
         </article>
 
         {faq.length ? <FaqSection title={home.faqTitle} items={faq} /> : null}
-
         <ContactSection title={home.contactTitle} text={home.contactText} phoneNumber={global.phonePrimary} phoneDisplay={global.phoneDisplay} locale={locale} />
       </main>
 
@@ -216,11 +167,13 @@ export default async function ServiceDetailPage({
   )
 }
 
-function InfoCard({ title, text }: { title: string; text: string }) {
+function InfoCard({ block, title, text }: { block?: SiteContentBlock; title: string; text: string }) {
+  const items = block?.items ?? []
   return (
     <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-5 backdrop-blur-xl">
-      <h2 className="text-lg font-semibold text-text">{title}</h2>
-      <p className="mt-2 text-sm leading-7 text-muted">{text}</p>
+      <h2 className="text-lg font-semibold text-text">{block?.title || title}</h2>
+      <p className="mt-2 text-sm leading-7 text-muted">{block?.body || text}</p>
+      {items.length ? <ul className="mt-4 grid gap-2">{items.map((item) => <li key={item} className="flex gap-3 text-sm leading-6 text-text/85"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-gold" /><span>{item}</span></li>)}</ul> : null}
     </div>
   )
 }
