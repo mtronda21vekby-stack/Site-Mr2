@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
+import AdminReadinessGuide from '@/components/admin/AdminReadinessGuide'
 
 type Locale = 'en' | 'es' | 'ru'
 
@@ -267,6 +268,15 @@ export default function AdminHomePage() {
         </div>
       </div>
 
+      <AdminReadinessGuide
+        title="These fields control the premium homepage, CTAs, conversion rails, emergency panels, FAQ title, and request form text."
+        items={[
+          { title: 'Hero + first impression', text: 'Hero Title, Hero Subtitle, and both CTA fields are visible above the fold and inside premium conversion panels.' },
+          { title: 'Emergency conversion', text: 'Emergency Title and Emergency Text power the dispatch panels and should explain urgency, service availability, and next steps.' },
+          { title: 'Ads readiness', text: 'Contact Title/Text, FAQ Title, and Reviews Title help Google Ads quality by making service purpose, trust, and request flow clear.' },
+        ]}
+      />
+
       {errorMessage ? (
         <div
           style={{
@@ -313,65 +323,16 @@ export default function AdminHomePage() {
           padding: 18,
         }}
       >
-        <Field
-          label="Hero Title"
-          value={form.heroTitle}
-          onChange={(value) => updateField('heroTitle', value)}
-        />
-
-        <TextAreaField
-          label="Hero Subtitle"
-          value={form.heroSubtitle}
-          onChange={(value) => updateField('heroSubtitle', value)}
-        />
-
-        <Field
-          label="Primary CTA"
-          value={form.heroPrimaryCta}
-          onChange={(value) => updateField('heroPrimaryCta', value)}
-        />
-
-        <Field
-          label="Secondary CTA"
-          value={form.heroSecondaryCta}
-          onChange={(value) => updateField('heroSecondaryCta', value)}
-        />
-
-        <Field
-          label="Emergency Title"
-          value={form.emergencyTitle}
-          onChange={(value) => updateField('emergencyTitle', value)}
-        />
-
-        <TextAreaField
-          label="Emergency Text"
-          value={form.emergencyText}
-          onChange={(value) => updateField('emergencyText', value)}
-        />
-
-        <Field
-          label="Reviews Title"
-          value={form.reviewsTitle}
-          onChange={(value) => updateField('reviewsTitle', value)}
-        />
-
-        <Field
-          label="FAQ Title"
-          value={form.faqTitle}
-          onChange={(value) => updateField('faqTitle', value)}
-        />
-
-        <Field
-          label="Contact Title"
-          value={form.contactTitle}
-          onChange={(value) => updateField('contactTitle', value)}
-        />
-
-        <TextAreaField
-          label="Contact Text"
-          value={form.contactText}
-          onChange={(value) => updateField('contactText', value)}
-        />
+        <Field label="Hero Title" value={form.heroTitle} onChange={(value) => updateField('heroTitle', value)} />
+        <TextAreaField label="Hero Subtitle" value={form.heroSubtitle} onChange={(value) => updateField('heroSubtitle', value)} />
+        <Field label="Primary CTA" value={form.heroPrimaryCta} onChange={(value) => updateField('heroPrimaryCta', value)} />
+        <Field label="Secondary CTA" value={form.heroSecondaryCta} onChange={(value) => updateField('heroSecondaryCta', value)} />
+        <Field label="Emergency Title" value={form.emergencyTitle} onChange={(value) => updateField('emergencyTitle', value)} />
+        <TextAreaField label="Emergency Text" value={form.emergencyText} onChange={(value) => updateField('emergencyText', value)} />
+        <Field label="Reviews Title" value={form.reviewsTitle} onChange={(value) => updateField('reviewsTitle', value)} />
+        <Field label="FAQ Title" value={form.faqTitle} onChange={(value) => updateField('faqTitle', value)} />
+        <Field label="Contact Title" value={form.contactTitle} onChange={(value) => updateField('contactTitle', value)} />
+        <TextAreaField label="Contact Text" value={form.contactText} onChange={(value) => updateField('contactText', value)} />
       </form>
 
       <AdminStickySaveBar
@@ -384,45 +345,20 @@ export default function AdminHomePage() {
   )
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-}) {
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
     <label style={{ display: 'grid', gap: 8 }}>
       <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        style={inputStyle}
-      />
+      <input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} />
     </label>
   )
 }
 
-function TextAreaField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-}) {
+function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
     <label style={{ display: 'grid', gap: 8 }}>
       <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        rows={4}
-        style={textAreaStyle}
-      />
+      <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} />
     </label>
   )
 }
