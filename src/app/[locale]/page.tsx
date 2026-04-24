@@ -15,6 +15,7 @@ import CustomerInfoSection from '@/components/sections/CustomerInfoSection'
 import ServiceDepthSection from '@/components/sections/ServiceDepthSection'
 import ConversionRail from '@/components/sections/ConversionRail'
 import {
+  getContentBlocksFromSource,
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
   getReviewsFromSource,
@@ -41,15 +42,20 @@ export default async function LocaleHome({
   const { locale } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
 
-  const [global, home, reviews, faq, services, areas] = await Promise.all([
+  const [global, home, reviews, faq, services, areas, blocks] = await Promise.all([
     getGlobalSettingsFromSource(),
     getHomeContentFromSource(locale),
     getReviewsFromSource(locale),
     getFaqFromSource(locale),
     getServicesListFromSource(locale),
     getAreasListFromSource(locale),
+    getContentBlocksFromSource(locale, 'home'),
   ])
 
+  const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
+  const serviceDepthBlock = blockBySlot.get('service-depth')
+  const customerInfoBlock = blockBySlot.get('customer-info')
+  const areaSectionBlock = blockBySlot.get('area-section')
   const featuredAreas = areas.slice(0, 6)
   const pageUrl = `${siteUrl}/${locale}`
   const jsonLd = [
@@ -109,14 +115,14 @@ export default async function LocaleHome({
         <ServiceDepthSection
           locale={locale}
           services={services}
-          eyebrow={home.faqTitle}
-          title={home.emergencyTitle}
-          intro={home.emergencyText}
+          eyebrow={serviceDepthBlock?.eyebrow || home.faqTitle}
+          title={serviceDepthBlock?.title || home.emergencyTitle}
+          intro={serviceDepthBlock?.body || home.emergencyText}
         />
         <CustomerInfoSection
-          eyebrow={home.contactTitle}
-          title={home.contactTitle}
-          intro={home.contactText}
+          eyebrow={customerInfoBlock?.eyebrow || home.contactTitle}
+          title={customerInfoBlock?.title || home.contactTitle}
+          intro={customerInfoBlock?.body || home.contactText}
           services={services}
           faq={faq}
         />
@@ -135,11 +141,11 @@ export default async function LocaleHome({
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-3xl">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-accent-cyan">{home.contactTitle}</p>
-                  <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">{home.heroSecondaryCta}</h2>
-                  <p className="mt-4 text-sm leading-7 text-muted">{home.contactText}</p>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-accent-cyan">{areaSectionBlock?.eyebrow || home.contactTitle}</p>
+                  <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">{areaSectionBlock?.title || home.heroSecondaryCta}</h2>
+                  <p className="mt-4 text-sm leading-7 text-muted">{areaSectionBlock?.body || home.contactText}</p>
                 </div>
-                <a href={`/${locale}/areas`} className="inline-flex w-fit rounded-full border border-white/15 bg-white/[0.035] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-accent-blue backdrop-blur-xl transition hover:border-accent-blue/50 hover:bg-accent-blue/10">{home.heroSecondaryCta} →</a>
+                <a href={areaSectionBlock?.ctaHref || `/${locale}/areas`} className="inline-flex w-fit rounded-full border border-white/15 bg-white/[0.035] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-accent-blue backdrop-blur-xl transition hover:border-accent-blue/50 hover:bg-accent-blue/10">{areaSectionBlock?.ctaLabel || home.heroSecondaryCta} →</a>
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -151,7 +157,7 @@ export default async function LocaleHome({
                       <h3 className="text-xl font-semibold tracking-[-0.02em] text-text">{area.title}</h3>
                       <p className="mt-2 text-sm text-muted">{[area.city, area.state].filter(Boolean).join(', ')}</p>
                       <p className="mt-4 text-sm leading-7 text-muted">{area.intro}</p>
-                      <span className="mt-5 inline-flex text-xs font-bold uppercase tracking-[0.16em] text-accent-blue transition group-hover:text-accent-cyan">{home.heroSecondaryCta} →</span>
+                      <span className="mt-5 inline-flex text-xs font-bold uppercase tracking-[0.16em] text-accent-blue transition group-hover:text-accent-cyan">{areaSectionBlock?.ctaLabel || home.heroSecondaryCta} →</span>
                     </div>
                   </a>
                 ))}
