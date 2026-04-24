@@ -10,7 +10,7 @@ export default function AdminShell({
 }: {
   children: ReactNode
 }) {
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
 
   useEffect(() => {
     function syncViewport() {
@@ -25,6 +25,10 @@ export default function AdminShell({
     }
   }, [])
 
+  if (isMobile === null) {
+    return null
+  }
+
   if (isMobile) {
     return (
       <div
@@ -38,12 +42,16 @@ export default function AdminShell({
       >
         <main
           style={{
-            padding: 14,
+            paddingTop: 'calc(12px + env(safe-area-inset-top))',
+            paddingRight: 'calc(12px + env(safe-area-inset-right))',
+            paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
+            paddingLeft: 'calc(12px + env(safe-area-inset-left))',
             boxSizing: 'border-box',
           }}
         >
           <div
             style={{
+              width: '100%',
               maxWidth: 1240,
               margin: '0 auto',
               display: 'grid',
@@ -58,7 +66,7 @@ export default function AdminShell({
                 padding: 14,
                 backdropFilter: 'blur(12px)',
                 position: 'sticky',
-                top: 12,
+                top: 'calc(10px + env(safe-area-inset-top))',
                 zIndex: 30,
               }}
             >
@@ -75,6 +83,7 @@ export default function AdminShell({
                 borderRadius: 20,
                 padding: 14,
                 backdropFilter: 'blur(10px)',
+                overflow: 'hidden',
               }}
             >
               {children}
@@ -107,7 +116,10 @@ export default function AdminShell({
         <main
           style={{
             flex: 1,
-            padding: 20,
+            paddingTop: 20,
+            paddingRight: 'calc(20px + env(safe-area-inset-right))',
+            paddingBottom: 20,
+            paddingLeft: 'calc(20px + env(safe-area-inset-left))',
             boxSizing: 'border-box',
           }}
         >
@@ -119,6 +131,7 @@ export default function AdminShell({
                 borderRadius: 20,
                 padding: 18,
                 backdropFilter: 'blur(10px)',
+                overflow: 'hidden',
               }}
             >
               <AdminTopbar />
