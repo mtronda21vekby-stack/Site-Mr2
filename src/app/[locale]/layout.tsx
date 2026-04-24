@@ -1,15 +1,9 @@
 import type { ReactNode } from 'react'
 import { notFound } from 'next/navigation'
-
-const locales = ['en', 'es', 'ru'] as const
-type Locale = (typeof locales)[number]
-
-function isValidLocale(value: string): value is Locale {
-  return locales.includes(value as Locale)
-}
+import { ACTIVE_LOCALES, isValidLocale } from '@/lib/locales'
 
 export async function generateStaticParams() {
-  return locales.map((locale) => ({ locale }))
+  return ACTIVE_LOCALES.map((locale) => ({ locale }))
 }
 
 export default async function LocaleLayout({
