@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStatCard from '@/components/admin/AdminStatCard'
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
   ]
 
   return (
-    <div>
+    <div style={{ minWidth: 0 }}>
       <div
         style={{
           marginBottom: 20,
@@ -228,7 +228,7 @@ export default function AdminDashboardPage() {
           flexWrap: 'wrap',
         }}
       >
-        <div>
+        <div style={{ minWidth: 0 }}>
           <p
             style={{
               margin: 0,
@@ -244,6 +244,7 @@ export default function AdminDashboardPage() {
               margin: '8px 0 0',
               fontSize: 36,
               lineHeight: 1.1,
+              wordBreak: 'break-word',
             }}
           >
             Technical Dashboard
@@ -254,35 +255,14 @@ export default function AdminDashboardPage() {
           type="button"
           onClick={() => window.location.reload()}
           disabled={isRefreshing}
-          style={{
-            minHeight: 42,
-            padding: '0 14px',
-            borderRadius: 12,
-            border: '1px solid rgba(255,255,255,0.10)',
-            background: '#11192E',
-            color: '#F5F7FB',
-            fontWeight: 700,
-            cursor: isRefreshing ? 'default' : 'pointer',
-            opacity: isRefreshing ? 0.7 : 1,
-          }}
+          style={buttonStyle(isRefreshing)}
         >
           {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
       {errorMessage ? (
-        <div
-          style={{
-            borderRadius: 12,
-            border: '1px solid rgba(255,122,122,0.25)',
-            background: 'rgba(255,122,122,0.08)',
-            color: '#FF9A9A',
-            padding: '12px 14px',
-            fontSize: 14,
-            lineHeight: 1.5,
-            marginBottom: 16,
-          }}
-        >
+        <div style={messageErrorStyle}>
           {errorMessage}
         </div>
       ) : null}
@@ -295,68 +275,25 @@ export default function AdminDashboardPage() {
           marginBottom: 18,
         }}
       >
-        <AdminStatCard
-          title="New Orders"
-          value={String(metrics.newOrders)}
-          note="Fresh incoming requests waiting for action."
-        />
-        <AdminStatCard
-          title="Active Orders"
-          value={String(metrics.activeOrders)}
-          note="Contacted, scheduled, or currently in progress."
-        />
-        <AdminStatCard
-          title="Completed Orders"
-          value={String(metrics.completedOrders)}
-          note="Closed requests marked as completed."
-        />
-        <AdminStatCard
-          title="Reviews"
-          value={String(metrics.reviews)}
-          note="Published review entries visible on the site."
-        />
-        <AdminStatCard
-          title="FAQ"
-          value={String(metrics.faq)}
-          note="Published FAQ items currently live."
-        />
-        <AdminStatCard
-          title="Services"
-          value={String(metrics.services)}
-          note="Published service pages available by locale."
-        />
-        <AdminStatCard
-          title="Areas"
-          value={String(metrics.areas)}
-          note="Published area landing pages available by locale."
-        />
+        <AdminStatCard title="New Orders" value={String(metrics.newOrders)} note="Fresh incoming requests waiting for action." />
+        <AdminStatCard title="Active Orders" value={String(metrics.activeOrders)} note="Contacted, scheduled, or currently in progress." />
+        <AdminStatCard title="Completed Orders" value={String(metrics.completedOrders)} note="Closed requests marked as completed." />
+        <AdminStatCard title="Reviews" value={String(metrics.reviews)} note="Published review entries visible on the site." />
+        <AdminStatCard title="FAQ" value={String(metrics.faq)} note="Published FAQ items currently live." />
+        <AdminStatCard title="Services" value={String(metrics.services)} note="Published service pages available by locale." />
+        <AdminStatCard title="Areas" value={String(metrics.areas)} note="Published area landing pages available by locale." />
       </div>
 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1.4fr 1fr',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: 14,
+          minWidth: 0,
         }}
       >
-        <div
-          style={{
-            background: '#0B1020',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 18,
-            padding: 18,
-          }}
-        >
-          <h3
-            style={{
-              margin: 0,
-              fontSize: 22,
-              lineHeight: 1.2,
-              color: '#F5F7FB',
-            }}
-          >
-            Quick Access
-          </h3>
+        <div style={panelStyle}>
+          <h3 style={panelTitleStyle}>Quick Access</h3>
 
           <div
             style={{
@@ -370,15 +307,7 @@ export default function AdminDashboardPage() {
               <a
                 key={item.href}
                 href={item.href}
-                style={{
-                  display: 'block',
-                  textDecoration: 'none',
-                  color: '#F5F7FB',
-                  background: '#11192E',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: 16,
-                  padding: 16,
-                }}
+                style={quickLinkStyle}
               >
                 <strong style={{ display: 'block', fontSize: 18 }}>
                   {item.title}
@@ -399,41 +328,17 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div
-          style={{
-            background: '#0B1020',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 18,
-            padding: 18,
-          }}
-        >
-          <h3
-            style={{
-              margin: 0,
-              fontSize: 22,
-              lineHeight: 1.2,
-              color: '#F5F7FB',
-            }}
-          >
-            Latest Orders
-          </h3>
+        <div style={panelStyle}>
+          <h3 style={panelTitleStyle}>Latest Orders</h3>
 
           <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
             {recentOrders.map((order) => (
               <a
                 key={order.id}
                 href="/admin/orders"
-                style={{
-                  display: 'block',
-                  textDecoration: 'none',
-                  background: '#11192E',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: 14,
-                  padding: 14,
-                  color: '#F5F7FB',
-                }}
+                style={quickLinkStyle}
               >
-                <strong style={{ display: 'block', fontSize: 16 }}>
+                <strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>
                   {order.service_needed || 'Order'}
                 </strong>
                 <p
@@ -442,6 +347,7 @@ export default function AdminDashboardPage() {
                     color: '#95A0B8',
                     fontSize: 14,
                     lineHeight: 1.5,
+                    wordBreak: 'break-word',
                   }}
                 >
                   {order.name || 'No name'} · {order.phone || 'No phone'}
@@ -477,4 +383,55 @@ export default function AdminDashboardPage() {
       </div>
     </div>
   )
+}
+
+function buttonStyle(disabled: boolean): CSSProperties {
+  return {
+    minHeight: 42,
+    padding: '0 14px',
+    borderRadius: 12,
+    border: '1px solid rgba(255,255,255,0.10)',
+    background: '#11192E',
+    color: '#F5F7FB',
+    fontWeight: 700,
+    cursor: disabled ? 'default' : 'pointer',
+    opacity: disabled ? 0.7 : 1,
+  }
+}
+
+const panelStyle: CSSProperties = {
+  background: '#0B1020',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 18,
+  padding: 18,
+  minWidth: 0,
+}
+
+const panelTitleStyle: CSSProperties = {
+  margin: 0,
+  fontSize: 22,
+  lineHeight: 1.2,
+  color: '#F5F7FB',
+}
+
+const quickLinkStyle: CSSProperties = {
+  display: 'block',
+  textDecoration: 'none',
+  color: '#F5F7FB',
+  background: '#11192E',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 16,
+  padding: 16,
+  minWidth: 0,
+}
+
+const messageErrorStyle: CSSProperties = {
+  borderRadius: 12,
+  border: '1px solid rgba(255,122,122,0.25)',
+  background: 'rgba(255,122,122,0.08)',
+  color: '#FF9A9A',
+  padding: '12px 14px',
+  fontSize: 14,
+  lineHeight: 1.5,
+  marginBottom: 16,
 }
