@@ -11,6 +11,9 @@ const footerLabels: Record<
     home: string
     services: string
     areas: string
+    contact: string
+    privacy: string
+    terms: string
     request: string
     rights: string
     description: string
@@ -24,6 +27,9 @@ const footerLabels: Record<
     home: 'Home',
     services: 'Services',
     areas: 'Service Areas',
+    contact: 'Contact',
+    privacy: 'Privacy Policy',
+    terms: 'Terms of Service',
     request: 'Request Service',
     rights: 'All rights reserved.',
     description: 'Planetlocksmiths provides mobile automotive locksmith request support for car lockouts, replacement keys, key fob programming, transponder keys, broken key extraction, and ignition-related help.',
@@ -36,6 +42,9 @@ const footerLabels: Record<
     home: 'Inicio',
     services: 'Servicios',
     areas: 'Áreas',
+    contact: 'Contacto',
+    privacy: 'Política de privacidad',
+    terms: 'Términos de servicio',
     request: 'Solicitud',
     rights: 'Todos los derechos reservados.',
     description: 'Planetlocksmiths ofrece soporte móvil de cerrajería automotriz para autos cerrados, reemplazo de llaves, programación de controles, llaves transponder, extracción de llave rota e ignición.',
@@ -48,6 +57,9 @@ const footerLabels: Record<
     home: 'Главная',
     services: 'Услуги',
     areas: 'Районы',
+    contact: 'Контакты',
+    privacy: 'Политика приватности',
+    terms: 'Условия сервиса',
     request: 'Заявка',
     rights: 'Все права защищены.',
     description: 'Planetlocksmiths помогает с мобильными автомобильными locksmith-заявками: открытие авто, замена ключей, программирование брелков, transponder-ключи, сломанные ключи и зажигание.',
@@ -89,6 +101,9 @@ export default function Footer({ locale }: FooterProps) {
               <Link href={`/${locale}`} className="text-sm hover:text-text">{labels.home}</Link>
               <Link href={`/${locale}/services`} className="text-sm hover:text-text">{labels.services}</Link>
               <Link href={`/${locale}/areas`} className="text-sm hover:text-text">{labels.areas}</Link>
+              <Link href={`/${locale}/contact`} className="text-sm hover:text-text">{labels.contact}</Link>
+              <Link href={`/${locale}/privacy`} className="text-sm hover:text-text">{labels.privacy}</Link>
+              <Link href={`/${locale}/terms`} className="text-sm hover:text-text">{labels.terms}</Link>
               <a href="#request-service" className="text-sm hover:text-text">{labels.request}</a>
             </nav>
           </div>
