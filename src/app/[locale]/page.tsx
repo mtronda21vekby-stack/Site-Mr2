@@ -46,7 +46,7 @@ export default async function LocaleHome({
   const featuredAreas = areas.slice(0, 6)
 
   return (
-    <>
+    <div className="cinematic-shell min-h-screen">
       <Header
         locale={locale}
         phoneDisplay={global.phoneDisplay}
@@ -77,48 +77,59 @@ export default async function LocaleHome({
         />
 
         {featuredAreas.length ? (
-          <section className="bg-surface py-16">
+          <section className="relative overflow-hidden bg-transparent py-20 sm:py-24">
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_50%,rgba(77,162,255,0.1),transparent_26rem),radial-gradient(circle_at_84%_8%,rgba(214,168,95,0.08),transparent_22rem)]" />
+
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-8 flex items-end justify-between gap-4">
-                <div>
-                  <p className="mb-2 text-xs uppercase tracking-[0.24em] text-muted">
-                    Coverage
+              <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                <div className="max-w-3xl">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-accent-cyan">
+                    Orbital coverage grid
                   </p>
-                  <h2 className="text-2xl font-heading font-semibold text-text sm:text-3xl">
+                  <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">
                     Service Areas
                   </h2>
                 </div>
 
                 <a
                   href={`/${locale}/areas`}
-                  className="text-sm font-semibold text-[var(--accent-blue)]"
+                  className="inline-flex w-fit rounded-full border border-white/15 bg-white/[0.035] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-accent-blue backdrop-blur-xl transition hover:border-accent-blue/50 hover:bg-accent-blue/10"
                 >
                   View all →
                 </a>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {featuredAreas.map((area) => (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {featuredAreas.map((area, index) => (
                   <a
                     key={area.slug}
                     href={`/${locale}/areas/${area.slug}`}
-                    className="block rounded-2xl border border-white/10 bg-bg/60 p-5 transition hover:border-white/20 hover:bg-white/5"
+                    className="group relative block overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.035] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.24)] backdrop-blur-xl transition hover:-translate-y-1 hover:border-accent-blue/40 hover:bg-white/[0.06]"
                   >
-                    <h3 className="text-xl font-heading font-semibold text-text">
-                      {area.title}
-                    </h3>
+                    <div className="absolute right-[-3rem] top-[-3rem] h-32 w-32 rounded-full border border-accent-blue/20 transition group-hover:border-accent-cyan/35" />
+                    <div className="absolute bottom-[-4rem] left-[-4rem] h-32 w-32 rounded-full bg-accent-gold/10 blur-2xl" />
 
-                    <p className="mt-2 text-sm text-muted">
-                      {[area.city, area.state].filter(Boolean).join(', ')}
-                    </p>
+                    <div className="relative">
+                      <p className="mb-5 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-accent-gold">
+                        Sector {String(index + 1).padStart(2, '0')}
+                      </p>
 
-                    <p className="mt-3 text-sm leading-6 text-muted">
-                      {area.intro}
-                    </p>
+                      <h3 className="text-xl font-semibold tracking-[-0.02em] text-text">
+                        {area.title}
+                      </h3>
 
-                    <span className="mt-4 inline-flex text-sm font-semibold text-[var(--accent-blue)]">
-                      Open area page →
-                    </span>
+                      <p className="mt-2 text-sm text-muted">
+                        {[area.city, area.state].filter(Boolean).join(', ')}
+                      </p>
+
+                      <p className="mt-4 text-sm leading-7 text-muted">
+                        {area.intro}
+                      </p>
+
+                      <span className="mt-6 inline-flex text-xs font-bold uppercase tracking-[0.18em] text-accent-blue transition group-hover:text-accent-cyan">
+                        Open area page →
+                      </span>
+                    </div>
                   </a>
                 ))}
               </div>
@@ -140,6 +151,6 @@ export default async function LocaleHome({
       </main>
 
       <Footer locale={locale} />
-    </>
+    </div>
   )
 }
