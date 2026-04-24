@@ -44,13 +44,8 @@ const emptyForm = (locale: Locale): HomePageForm => ({
 export default function AdminHomePage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
-
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
-  const [forms, setForms] = useState<Record<Locale, HomePageForm>>({
-    en: emptyForm('en'),
-    es: emptyForm('es'),
-    ru: emptyForm('ru'),
-  })
+  const [forms, setForms] = useState<Record<Locale, HomePageForm>>({ en: emptyForm('en'), es: emptyForm('es'), ru: emptyForm('ru') })
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -63,37 +58,21 @@ export default function AdminHomePage() {
       try {
         setErrorMessage('')
         setSuccessMessage('')
-
         const sessionResult = await supabase.auth.getSession()
         const session = sessionResult?.data?.session
-
-        if (!session) {
-          router.replace('/admin/login')
-          return
-        }
+        if (!session) { router.replace('/admin/login'); return }
 
         const result = await (supabase.from('home_pages') as any)
-          .select(
-            'id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, emergency_title, emergency_text, reviews_title, faq_title, contact_title, contact_text'
-          )
+          .select('id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, emergency_title, emergency_text, reviews_title, faq_title, contact_title, contact_text')
 
-        if (result.error) {
-          throw new Error(result.error.message)
-        }
+        if (result.error) throw new Error(result.error.message)
 
         const rows = Array.isArray(result.data) ? result.data : []
-
-        const nextForms: Record<Locale, HomePageForm> = {
-          en: emptyForm('en'),
-          es: emptyForm('es'),
-          ru: emptyForm('ru'),
-        }
+        const nextForms: Record<Locale, HomePageForm> = { en: emptyForm('en'), es: emptyForm('es'), ru: emptyForm('ru') }
 
         for (const row of rows) {
           const locale = row.locale as Locale
-
           if (!locales.includes(locale)) continue
-
           nextForms[locale] = {
             id: row.id ?? '',
             locale,
@@ -114,76 +93,77 @@ export default function AdminHomePage() {
         setForms(nextForms)
       } catch (error) {
         if (!mounted) return
-        setErrorMessage(
-          error instanceof Error ? error.message : 'Failed to load home content'
-        )
+        setErrorMessage(error instanceof Error ? error.message : 'Failed to load home content')
       } finally {
-        if (mounted) {
-          setIsBooting(false)
-        }
+        if (mounted) setIsBooting(false)
       }
     }
 
     boot()
-
-    return () => {
-      mounted = false
-    }
+    return () => { mounted = false }
   }, [router, supabase])
 
-  function updateField<K extends keyof HomePageForm>(
-    key: K,
-    value: HomePageForm[K]
-  ) {
-    setForms((prev) => ({
-      ...prev,
-      [activeLocale]: {
-        ...prev[activeLocale],
-        [key]: value,
-      },
-    }))
+  function updateField<K extends keyof HomePageForm>(key: K, value: HomePageForm[K]) {
+    setForms((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], [key]: value } }))
   }
 
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-
     setErrorMessage('')
     setSuccessMessage('')
 
     const form = forms[activeLocale]
+    const heroTitle = form.heroTitle.trim()
+    const heroSubtitle = form.heroSubtitle.trim()
+    const heroPrimaryCta = form.heroPrimaryCta.trim()
+    const heroSecondaryCta = form.heroSecondaryCta.trim()
+    const emergencyTitle = form.emergencyTitle.trim()
+    const emergencyText = form.emergencyText.trim()
+    const reviewsTitle = form.reviewsTitle.trim()
+    const faqTitle = form.faqTitle.trim()
+    const contactTitle = form.contactTitle.trim()
+    const contactText = form.contactText.trim()
 
-    if (!form.id) {
-      setErrorMessage(`Row for locale "${activeLocale}" not found`)
-      return
-    }
+    if (!heroTitle) { setErrorMessage('Hero Title is required.'); return }
+    if (heroSubtitle.length < 80) { setErrorMessage('Hero Subtitle should be at least 80 characters.'); return }
+    if (!heroPrimaryCta) { setErrorMessage('Primary CTA is required.'); return }
+    if (!heroSecondaryCta) { setErrorMessage('Secondary CTA is required.'); return }
+    if (!emergencyTitle) { setErrorMessage('Emergency Title is required.'); return }
+    if (emergencyText.length < 80) { setErrorMessage('Emergency Text should be at least 80 characters.'); return }
+    if (!reviewsTitle) { setErrorMessage('Reviews Title is required.'); return }
+    if (!faqTitle) { setErrorMessage('FAQ Title is required.'); return }
+    if (!contactTitle) { setErrorMessage('Contact Title is required.'); return }
+    if (contactText.length < 80) { setErrorMessage('Contact Text should be at least 80 characters.'); return }
 
     setIsSaving(true)
 
     try {
-      const result = await (supabase.from('home_pages') as any)
-        .update({
-          hero_title: form.heroTitle.trim(),
-          hero_subtitle: form.heroSubtitle.trim(),
-          hero_primary_cta: form.heroPrimaryCta.trim(),
-          hero_secondary_cta: form.heroSecondaryCta.trim(),
-          emergency_title: form.emergencyTitle.trim(),
-          emergency_text: form.emergencyText.trim(),
-          reviews_title: form.reviewsTitle.trim(),
-          faq_title: form.faqTitle.trim(),
-          contact_title: form.contactTitle.trim(),
-          contact_text: form.contactText.trim(),
-        })
-        .eq('id', form.id)
+      const payload = {
+        locale: activeLocale,
+        hero_title: heroTitle,
+        hero_subtitle: heroSubtitle,
+        hero_primary_cta: heroPrimaryCta,
+        hero_secondary_cta: heroSecondaryCta,
+        emergency_title: emergencyTitle,
+        emergency_text: emergencyText,
+        reviews_title: reviewsTitle,
+        faq_title: faqTitle,
+        contact_title: contactTitle,
+        contact_text: contactText,
+      }
 
-      if (result.error) {
-        throw new Error(result.error.message)
+      if (form.id) {
+        const result = await (supabase.from('home_pages') as any).update(payload).eq('id', form.id)
+        if (result.error) throw new Error(result.error.message)
+      } else {
+        const result = await (supabase.from('home_pages') as any).insert(payload).select('id').single()
+        if (result.error) throw new Error(result.error.message)
+        setForms((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], id: result.data?.id ?? '' } }))
       }
 
       setSuccessMessage(`Home content saved for ${activeLocale.toUpperCase()}`)
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'Failed to save home content'
-      )
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to save home content')
     } finally {
       setIsSaving(false)
     }
@@ -191,80 +171,18 @@ export default function AdminHomePage() {
 
   const form = forms[activeLocale]
 
-  if (isBooting) {
-    return (
-      <div style={{ paddingTop: 20 }}>
-        <p style={{ color: '#95A0B8', margin: 0 }}>Loading home content...</p>
-      </div>
-    )
-  }
+  if (isBooting) return <div style={{ paddingTop: 20 }}><p style={{ color: '#95A0B8', margin: 0 }}>Loading home content...</p></div>
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: 20,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
+      <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
-            Planetlocksmiths / Admin / Home
-          </p>
-          <h2 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
-            Home Content
-          </h2>
+          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>Planetlocksmiths / Admin / Home</p>
+          <h2 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>Home Content</h2>
         </div>
-
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          {locales.map((locale) => (
-            <button
-              key={locale}
-              type="button"
-              onClick={() => {
-                setSuccessMessage('')
-                setErrorMessage('')
-                setActiveLocale(locale)
-              }}
-              style={{
-                minHeight: 42,
-                padding: '0 14px',
-                borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.10)',
-                background: activeLocale === locale ? '#4DA2FF' : '#11192E',
-                color: activeLocale === locale ? '#05070B' : '#F5F7FB',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              {locale.toUpperCase()}
-            </button>
-          ))}
-
-          <a
-            href={`/${activeLocale}`}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 42,
-              padding: '0 14px',
-              borderRadius: 12,
-              textDecoration: 'none',
-              border: '1px solid rgba(255,255,255,0.10)',
-              background: '#11192E',
-              color: '#F5F7FB',
-              fontWeight: 700,
-            }}
-          >
-            Preview {activeLocale.toUpperCase()}
-          </a>
+          {locales.map((locale) => <button key={locale} type="button" onClick={() => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} style={{ minHeight: 42, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: activeLocale === locale ? '#4DA2FF' : '#11192E', color: activeLocale === locale ? '#05070B' : '#F5F7FB', fontWeight: 700, cursor: 'pointer' }}>{locale.toUpperCase()}</button>)}
+          <a href={`/${activeLocale}`} target="_blank" rel="noreferrer" style={ghostLinkStyle}>Preview {activeLocale.toUpperCase()}</a>
         </div>
       </div>
 
@@ -277,52 +195,10 @@ export default function AdminHomePage() {
         ]}
       />
 
-      {errorMessage ? (
-        <div
-          style={{
-            borderRadius: 12,
-            border: '1px solid rgba(255,122,122,0.25)',
-            background: 'rgba(255,122,122,0.08)',
-            color: '#FF9A9A',
-            padding: '12px 14px',
-            fontSize: 14,
-            lineHeight: 1.5,
-            marginBottom: 16,
-          }}
-        >
-          {errorMessage}
-        </div>
-      ) : null}
+      {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
+      {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
 
-      {successMessage ? (
-        <div
-          style={{
-            borderRadius: 12,
-            border: '1px solid rgba(77,162,255,0.25)',
-            background: 'rgba(77,162,255,0.08)',
-            color: '#A9D0FF',
-            padding: '12px 14px',
-            fontSize: 14,
-            lineHeight: 1.5,
-            marginBottom: 16,
-          }}
-        >
-          {successMessage}
-        </div>
-      ) : null}
-
-      <form
-        id={FORM_ID}
-        onSubmit={handleSave}
-        style={{
-          display: 'grid',
-          gap: 16,
-          background: '#0B1020',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 20,
-          padding: 18,
-        }}
-      >
+      <form id={FORM_ID} onSubmit={handleSave} style={{ display: 'grid', gap: 16, background: '#0B1020', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: 18 }}>
         <Field label="Hero Title" value={form.heroTitle} onChange={(value) => updateField('heroTitle', value)} />
         <TextAreaField label="Hero Subtitle" value={form.heroSubtitle} onChange={(value) => updateField('heroSubtitle', value)} />
         <Field label="Primary CTA" value={form.heroPrimaryCta} onChange={(value) => updateField('heroPrimaryCta', value)} />
@@ -334,59 +210,15 @@ export default function AdminHomePage() {
         <Field label="Contact Title" value={form.contactTitle} onChange={(value) => updateField('contactTitle', value)} />
         <TextAreaField label="Contact Text" value={form.contactText} onChange={(value) => updateField('contactText', value)} />
       </form>
-
-      <AdminStickySaveBar
-        formId={FORM_ID}
-        isSaving={isSaving}
-        label={`Save ${activeLocale.toUpperCase()} Home`}
-        note={`Sticky save bar is active for ${activeLocale.toUpperCase()} homepage content.`}
-      />
+      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label={`Save ${activeLocale.toUpperCase()} Home`} note={`Sticky save bar is active for ${activeLocale.toUpperCase()} homepage content.`} />
     </div>
   )
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label style={{ display: 'grid', gap: 8 }}>
-      <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
-      <input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} />
-    </label>
-  )
-}
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label> }
+function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label> }
+function MessageBox({ type, children }: { type: 'error' | 'success'; children: React.ReactNode }) { const isError = type === 'error'; return <div style={{ borderRadius: 12, border: isError ? '1px solid rgba(255,122,122,0.25)' : '1px solid rgba(77,162,255,0.25)', background: isError ? 'rgba(255,122,122,0.08)' : 'rgba(77,162,255,0.08)', color: isError ? '#FF9A9A' : '#A9D0FF', padding: '12px 14px', fontSize: 14, lineHeight: 1.5, marginBottom: 16 }}>{children}</div> }
 
-function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label style={{ display: 'grid', gap: 8 }}>
-      <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
-      <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} />
-    </label>
-  )
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  minHeight: 48,
-  borderRadius: 12,
-  border: '1px solid rgba(255,255,255,0.10)',
-  background: '#11192E',
-  color: '#F5F7FB',
-  padding: '0 14px',
-  outline: 'none',
-  fontSize: 16,
-  boxSizing: 'border-box',
-  WebkitAppearance: 'none',
-}
-
-const textAreaStyle: React.CSSProperties = {
-  width: '100%',
-  borderRadius: 12,
-  border: '1px solid rgba(255,255,255,0.10)',
-  background: '#11192E',
-  color: '#F5F7FB',
-  padding: '12px 14px',
-  outline: 'none',
-  fontSize: 16,
-  boxSizing: 'border-box',
-  resize: 'vertical',
-  WebkitAppearance: 'none',
-}
+const ghostLinkStyle: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 42, padding: '0 14px', borderRadius: 12, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', fontWeight: 700 }
+const inputStyle: React.CSSProperties = { width: '100%', minHeight: 48, borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
+const textAreaStyle: React.CSSProperties = { width: '100%', borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', padding: '12px 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', resize: 'vertical', WebkitAppearance: 'none' }
