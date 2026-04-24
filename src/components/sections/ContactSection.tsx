@@ -102,23 +102,24 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
   }
 
   return (
-    <section id="request-service" className="relative overflow-hidden bg-transparent py-20 sm:py-24">
+    <section id="request-service" className="relative overflow-hidden bg-transparent py-20 sm:py-28">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_20%,rgba(77,162,255,0.13),transparent_30rem),radial-gradient(circle_at_90%_46%,rgba(214,168,95,0.10),transparent_28rem)]" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.82fr_1.18fr] lg:px-8">
         <div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">Request mobile locksmith service</p>
-          <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">{title}</h2>
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">Request mobile locksmith service</p>
+          <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-text sm:text-5xl lg:text-6xl">{title}</h2>
           <p className="mt-5 max-w-xl text-base leading-8 text-muted">{text}</p>
 
-          <div className="mt-8 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+          <div className="premium-panel mt-8 rounded-[1.5rem] p-5">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent-gold">Request readiness</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-accent-gold">Request readiness</p>
                 <p className="mt-2 text-sm leading-7 text-muted">More vehicle details usually means a faster, cleaner callback.</p>
               </div>
-              <span className="rounded-full border border-accent-blue/25 bg-accent-blue/10 px-3 py-1 text-sm font-bold text-accent-cyan">{completionScore}/6</span>
+              <span className="rounded-full border border-accent-blue/25 bg-accent-blue/10 px-3 py-1 text-sm font-black text-accent-cyan">{completionScore}/6</span>
             </div>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-accent-blue transition-all" style={{ width: `${Math.round((completionScore / 6) * 100)}%` }} />
+              <div className="h-full rounded-full bg-accent-blue shadow-[0_0_22px_rgba(77,162,255,0.5)] transition-all" style={{ width: `${Math.round((completionScore / 6) * 100)}%` }} />
             </div>
           </div>
 
@@ -128,22 +129,22 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
               ['Vehicle', 'Select make, model, and year so the request is actionable.'],
               ['Location', 'Add address, ZIP, parking lot, or landmark for mobile service.'],
             ].map(([heading, copy], index) => (
-              <div key={heading} className="rounded-[1.25rem] border border-white/10 bg-white/[0.035] p-4 backdrop-blur-xl">
+              <div key={heading} className="premium-panel rounded-[1.25rem] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-accent-blue/30">
                 <div className="flex gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-blue text-xs font-bold text-black">{index + 1}</span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-blue text-xs font-black text-black shadow-[0_0_20px_rgba(77,162,255,0.28)]">{index + 1}</span>
                   <div><h3 className="font-semibold text-text">{heading}</h3><p className="mt-1 text-sm leading-6 text-muted">{copy}</p></div>
                 </div>
               </div>
             ))}
           </div>
 
-          <a href={`tel:${phoneNumber}`} className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 bg-white/[0.035] px-6 py-3 text-sm font-bold uppercase tracking-[0.16em] text-text backdrop-blur-xl transition hover:border-accent-blue/45 hover:bg-accent-blue/10 sm:w-auto">Call instead: {phoneDisplay}</a>
+          <a href={`tel:${phoneNumber}`} className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-sm font-black uppercase tracking-[0.16em] text-text backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-blue/45 hover:bg-accent-blue/10 sm:w-auto">Call instead: {phoneDisplay}</a>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-[2rem] border border-white/10 bg-white/[0.05] p-5 shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-7">
+        <form onSubmit={handleSubmit} className="premium-panel premium-hairline rounded-[2rem] p-5 sm:p-7">
           <div className="mb-6 flex flex-col gap-3 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="text-xs font-bold uppercase tracking-[0.28em] text-accent-gold">Fast quote form</p><h3 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-text">Vehicle + service details</h3></div>
-            <span className="w-fit rounded-full border border-accent-blue/25 bg-accent-blue/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-accent-cyan">Secure request</span>
+            <div><p className="text-xs font-black uppercase tracking-[0.28em] text-accent-gold">Fast quote form</p><h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-text">Vehicle + service details</h3></div>
+            <span className="w-fit rounded-full border border-accent-blue/25 bg-accent-blue/10 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.18em] text-accent-cyan">Secure request</span>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -159,13 +160,13 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             <Field label="Preferred Time" name="preferred_time" value={formData.preferred_time} onChange={handleChange} placeholder="ASAP / Today / 5 PM" />
 
             <div className="flex flex-col sm:col-span-2">
-              <label htmlFor="message" className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-muted">Extra Details</label>
-              <textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none" placeholder="Example: keys lost, car is running, door locked, key fob not detected, parking lot name, etc." />
+              <label htmlFor="message" className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-muted">Extra Details</label>
+              <textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className="rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-text placeholder:text-muted outline-none transition focus:border-accent-blue focus:bg-black/45" placeholder="Example: keys lost, car is running, door locked, key fob not detected, parking lot name, etc." />
             </div>
 
             <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
-              <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-bold uppercase tracking-[0.18em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition hover:brightness-110 disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>
-              <a href={`tel:${phoneNumber}`} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-black/25 px-7 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-text transition hover:border-accent-gold/50 hover:bg-accent-gold/10">Call {phoneDisplay}</a>
+              <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.18em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>
+              <a href={`tel:${phoneNumber}`} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-black/25 px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/50 hover:bg-accent-gold/10">Call {phoneDisplay}</a>
             </div>
 
             {status === 'success' ? <p className="sm:col-span-2 rounded-2xl border border-accent-gold/25 bg-accent-gold/10 px-4 py-3 text-sm text-accent-gold">Thank you. Your request has been received.</p> : null}
@@ -178,9 +179,9 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
 }
 
 function Field({ label, name, value, onChange, placeholder, required = false, type = 'text', inputMode }: { label: string; name: string; value: string; onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void; placeholder: string; required?: boolean; type?: string; inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'] }) {
-  return <div className="flex flex-col"><label htmlFor={name} className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-muted">{label}</label><input id={name} name={name} type={type} value={value} onChange={onChange} required={required} inputMode={inputMode} className="min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-text placeholder:text-muted focus:border-accent-blue focus:outline-none" placeholder={placeholder} /></div>
+  return <div className="flex flex-col"><label htmlFor={name} className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-muted">{label}</label><input id={name} name={name} type={type} value={value} onChange={onChange} required={required} inputMode={inputMode} className="min-h-12 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-text placeholder:text-muted outline-none transition focus:border-accent-blue focus:bg-black/45" placeholder={placeholder} /></div>
 }
 
 function SelectField({ label, name, value, onChange, options, rawValues, placeholder, required = false, disabled = false }: { label: string; name: string; value: string; onChange: (e: ChangeEvent<HTMLSelectElement>) => void; options: string[]; rawValues?: string[]; placeholder?: string; required?: boolean; disabled?: boolean }) {
-  return <label className="flex flex-col"><span className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-muted">{label}</span><select name={name} value={value} onChange={onChange} required={required} disabled={disabled} className="min-h-12 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-text focus:border-accent-blue focus:outline-none disabled:cursor-not-allowed disabled:opacity-50">{placeholder ? <option value="">{placeholder}</option> : null}{options.map((option, index) => <option key={`${name}-${option}`} value={rawValues?.[index] ?? option}>{option}</option>)}</select></label>
+  return <label className="flex flex-col"><span className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-muted">{label}</span><select name={name} value={value} onChange={onChange} required={required} disabled={disabled} className="min-h-12 rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-text outline-none transition focus:border-accent-blue focus:bg-black/45 disabled:cursor-not-allowed disabled:opacity-50">{placeholder ? <option value="">{placeholder}</option> : null}{options.map((option, index) => <option key={`${name}-${option}`} value={rawValues?.[index] ?? option}>{option}</option>)}</select></label>
 }
