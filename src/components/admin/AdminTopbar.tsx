@@ -1,9 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { adminFlatNavItems } from './admin-nav'
 
 export default function AdminTopbar() {
+  const pathname = usePathname()
   const supabase = useMemo(() => getSupabaseClient(), [])
   const [userEmail, setUserEmail] = useState('Unknown session')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -17,7 +20,6 @@ export default function AdminTopbar() {
       } = await supabase.auth.getUser()
 
       if (!mounted) return
-
       setUserEmail(user?.email ?? 'Unknown session')
     }
 
@@ -42,6 +44,11 @@ export default function AdminTopbar() {
     window.location.href = '/admin/login'
   }
 
+  const currentPage =
+    adminFlatNavItems.find(
+      (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+    )?.label ?? 'Admin'
+
   return (
     <div
       style={{
@@ -49,24 +56,20 @@ export default function AdminTopbar() {
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: 12,
-        marginBottom: 18,
         flexWrap: 'wrap',
       }}
     >
-      <div
-        style={{
-          display: 'grid',
-          gap: 6,
-        }}
-      >
+      <div style={{ display: 'grid', gap: 6 }}>
         <div
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
             color: '#A9D0FF',
-            fontSize: 13,
-            fontWeight: 700,
+            fontSize: 12,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: 0.8,
           }}
         >
           <span
@@ -79,8 +82,19 @@ export default function AdminTopbar() {
               boxShadow: '0 0 12px rgba(45,226,230,0.8)',
             }}
           />
-          AUTHENTICATED SESSION
+          Authenticated session
         </div>
+
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 24,
+            lineHeight: 1.1,
+            color: '#F5F7FB',
+          }}
+        >
+          {currentPage}
+        </h1>
 
         <p
           style={{
@@ -117,6 +131,25 @@ export default function AdminTopbar() {
           }}
         >
           Open site
+        </a>
+
+        <a
+          href="/admin/orders"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 42,
+            padding: '0 14px',
+            borderRadius: 12,
+            textDecoration: 'none',
+            background: '#11192E',
+            color: '#F5F7FB',
+            fontWeight: 700,
+            border: '1px solid rgba(255,255,255,0.10)',
+          }}
+        >
+          Orders
         </a>
 
         <button
