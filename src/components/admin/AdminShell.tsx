@@ -1,6 +1,4 @@
-'use client'
-
-import { useEffect, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import AdminSidebar from './AdminSidebar'
 import AdminTopbar from './AdminTopbar'
 import AdminMobileNav from './AdminMobileNav'
@@ -10,136 +8,159 @@ export default function AdminShell({
 }: {
   children: ReactNode
 }) {
-  const [isMobile, setIsMobile] = useState<boolean | null>(null)
+  return (
+    <div className="admin-shell">
+      <div className="admin-shell__body">
+        <aside className="admin-shell__sidebar">
+          <AdminSidebar />
+        </aside>
 
-  useEffect(() => {
-    function syncViewport() {
-      setIsMobile(window.innerWidth < 1024)
-    }
+        <main className="admin-shell__main">
+          <div className="admin-shell__inner">
+            <div className="admin-shell__mobileHead">
+              <div className="admin-shell__mobileTopbar">
+                <AdminTopbar />
+              </div>
 
-    syncViewport()
-    window.addEventListener('resize', syncViewport)
-
-    return () => {
-      window.removeEventListener('resize', syncViewport)
-    }
-  }, [])
-
-  if (isMobile === null) {
-    return null
-  }
-
-  if (isMobile) {
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          background:
-            'radial-gradient(circle at top, rgba(77,162,255,0.10), transparent 30%), #05070B',
-          color: '#F5F7FB',
-          fontFamily: 'Inter, sans-serif',
-        }}
-      >
-        <main
-          style={{
-            paddingTop: 'calc(12px + env(safe-area-inset-top))',
-            paddingRight: 'calc(12px + env(safe-area-inset-right))',
-            paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
-            paddingLeft: 'calc(12px + env(safe-area-inset-left))',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: 1240,
-              margin: '0 auto',
-              display: 'grid',
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                background: 'rgba(11,16,32,0.88)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 20,
-                padding: 14,
-                backdropFilter: 'blur(12px)',
-                position: 'sticky',
-                top: 'calc(10px + env(safe-area-inset-top))',
-                zIndex: 30,
-              }}
-            >
-              <AdminTopbar />
-              <div style={{ marginTop: 12 }}>
+              <div className="admin-shell__mobileNav">
                 <AdminMobileNav />
               </div>
             </div>
 
-            <div
-              style={{
-                background: 'rgba(11,16,32,0.82)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 20,
-                padding: 14,
-                backdropFilter: 'blur(10px)',
-                overflow: 'hidden',
-              }}
-            >
-              {children}
+            <div className="admin-shell__panel">
+              <div className="admin-shell__desktopTopbar">
+                <AdminTopbar />
+              </div>
+
+              <div className="admin-shell__content">{children}</div>
             </div>
           </div>
         </main>
       </div>
-    )
-  }
 
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background:
-          'radial-gradient(circle at top right, rgba(77,162,255,0.08), transparent 30%), #05070B',
-        color: '#F5F7FB',
-        fontFamily: 'Inter, sans-serif',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'stretch',
-          minHeight: '100vh',
-        }}
-      >
-        <AdminSidebar />
+      <style jsx>{`
+        .admin-shell {
+          min-height: 100vh;
+          background:
+            radial-gradient(circle at top right, rgba(77, 162, 255, 0.08), transparent 30%),
+            #05070b;
+          color: #f5f7fb;
+          font-family: Inter, sans-serif;
+        }
 
-        <main
-          style={{
-            flex: 1,
-            paddingTop: 20,
-            paddingRight: 'calc(20px + env(safe-area-inset-right))',
-            paddingBottom: 20,
-            paddingLeft: 'calc(20px + env(safe-area-inset-left))',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-            <div
-              style={{
-                background: 'rgba(11,16,32,0.78)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 20,
-                padding: 18,
-                backdropFilter: 'blur(10px)',
-                overflow: 'hidden',
-              }}
-            >
-              <AdminTopbar />
-              <div style={{ marginTop: 16 }}>{children}</div>
-            </div>
-          </div>
-        </main>
-      </div>
+        .admin-shell__body {
+          min-height: 100vh;
+          display: flex;
+          align-items: stretch;
+        }
+
+        .admin-shell__sidebar {
+          width: 280px;
+          min-width: 280px;
+          flex-shrink: 0;
+        }
+
+        .admin-shell__main {
+          flex: 1;
+          min-width: 0;
+          padding-top: 20px;
+          padding-right: calc(20px + env(safe-area-inset-right));
+          padding-bottom: calc(20px + env(safe-area-inset-bottom));
+          padding-left: calc(20px + env(safe-area-inset-left));
+          box-sizing: border-box;
+        }
+
+        .admin-shell__inner {
+          width: 100%;
+          max-width: 1240px;
+          margin: 0 auto;
+          min-width: 0;
+        }
+
+        .admin-shell__panel {
+          background: rgba(11, 16, 32, 0.78);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 20px;
+          padding: 18px;
+          backdrop-filter: blur(10px);
+          overflow: hidden;
+          min-width: 0;
+        }
+
+        .admin-shell__content {
+          margin-top: 16px;
+          min-width: 0;
+        }
+
+        .admin-shell__mobileHead {
+          display: none;
+        }
+
+        .admin-shell__desktopTopbar {
+          display: block;
+        }
+
+        @media (max-width: 1023px) {
+          .admin-shell__body {
+            display: block;
+          }
+
+          .admin-shell__sidebar {
+            display: none;
+          }
+
+          .admin-shell__main {
+            padding-top: calc(12px + env(safe-area-inset-top));
+            padding-right: calc(12px + env(safe-area-inset-right));
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            padding-left: calc(12px + env(safe-area-inset-left));
+          }
+
+          .admin-shell__inner {
+            display: grid;
+            gap: 12px;
+          }
+
+          .admin-shell__mobileHead {
+            display: grid;
+            gap: 12px;
+            position: sticky;
+            top: calc(10px + env(safe-area-inset-top));
+            z-index: 30;
+          }
+
+          .admin-shell__mobileTopbar,
+          .admin-shell__mobileNav,
+          .admin-shell__panel {
+            background: rgba(11, 16, 32, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            min-width: 0;
+          }
+
+          .admin-shell__mobileTopbar {
+            padding: 14px;
+          }
+
+          .admin-shell__mobileNav {
+            padding: 10px 12px;
+          }
+
+          .admin-shell__panel {
+            padding: 14px;
+            overflow: hidden;
+          }
+
+          .admin-shell__desktopTopbar {
+            display: none;
+          }
+
+          .admin-shell__content {
+            margin-top: 0;
+          }
+        }
+      `}</style>
     </div>
   )
 }
