@@ -15,7 +15,7 @@ export default function AdminStickySaveBar({
     <div
       style={{
         position: 'sticky',
-        bottom: 12,
+        bottom: 'calc(10px + env(safe-area-inset-bottom))',
         zIndex: 40,
         marginTop: 18,
       }}
