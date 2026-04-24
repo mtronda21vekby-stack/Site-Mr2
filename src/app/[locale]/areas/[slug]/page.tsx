@@ -37,39 +37,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 }
 
 const labels: Record<Locale, { eyebrow: string; overview: string; customerPrep: string; localInfo: string; serviceReady: string; coverageNotes: string; prepItems: string[]; localItems: string[]; defaultServices: string[] }> = {
-  en: {
-    eyebrow: 'Local automotive locksmith coverage',
-    overview: 'Area overview',
-    customerPrep: 'What to prepare before service',
-    localInfo: 'Local service information',
-    serviceReady: 'Services commonly requested here',
-    coverageNotes: 'Coverage notes',
-    prepItems: ['Vehicle make, model, and year', 'Exact address, parking lot, or nearby landmark', 'Whether all keys are lost', 'Whether the vehicle is locked, running, or in a garage', 'Phone number for fast confirmation'],
-    localItems: ['Mobile service depends on technician availability and location', 'Response times may vary by traffic, distance, weather, and urgency', 'Final price depends on vehicle details, parts, and job complexity'],
-    defaultServices: ['Car lockout help', 'Replacement car keys', 'Key fob and transponder programming', 'Broken key extraction', 'Ignition-related support'],
-  },
-  es: {
-    eyebrow: 'Cobertura local automotriz',
-    overview: 'Resumen del área',
-    customerPrep: 'Qué preparar antes del servicio',
-    localInfo: 'Información local',
-    serviceReady: 'Servicios comunes aquí',
-    coverageNotes: 'Notas de cobertura',
-    prepItems: ['Marca, modelo y año', 'Dirección, estacionamiento o referencia', 'Si perdió todas las llaves', 'Si el vehículo está cerrado, encendido o en garaje', 'Teléfono para confirmación'],
-    localItems: ['Servicio móvil depende de disponibilidad y ubicación', 'El tiempo varía por tráfico, distancia, clima y urgencia', 'El precio depende del vehículo, piezas y complejidad'],
-    defaultServices: ['Auto cerrado', 'Reemplazo de llaves', 'Programación de control y transponder', 'Extracción de llave rota', 'Soporte de ignición'],
-  },
-  ru: {
-    eyebrow: 'Локальная зона авто-сервиса',
-    overview: 'Описание района',
-    customerPrep: 'Что подготовить перед услугой',
-    localInfo: 'Локальная информация',
-    serviceReady: 'Частые услуги здесь',
-    coverageNotes: 'Заметки по покрытию',
-    prepItems: ['Марка, модель и год автомобиля', 'Точный адрес, парковка или ориентир', 'Потеряны ли все ключи', 'Машина закрыта, заведена или в гараже', 'Телефон для подтверждения'],
-    localItems: ['Мобильный сервис зависит от доступности и локации', 'Сроки зависят от трафика, расстояния, погоды и срочности', 'Цена зависит от авто, деталей и сложности'],
-    defaultServices: ['Открытие авто', 'Замена автомобильных ключей', 'Программирование брелков и transponder', 'Извлечение сломанного ключа', 'Помощь с зажиганием'],
-  },
+  en: { eyebrow: 'Local automotive locksmith coverage', overview: 'Area overview', customerPrep: 'What to prepare before service', localInfo: 'Local service information', serviceReady: 'Services commonly requested here', coverageNotes: 'Coverage notes', prepItems: ['Vehicle make, model, and year', 'Exact address, parking lot, or nearby landmark', 'Whether all keys are lost', 'Whether the vehicle is locked, running, or in a garage', 'Phone number for fast confirmation'], localItems: ['Mobile service depends on technician availability and location', 'Response times may vary by traffic, distance, weather, and urgency', 'Final price depends on vehicle details, parts, and job complexity'], defaultServices: ['Car lockout help', 'Replacement car keys', 'Key fob and transponder programming', 'Broken key extraction', 'Ignition-related support'] },
+  es: { eyebrow: 'Cobertura local automotriz', overview: 'Resumen del área', customerPrep: 'Qué preparar antes del servicio', localInfo: 'Información local', serviceReady: 'Servicios comunes aquí', coverageNotes: 'Notas de cobertura', prepItems: ['Marca, modelo y año', 'Dirección, estacionamiento o referencia', 'Si perdió todas las llaves', 'Si el vehículo está cerrado, encendido o en garaje', 'Teléfono para confirmación'], localItems: ['Servicio móvil depende de disponibilidad y ubicación', 'El tiempo varía por tráfico, distancia, clima y urgencia', 'El precio depende del vehículo, piezas y complejidad'], defaultServices: ['Auto cerrado', 'Reemplazo de llaves', 'Programación de control y transponder', 'Extracción de llave rota', 'Soporte de ignición'] },
+  ru: { eyebrow: 'Локальная зона авто-сервиса', overview: 'Описание района', customerPrep: 'Что подготовить перед услугой', localInfo: 'Локальная информация', serviceReady: 'Частые услуги здесь', coverageNotes: 'Заметки по покрытию', prepItems: ['Марка, модель и год автомобиля', 'Точный адрес, парковка или ориентир', 'Потеряны ли все ключи', 'Машина закрыта, заведена или в гараже', 'Телефон для подтверждения'], localItems: ['Мобильный сервис зависит от доступности и локации', 'Сроки зависят от трафика, расстояния, погоды и срочности', 'Цена зависит от авто, деталей и сложности'], defaultServices: ['Открытие авто', 'Замена автомобильных ключей', 'Программирование брелков и transponder', 'Извлечение сломанного ключа', 'Помощь с зажиганием'] },
 }
 
 export default async function AreaDetailPage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
@@ -115,29 +85,31 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
       <CinematicBackground />
       <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
 
-      <main className="relative overflow-hidden px-4 py-14 text-text sm:px-6 lg:px-8">
-        <article className="mx-auto max-w-7xl">
-          <section className="grid gap-8 rounded-[2rem] border border-white/10 bg-white/[0.05] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">
-            <div>
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">{heroBlock?.eyebrow || `${copy.eyebrow} / ${area.city || slug}`}</p>
-              <h1 className="max-w-5xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-7xl">{heroBlock?.title || area.title}</h1>
-              <p className="mt-6 max-w-3xl text-base leading-8 text-muted sm:text-lg">{heroBlock?.body || area.seoDescription || `Mobile automotive locksmith coverage for ${location}.`}</p>
+      <main className="relative overflow-hidden text-text">
+        <article className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <section className="premium-panel premium-hairline relative grid gap-8 overflow-hidden rounded-[2.25rem] p-6 sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">
+            <div className="absolute right-[-8rem] top-[-8rem] h-80 w-80 rounded-full border border-accent-cyan/15" />
+            <div className="absolute bottom-[-8rem] left-[-6rem] h-80 w-80 rounded-full bg-accent-blue/10 blur-3xl" />
+            <div className="relative">
+              <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">{heroBlock?.eyebrow || `${copy.eyebrow} / ${area.city || slug}`}</p>
+              <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{heroBlock?.title || area.title}</h1>
+              <p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{heroBlock?.body || area.seoDescription || `Mobile automotive locksmith coverage for ${location}.`}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition hover:brightness-110">{heroBlock?.ctaLabel || primaryCta}</a>
-                <a href={heroBlock?.ctaHref || '#request-service'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-accent-gold transition hover:bg-accent-gold/15">{secondaryCta}</a>
+                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110">{heroBlock?.ctaLabel || primaryCta}</a>
+                <a href={heroBlock?.ctaHref || '#request-service'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-accent-gold transition duration-300 hover:-translate-y-0.5 hover:bg-accent-gold/15">{secondaryCta}</a>
               </div>
             </div>
 
-            <aside className="rounded-[1.5rem] border border-accent-blue/20 bg-black/25 p-5 backdrop-blur-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">{home.emergencyTitle || global.serviceHours}</p>
+            <aside className="premium-panel relative rounded-[1.5rem] p-5">
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-accent-cyan">{home.emergencyTitle || global.serviceHours}</p>
               <p className="mt-3 text-2xl font-semibold text-text">{global.phoneDisplay}</p>
               <p className="mt-3 text-sm leading-7 text-muted">{home.emergencyText || home.contactText}</p>
             </aside>
           </section>
 
           <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_23rem]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 backdrop-blur-xl sm:p-8">
-              <p className="mb-5 text-xs font-bold uppercase tracking-[0.26em] text-accent-gold">{overviewBlock?.eyebrow || area.seoTitle || copy.overview}</p>
+            <div className="premium-panel rounded-[2rem] p-6 sm:p-8">
+              <p className="mb-5 text-xs font-black uppercase tracking-[0.26em] text-accent-gold">{overviewBlock?.eyebrow || area.seoTitle || copy.overview}</p>
               {overviewBlock?.title ? <h2 className="mb-5 text-3xl font-semibold tracking-[-0.035em] text-text">{overviewBlock.title}</h2> : null}
               {overviewBlock?.body ? <p className="text-base leading-8 text-muted">{overviewBlock.body}</p> : paragraphs.length ? <div className="space-y-5 text-base leading-8 text-muted">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div> : <p className="text-base leading-8 text-muted">{area.seoDescription}</p>}
             </div>
@@ -167,8 +139,8 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
 function InfoBox({ block, title, items }: { block?: SiteContentBlock; title: string; items: string[] }) {
   const finalItems = block?.items.length ? block.items : items
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-6 backdrop-blur-xl">
-      <p className="mb-5 text-xs font-bold uppercase tracking-[0.22em] text-accent-cyan">{block?.eyebrow || block?.title || title}</p>
+    <div className="premium-panel rounded-[1.5rem] p-6 transition duration-300 hover:-translate-y-1 hover:border-accent-blue/30">
+      <p className="mb-5 text-xs font-black uppercase tracking-[0.22em] text-accent-cyan">{block?.eyebrow || block?.title || title}</p>
       {block?.body ? <p className="mb-5 text-sm leading-7 text-muted">{block.body}</p> : null}
       <ul className="grid gap-3">
         {finalItems.map((item) => (
