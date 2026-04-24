@@ -31,6 +31,8 @@ const statusOptions = [
   'cancelled',
 ]
 
+const urgencyOptions = ['all', 'normal', 'urgent', 'same_day']
+
 export default function AdminOrdersPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
@@ -38,8 +40,12 @@ export default function AdminOrdersPage() {
   const [rows, setRows] = useState<OrderRow[]>([])
   const [isBooting, setIsBooting] = useState(true)
   const [isSavingId, setIsSavingId] = useState<string | null>(null)
+  const [isDeletingId, setIsDeletingId] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [urgencyFilter, setUrgencyFilter] = useState('all')
 
   useEffect(() => {
     let mounted = true
@@ -149,6 +155,64 @@ export default function AdminOrdersPage() {
     }
   }
 
+  async function deleteRow(id: string) {
+    const ok = window.confirm(
+      'Delete this order permanently? This action cannot be undone.'
+    )
+
+    if (!ok) return
+
+    setErrorMessage('')
+    setSuccessMessage('')
+    setIsDeletingId(id)
+
+    try {
+      const result = await (supabase.from('orders') as any)
+        .delete()
+        .eq('id', id)
+
+      if (result.error) {
+        throw new Error(result.error.message)
+      }
+
+      setRows((prev) => prev.filter((row) => row.id !== id))
+      setSuccessMessage(`Order ${id.slice(0, 8)} deleted`)
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Failed to delete order'
+      )
+    } finally {
+      setIsDeletingId(null)
+    }
+  }
+
+  const filteredRows = rows.filter((row) => {
+    const q = search.trim().toLowerCase()
+
+    const matchesSearch =
+      !q ||
+      row.name.toLowerCase().includes(q) ||
+      row.phone.toLowerCase().includes(q) ||
+      row.email.toLowerCase().includes(q) ||
+      row.service_needed.toLowerCase().includes(q) ||
+      row.location.toLowerCase().includes(q) ||
+      row.vehicle_make_model.toLowerCase().includes(q)
+
+    const matchesStatus =
+      statusFilter === 'all' ? true : row.status === statusFilter
+
+    const matchesUrgency =
+      urgencyFilter === 'all' ? true : row.urgency === urgencyFilter
+
+    return matchesSearch && matchesStatus && matchesUrgency
+  })
+
+  const newCount = rows.filter((row) => row.status === 'new').length
+  const activeCount = rows.filter((row) =>
+    ['contacted', 'scheduled', 'in_progress'].includes(row.status)
+  ).length
+  const completedCount = rows.filter((row) => row.status === 'completed').length
+
   if (isBooting) {
     return (
       <div style={{ paddingTop: 20 }}>
@@ -159,13 +223,96 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
-          Planetlocksmiths / Admin / Orders
-        </p>
-        <h1 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
-          Orders
-        </h1>
+      <div
+        style={{
+          marginBottom: 20,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
+            Planetlocksmiths / Admin / Orders
+          </p>
+          <h1 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
+            Orders
+          </h1>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          style={{
+            minHeight: 42,
+            padding: '0 14px',
+            borderRadius: 12,
+            border: '1px solid rgba(255,255,255,0.10)',
+            background: '#11192E',
+            color: '#F5F7FB',
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          Refresh
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 14,
+          marginBottom: 18,
+        }}
+      >
+        <StatBlock title="Total" value={String(rows.length)} />
+        <StatBlock title="New" value={String(newCount)} />
+        <StatBlock title="Active" value={String(activeCount)} />
+        <StatBlock title="Completed" value={String(completedCount)} />
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr 1fr',
+          gap: 12,
+          marginBottom: 18,
+        }}
+      >
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, phone, email, service, location, vehicle"
+          style={inputStyle}
+        />
+
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={inputStyle}
+        >
+          <option value="all">All statuses</option>
+          {statusOptions.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={urgencyFilter}
+          onChange={(e) => setUrgencyFilter(e.target.value)}
+          style={inputStyle}
+        >
+          {urgencyOptions.map((urgency) => (
+            <option key={urgency} value={urgency}>
+              {urgency === 'all' ? 'All urgency' : urgency}
+            </option>
+          ))}
+        </select>
       </div>
 
       {errorMessage ? (
@@ -203,7 +350,7 @@ export default function AdminOrdersPage() {
       ) : null}
 
       <div style={{ display: 'grid', gap: 16 }}>
-        {rows.map((row) => (
+        {filteredRows.map((row) => (
           <div
             key={row.id}
             style={{
@@ -215,38 +362,66 @@ export default function AdminOrdersPage() {
               gap: 14,
             }}
           >
-            <div style={{ display: 'grid', gap: 8 }}>
-              <strong style={{ fontSize: 18 }}>
-                {row.service_needed || 'Order'}
-              </strong>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: 12,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ display: 'grid', gap: 8 }}>
+                <strong style={{ fontSize: 18 }}>
+                  {row.service_needed || 'Order'}
+                </strong>
 
-              <div style={{ color: '#95A0B8', fontSize: 14, lineHeight: 1.6 }}>
-                <div>Name: {row.name || '—'}</div>
-                <div>Phone: {row.phone || '—'}</div>
-                <div>Email: {row.email || '—'}</div>
-                <div>Vehicle: {row.vehicle_make_model || '—'}</div>
-                <div>Year: {row.vehicle_year || '—'}</div>
-                <div>Location: {row.location || '—'}</div>
-                <div>Urgency: {row.urgency || '—'}</div>
-                <div>Preferred time: {row.preferred_time || '—'}</div>
-                <div>Created: {row.created_at || '—'}</div>
+                <div style={{ color: '#95A0B8', fontSize: 14, lineHeight: 1.6 }}>
+                  <div>Name: {row.name || '—'}</div>
+                  <div>Phone: {row.phone || '—'}</div>
+                  <div>Email: {row.email || '—'}</div>
+                  <div>Vehicle: {row.vehicle_make_model || '—'}</div>
+                  <div>Year: {row.vehicle_year || '—'}</div>
+                  <div>Location: {row.location || '—'}</div>
+                  <div>Urgency: {row.urgency || '—'}</div>
+                  <div>Preferred time: {row.preferred_time || '—'}</div>
+                  <div>Created: {row.created_at || '—'}</div>
+                </div>
               </div>
 
-              {row.message ? (
-                <div
-                  style={{
-                    background: '#11192E',
-                    borderRadius: 12,
-                    padding: 12,
-                    color: '#F5F7FB',
-                    fontSize: 14,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {row.message}
-                </div>
-              ) : null}
+              <button
+                type="button"
+                onClick={() => deleteRow(row.id)}
+                disabled={isDeletingId === row.id}
+                style={{
+                  minHeight: 40,
+                  padding: '0 12px',
+                  borderRadius: 10,
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'transparent',
+                  color: '#FF9A9A',
+                  cursor: isDeletingId === row.id ? 'default' : 'pointer',
+                  opacity: isDeletingId === row.id ? 0.7 : 1,
+                }}
+              >
+                {isDeletingId === row.id ? 'Deleting...' : 'Delete'}
+              </button>
             </div>
+
+            {row.message ? (
+              <div
+                style={{
+                  background: '#11192E',
+                  borderRadius: 12,
+                  padding: 12,
+                  color: '#F5F7FB',
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                }}
+              >
+                {row.message}
+              </div>
+            ) : null}
 
             <div style={{ display: 'grid', gap: 12 }}>
               <label style={{ display: 'grid', gap: 8 }}>
@@ -310,7 +485,45 @@ export default function AdminOrdersPage() {
             </div>
           </div>
         ))}
+
+        {!filteredRows.length ? (
+          <div
+            style={{
+              background: '#0B1020',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 18,
+              padding: 18,
+              color: '#95A0B8',
+            }}
+          >
+            No orders match the current filters.
+          </div>
+        ) : null}
       </div>
+    </div>
+  )
+}
+
+function StatBlock({
+  title,
+  value,
+}: {
+  title: string
+  value: string
+}) {
+  return (
+    <div
+      style={{
+        background: '#0B1020',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 16,
+        padding: 16,
+      }}
+    >
+      <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>{title}</p>
+      <h2 style={{ margin: '8px 0 0', fontSize: 28, lineHeight: 1.1 }}>
+        {value}
+      </h2>
     </div>
   )
 }
