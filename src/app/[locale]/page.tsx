@@ -16,16 +16,13 @@ import {
   getServicesListFromSource,
   getAreasListFromSource,
 } from '@/lib/content.server'
+import { ACTIVE_LOCALES } from '@/lib/locales'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function generateStaticParams() {
-  return [
-    { locale: 'en' },
-    { locale: 'es' },
-    { locale: 'ru' },
-  ]
+  return ACTIVE_LOCALES.map((locale) => ({ locale }))
 }
 
 export default async function LocaleHome({
