@@ -26,12 +26,16 @@ export async function POST(request: Request) {
           ? body.service.trim()
           : ''
 
+    const vehicleMake =
+      typeof body.vehicle_make === 'string' ? body.vehicle_make.trim() : ''
+
+    const vehicleModel =
+      typeof body.vehicle_model === 'string' ? body.vehicle_model.trim() : ''
+
     const vehicleMakeModel =
-      typeof body.vehicle_make_model === 'string'
+      typeof body.vehicle_make_model === 'string' && body.vehicle_make_model.trim()
         ? body.vehicle_make_model.trim()
-        : typeof body.vehicle === 'string'
-          ? body.vehicle.trim()
-          : ''
+        : [vehicleMake, vehicleModel].filter(Boolean).join(' ')
 
     const vehicleYear =
       typeof body.vehicle_year === 'string' ? body.vehicle_year.trim() : ''
