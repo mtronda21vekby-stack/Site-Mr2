@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Locale } from './Header'
 
 const labels: Record<Locale, { call: string; request: string }> = {
@@ -14,6 +15,7 @@ export default function MobileStickyCta({
   phoneNumber: string
 }) {
   const copy = labels[locale]
+  const requestHref = `/${locale}/contact#request-service`
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-bg/95 p-3 backdrop-blur-xl md:hidden">
@@ -24,12 +26,12 @@ export default function MobileStickyCta({
         >
           {copy.call}
         </a>
-        <a
-          href="#request-service"
+        <Link
+          href={requestHref}
           className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] px-4 text-sm font-bold text-text"
         >
           {copy.request}
-        </a>
+        </Link>
       </div>
     </div>
   )
