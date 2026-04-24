@@ -35,12 +35,14 @@ export default async function LocaleHome({
 
   const { locale } = await params
 
-  const [home, global, reviews, faqs] = await Promise.all([
-    getHomeContentFromSource(locale),
-    getGlobalSettingsFromSource(),
-    getReviewsFromSource(locale),
-    getFaqFromSource(locale),
-  ])
+  const [global, home, reviews, faq, services, areas] = await Promise.all([
+  getGlobalSettingsFromSource(),
+  getHomeContentFromSource(locale),
+  getReviewsFromSource(locale),
+  getFaqFromSource(locale),
+  getServicesListFromSource(locale),
+  getAreasListFromSource(locale),
+])
 
   return (
     <>
