@@ -5,16 +5,39 @@ import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStatCard from '@/components/admin/AdminStatCard'
 
+type Metrics = {
+  newOrders: number
+  activeOrders: number
+  completedOrders: number
+  reviews: number
+  faq: number
+  services: number
+  areas: number
+}
+
+const initialMetrics: Metrics = {
+  newOrders: 0,
+  activeOrders: 0,
+  completedOrders: 0,
+  reviews: 0,
+  faq: 0,
+  services: 0,
+  areas: 0,
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter()
-  const supabase = useMemo(() => getSupabaseClient(), [])
+  const supabase: any = useMemo(() => getSupabaseClient() as any, [])
 
   const [isChecking, setIsChecking] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [metrics, setMetrics] = useState<Metrics>(initialMetrics)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     let isMounted = true
 
-    async function checkSession() {
+    async function boot() {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -27,9 +50,90 @@ export default function AdminDashboardPage() {
       if (isMounted) {
         setIsChecking(false)
       }
+
+      await loadMetrics(isMounted)
     }
 
-    checkSession()
+    async function loadMetrics(mounted: boolean) {
+      try {
+        setErrorMessage('')
+        setIsRefreshing(true)
+
+        const [
+          newOrdersResult,
+          activeOrdersResult,
+          completedOrdersResult,
+          reviewsResult,
+          faqResult,
+          servicesResult,
+          areasResult,
+        ] = await Promise.all([
+          (supabase.from('orders') as any)
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'new'),
+
+          (supabase.from('orders') as any)
+            .select('*', { count: 'exact', head: true })
+            .in('status', ['contacted', 'scheduled', 'in_progress']),
+
+          (supabase.from('orders') as any)
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'completed'),
+
+          (supabase.from('reviews') as any)
+            .select('*', { count: 'exact', head: true })
+            .eq('is_published', true),
+
+          (supabase.from('faq_items') as any)
+            .select('*', { count: 'exact', head: true })
+            .eq('is_published', true),
+
+          (supabase.from('services') as any)
+            .select('*', { count: 'exact', head: true })
+            .eq('is_published', true),
+
+          (supabase.from('areas') as any)
+            .select('*', { count: 'exact', head: true })
+            .eq('is_published', true),
+        ])
+
+        const firstError =
+          newOrdersResult.error ||
+          activeOrdersResult.error ||
+          completedOrdersResult.error ||
+          reviewsResult.error ||
+          faqResult.error ||
+          servicesResult.error ||
+          areasResult.error
+
+        if (firstError) {
+          throw new Error(firstError.message)
+        }
+
+        if (!mounted) return
+
+        setMetrics({
+          newOrders: newOrdersResult.count ?? 0,
+          activeOrders: activeOrdersResult.count ?? 0,
+          completedOrders: completedOrdersResult.count ?? 0,
+          reviews: reviewsResult.count ?? 0,
+          faq: faqResult.count ?? 0,
+          services: servicesResult.count ?? 0,
+          areas: areasResult.count ?? 0,
+        })
+      } catch (error) {
+        if (!mounted) return
+        setErrorMessage(
+          error instanceof Error ? error.message : 'Failed to load dashboard metrics'
+        )
+      } finally {
+        if (mounted) {
+          setIsRefreshing(false)
+        }
+      }
+    }
+
+    boot()
 
     return () => {
       isMounted = false
@@ -48,7 +152,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Orders',
       href: '/admin/orders',
-      description: 'Incoming leads, statuses, admin notes, assignment',
+      description: 'Incoming leads, filters, statuses, admin notes, delete',
     },
     {
       title: 'Settings',
@@ -78,33 +182,80 @@ export default function AdminDashboardPage() {
     {
       title: 'Areas',
       href: '/admin/areas',
-      description: 'Next content block to build',
+      description: 'Localized area pages with highlights and supported services',
     },
   ]
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <p
-          style={{
-            margin: 0,
-            color: '#95A0B8',
-            fontSize: 13,
-          }}
-        >
-          Planetlocksmiths / Admin
-        </p>
+      <div
+        style={{
+          marginBottom: 20,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <p
+            style={{
+              margin: 0,
+              color: '#95A0B8',
+              fontSize: 13,
+            }}
+          >
+            Planetlocksmiths / Admin
+          </p>
 
-        <h1
+          <h1
+            style={{
+              margin: '8px 0 0',
+              fontSize: 36,
+              lineHeight: 1.1,
+            }}
+          >
+            Technical Dashboard
+          </h1>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          disabled={isRefreshing}
           style={{
-            margin: '8px 0 0',
-            fontSize: 36,
-            lineHeight: 1.1,
+            minHeight: 42,
+            padding: '0 14px',
+            borderRadius: 12,
+            border: '1px solid rgba(255,255,255,0.10)',
+            background: '#11192E',
+            color: '#F5F7FB',
+            fontWeight: 700,
+            cursor: isRefreshing ? 'default' : 'pointer',
+            opacity: isRefreshing ? 0.7 : 1,
           }}
         >
-          Technical Dashboard
-        </h1>
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
+        </button>
       </div>
+
+      {errorMessage ? (
+        <div
+          style={{
+            borderRadius: 12,
+            border: '1px solid rgba(255,122,122,0.25)',
+            background: 'rgba(255,122,122,0.08)',
+            color: '#FF9A9A',
+            padding: '12px 14px',
+            fontSize: 14,
+            lineHeight: 1.5,
+            marginBottom: 16,
+          }}
+        >
+          {errorMessage}
+        </div>
+      ) : null}
 
       <div
         style={{
@@ -115,29 +266,39 @@ export default function AdminDashboardPage() {
         }}
       >
         <AdminStatCard
-          title="Orders"
-          value="Live"
-          note="Public contact requests now land in the admin panel."
+          title="New Orders"
+          value={String(metrics.newOrders)}
+          note="Fresh incoming requests waiting for action."
         />
         <AdminStatCard
-          title="Settings"
-          value="Live"
-          note="Global site settings already come from Supabase."
+          title="Active Orders"
+          value={String(metrics.activeOrders)}
+          note="Contacted, scheduled, or currently in progress."
         />
         <AdminStatCard
-          title="Home"
-          value="Live"
-          note="Homepage content is editable from the admin."
+          title="Completed Orders"
+          value={String(metrics.completedOrders)}
+          note="Closed requests marked as completed."
         />
         <AdminStatCard
-          title="Reviews / FAQ"
-          value="Live"
-          note="Localized review and FAQ blocks are already database-driven."
+          title="Reviews"
+          value={String(metrics.reviews)}
+          note="Published review entries visible on the site."
+        />
+        <AdminStatCard
+          title="FAQ"
+          value={String(metrics.faq)}
+          note="Published FAQ items currently live."
         />
         <AdminStatCard
           title="Services"
-          value="Live"
-          note="Service pages can now come from Supabase."
+          value={String(metrics.services)}
+          note="Published service pages available by locale."
+        />
+        <AdminStatCard
+          title="Areas"
+          value={String(metrics.areas)}
+          note="Published area landing pages available by locale."
         />
       </div>
 
