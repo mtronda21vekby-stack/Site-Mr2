@@ -15,6 +15,15 @@ type Metrics = {
   areas: number
 }
 
+type RecentOrder = {
+  id: string
+  name: string
+  phone: string
+  service_needed: string
+  status: string
+  created_at: string
+}
+
 const initialMetrics: Metrics = {
   newOrders: 0,
   activeOrders: 0,
@@ -32,29 +41,13 @@ export default function AdminDashboardPage() {
   const [isChecking, setIsChecking] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics)
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     let isMounted = true
 
-    async function boot() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-
-      if (!session) {
-        router.replace('/admin/login')
-        return
-      }
-
-      if (isMounted) {
-        setIsChecking(false)
-      }
-
-      await loadMetrics(isMounted)
-    }
-
-    async function loadMetrics(mounted: boolean) {
+    async function loadDashboard(mounted: boolean) {
       try {
         setErrorMessage('')
         setIsRefreshing(true)
@@ -67,6 +60,7 @@ export default function AdminDashboardPage() {
           faqResult,
           servicesResult,
           areasResult,
+          recentOrdersResult,
         ] = await Promise.all([
           (supabase.from('orders') as any)
             .select('*', { count: 'exact', head: true })
@@ -95,6 +89,11 @@ export default function AdminDashboardPage() {
           (supabase.from('areas') as any)
             .select('*', { count: 'exact', head: true })
             .eq('is_published', true),
+
+          (supabase.from('orders') as any)
+            .select('id, name, phone, service_needed, status, created_at')
+            .order('created_at', { ascending: false })
+            .limit(5),
         ])
 
         const firstError =
@@ -104,7 +103,8 @@ export default function AdminDashboardPage() {
           reviewsResult.error ||
           faqResult.error ||
           servicesResult.error ||
-          areasResult.error
+          areasResult.error ||
+          recentOrdersResult.error
 
         if (firstError) {
           throw new Error(firstError.message)
@@ -121,16 +121,46 @@ export default function AdminDashboardPage() {
           services: servicesResult.count ?? 0,
           areas: areasResult.count ?? 0,
         })
+
+        setRecentOrders(
+          Array.isArray(recentOrdersResult.data)
+            ? recentOrdersResult.data.map((row: any) => ({
+                id: row.id ?? '',
+                name: row.name ?? '',
+                phone: row.phone ?? '',
+                service_needed: row.service_needed ?? '',
+                status: row.status ?? 'new',
+                created_at: row.created_at ?? '',
+              }))
+            : []
+        )
       } catch (error) {
         if (!mounted) return
         setErrorMessage(
-          error instanceof Error ? error.message : 'Failed to load dashboard metrics'
+          error instanceof Error ? error.message : 'Failed to load dashboard'
         )
       } finally {
         if (mounted) {
           setIsRefreshing(false)
         }
       }
+    }
+
+    async function boot() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session) {
+        router.replace('/admin/login')
+        return
+      }
+
+      if (isMounted) {
+        setIsChecking(false)
+      }
+
+      await loadDashboard(isMounted)
     }
 
     boot()
@@ -167,22 +197,22 @@ export default function AdminDashboardPage() {
     {
       title: 'Reviews',
       href: '/admin/reviews',
-      description: 'Localized reviews and publishing control',
+      description: 'Localized reviews, search, publish and delete',
     },
     {
       title: 'FAQ',
       href: '/admin/faq',
-      description: 'Localized FAQ management and ordering',
+      description: 'Localized FAQ, search, publish and delete',
     },
     {
       title: 'Services',
       href: '/admin/services',
-      description: 'Real service pages, SEO fields, publishing state',
+      description: 'Service pages, SEO, search, publish and delete',
     },
     {
       title: 'Areas',
       href: '/admin/areas',
-      description: 'Localized area pages with highlights and supported services',
+      description: 'Localized area pages, highlights, publish and delete',
     },
   ]
 
@@ -209,7 +239,7 @@ export default function AdminDashboardPage() {
             Planetlocksmiths / Admin
           </p>
 
-          <h1
+          <h2
             style={{
               margin: '8px 0 0',
               fontSize: 36,
@@ -217,7 +247,7 @@ export default function AdminDashboardPage() {
             }}
           >
             Technical Dashboard
-          </h1>
+          </h2>
         </div>
 
         <button
@@ -305,46 +335,145 @@ export default function AdminDashboardPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gridTemplateColumns: '1.4fr 1fr',
           gap: 14,
         }}
       >
-        {links.map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
+        <div
+          style={{
+            background: '#0B1020',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 18,
+            padding: 18,
+          }}
+        >
+          <h3
             style={{
-              display: 'block',
-              textDecoration: 'none',
+              margin: 0,
+              fontSize: 22,
+              lineHeight: 1.2,
               color: '#F5F7FB',
-              background: '#0B1020',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 18,
-              padding: 18,
             }}
           >
-            <h2
-              style={{
-                margin: 0,
-                fontSize: 20,
-                lineHeight: 1.2,
-              }}
-            >
-              {item.title}
-            </h2>
+            Quick Access
+          </h3>
 
-            <p
-              style={{
-                margin: '10px 0 0',
-                color: '#95A0B8',
-                fontSize: 14,
-                lineHeight: 1.6,
-              }}
-            >
-              {item.description}
-            </p>
-          </a>
-        ))}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+              marginTop: 14,
+            }}
+          >
+            {links.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                style={{
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: '#F5F7FB',
+                  background: '#11192E',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 16,
+                  padding: 16,
+                }}
+              >
+                <strong style={{ display: 'block', fontSize: 18 }}>
+                  {item.title}
+                </strong>
+
+                <p
+                  style={{
+                    margin: '8px 0 0',
+                    color: '#95A0B8',
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {item.description}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: '#0B1020',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 18,
+            padding: 18,
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 22,
+              lineHeight: 1.2,
+              color: '#F5F7FB',
+            }}
+          >
+            Latest Orders
+          </h3>
+
+          <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
+            {recentOrders.map((order) => (
+              <a
+                key={order.id}
+                href="/admin/orders"
+                style={{
+                  display: 'block',
+                  textDecoration: 'none',
+                  background: '#11192E',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 14,
+                  padding: 14,
+                  color: '#F5F7FB',
+                }}
+              >
+                <strong style={{ display: 'block', fontSize: 16 }}>
+                  {order.service_needed || 'Order'}
+                </strong>
+                <p
+                  style={{
+                    margin: '6px 0 0',
+                    color: '#95A0B8',
+                    fontSize: 14,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {order.name || 'No name'} · {order.phone || 'No phone'}
+                </p>
+                <p
+                  style={{
+                    margin: '6px 0 0',
+                    color: '#A9D0FF',
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.6,
+                  }}
+                >
+                  {order.status}
+                </p>
+              </a>
+            ))}
+
+            {!recentOrders.length ? (
+              <div
+                style={{
+                  color: '#95A0B8',
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                }}
+              >
+                No recent orders yet.
+              </div>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   )
