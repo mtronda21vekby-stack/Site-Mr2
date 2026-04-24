@@ -13,9 +13,18 @@ function getSupabaseServerClient() {
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json()
+  let body: any
 
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid request body.' },
+      { status: 400 }
+    )
+  }
+
+  try {
     const name = typeof body.name === 'string' ? body.name.trim() : ''
     const phone = typeof body.phone === 'string' ? body.phone.trim() : ''
     const email = typeof body.email === 'string' ? body.email.trim() : ''
@@ -87,10 +96,12 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true })
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to create order.'
+
     return NextResponse.json(
-      { error: 'Invalid request body.' },
-      { status: 400 }
+      { error: message },
+      { status: 500 }
     )
   }
 }
