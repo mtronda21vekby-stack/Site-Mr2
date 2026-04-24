@@ -10,9 +10,11 @@ import ContactSection from '@/components/sections/ContactSection'
 import FaqSection from '@/components/sections/FaqSection'
 import {
   getAreaPageFromSource,
+  getContentBlocksFromSource,
   getFaqFromSource,
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
+  type SiteContentBlock,
 } from '@/lib/content.server'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -20,51 +22,21 @@ type Locale = 'en' | 'es' | 'ru'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: Locale; slug: string }>
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
   const area = await getAreaPageFromSource(locale, slug)
 
-  if (!area) {
-    return {
-      title: 'Service Area Not Found | Planetlocksmiths',
-      robots: { index: false, follow: false },
-    }
-  }
+  if (!area) return { title: 'Service Area Not Found | Planetlocksmiths', robots: { index: false, follow: false } }
 
   const url = `${siteUrl}/${locale}/areas/${area.slug}`
   const title = area.seoTitle || area.title
   const description = area.seoDescription || area.intro
 
-  return {
-    title,
-    description,
-    alternates: { canonical: url },
-    openGraph: {
-      type: 'website',
-      url,
-      title,
-      description,
-      siteName: 'Planetlocksmiths',
-    },
-  }
+  return { title, description, alternates: { canonical: url }, openGraph: { type: 'website', url, title, description, siteName: 'Planetlocksmiths' } }
 }
 
-const labels: Record<Locale, {
-  eyebrow: string
-  overview: string
-  customerPrep: string
-  localInfo: string
-  serviceReady: string
-  coverageNotes: string
-  prepItems: string[]
-  localItems: string[]
-  defaultServices: string[]
-}> = {
+const labels: Record<Locale, { eyebrow: string; overview: string; customerPrep: string; localInfo: string; serviceReady: string; coverageNotes: string; prepItems: string[]; localItems: string[]; defaultServices: string[] }> = {
   en: {
     eyebrow: 'Local automotive locksmith coverage',
     overview: 'Area overview',
@@ -105,11 +77,13 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
 
   const { locale, slug } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
-  const [global, home, area, faq] = await Promise.all([
+  const [global, home, area, faq, commonBlocks, areaBlocks] = await Promise.all([
     getGlobalSettingsFromSource(),
     getHomeContentFromSource(locale),
     getAreaPageFromSource(locale, slug),
     getFaqFromSource(locale),
+    getContentBlocksFromSource(locale, 'area-detail'),
+    getContentBlocksFromSource(locale, `area:${slug}`),
   ])
 
   if (!area) notFound()
@@ -122,39 +96,17 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
   const secondaryCta = home.heroSecondaryCta || home.contactTitle || 'Request service'
   const supportedServices = area.supportedServices.length ? area.supportedServices : copy.defaultServices
   const localInfo = area.highlights.length ? area.highlights : copy.localItems
+  const blockBySlot = new Map([...commonBlocks, ...areaBlocks].map((block) => [block.slot, block]))
+  const heroBlock = blockBySlot.get('hero')
+  const overviewBlock = blockBySlot.get('overview')
+  const prepBlock = blockBySlot.get('prep')
+  const servicesBlock = blockBySlot.get('supported-services')
+  const localInfoBlock = blockBySlot.get('local-info')
+  const coverageBlock = blockBySlot.get('coverage-notes')
 
   const jsonLd = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'AutomotiveBusiness',
-      '@id': `${pageUrl}#business`,
-      name: global.brandName,
-      url: pageUrl,
-      telephone: global.phoneDisplay,
-      description: area.seoDescription || area.intro,
-      areaServed: {
-        '@type': 'City',
-        name: location,
-      },
-      openingHours: global.serviceHours,
-      makesOffer: supportedServices.map((service) => ({
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: service,
-          areaServed: location,
-        },
-      })),
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/${locale}` },
-        { '@type': 'ListItem', position: 2, name: 'Service Areas', item: `${siteUrl}/${locale}/areas` },
-        { '@type': 'ListItem', position: 3, name: area.title, item: pageUrl },
-      ],
-    },
+    { '@context': 'https://schema.org', '@type': 'AutomotiveBusiness', '@id': `${pageUrl}#business`, name: global.brandName, url: pageUrl, telephone: global.phoneDisplay, description: area.seoDescription || area.intro, areaServed: { '@type': 'City', name: location }, openingHours: global.serviceHours, makesOffer: supportedServices.map((service) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: service, areaServed: location } })) },
+    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/${locale}` }, { '@type': 'ListItem', position: 2, name: 'Service Areas', item: `${siteUrl}/${locale}/areas` }, { '@type': 'ListItem', position: 3, name: area.title, item: pageUrl }] },
   ]
 
   return (
@@ -167,12 +119,12 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
         <article className="mx-auto max-w-7xl">
           <section className="grid gap-8 rounded-[2rem] border border-white/10 bg-white/[0.05] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">
             <div>
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">{copy.eyebrow} / {area.city || slug}</p>
-              <h1 className="max-w-5xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-7xl">{area.title}</h1>
-              <p className="mt-6 max-w-3xl text-base leading-8 text-muted sm:text-lg">{area.seoDescription || `Mobile automotive locksmith coverage for ${location}.`}</p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-accent-cyan">{heroBlock?.eyebrow || `${copy.eyebrow} / ${area.city || slug}`}</p>
+              <h1 className="max-w-5xl text-balance text-4xl font-semibold tracking-[-0.055em] sm:text-5xl lg:text-7xl">{heroBlock?.title || area.title}</h1>
+              <p className="mt-6 max-w-3xl text-base leading-8 text-muted sm:text-lg">{heroBlock?.body || area.seoDescription || `Mobile automotive locksmith coverage for ${location}.`}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition hover:brightness-110">{primaryCta}</a>
-                <a href="#request-service" className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-accent-gold transition hover:bg-accent-gold/15">{secondaryCta}</a>
+                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition hover:brightness-110">{heroBlock?.ctaLabel || primaryCta}</a>
+                <a href={heroBlock?.ctaHref || '#request-service'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-bold uppercase tracking-[0.16em] text-accent-gold transition hover:bg-accent-gold/15">{secondaryCta}</a>
               </div>
             </div>
 
@@ -185,24 +137,24 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
 
           <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_23rem]">
             <div className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-6 backdrop-blur-xl sm:p-8">
-              <p className="mb-5 text-xs font-bold uppercase tracking-[0.26em] text-accent-gold">{area.seoTitle || copy.overview}</p>
-              {paragraphs.length ? <div className="space-y-5 text-base leading-8 text-muted">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div> : <p className="text-base leading-8 text-muted">{area.seoDescription}</p>}
+              <p className="mb-5 text-xs font-bold uppercase tracking-[0.26em] text-accent-gold">{overviewBlock?.eyebrow || area.seoTitle || copy.overview}</p>
+              {overviewBlock?.title ? <h2 className="mb-5 text-3xl font-semibold tracking-[-0.035em] text-text">{overviewBlock.title}</h2> : null}
+              {overviewBlock?.body ? <p className="text-base leading-8 text-muted">{overviewBlock.body}</p> : paragraphs.length ? <div className="space-y-5 text-base leading-8 text-muted">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div> : <p className="text-base leading-8 text-muted">{area.seoDescription}</p>}
             </div>
 
             <aside className="grid gap-4">
-              <InfoBox title={copy.customerPrep} items={copy.prepItems} />
+              <InfoBox block={prepBlock} title={copy.customerPrep} items={copy.prepItems} />
             </aside>
           </section>
 
           <section className="mt-8 grid gap-6 lg:grid-cols-3">
-            <InfoBox title={copy.serviceReady} items={supportedServices} />
-            <InfoBox title={copy.localInfo} items={localInfo} />
-            <InfoBox title={copy.coverageNotes} items={copy.localItems} />
+            <InfoBox block={servicesBlock} title={copy.serviceReady} items={supportedServices} />
+            <InfoBox block={localInfoBlock} title={copy.localInfo} items={localInfo} />
+            <InfoBox block={coverageBlock} title={copy.coverageNotes} items={copy.localItems} />
           </section>
         </article>
 
         {faq.length ? <FaqSection title={home.faqTitle} items={faq} /> : null}
-
         <ContactSection title={home.contactTitle} text={home.contactText} phoneNumber={global.phonePrimary} phoneDisplay={global.phoneDisplay} locale={locale} />
       </main>
 
@@ -212,12 +164,14 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
   )
 }
 
-function InfoBox({ title, items }: { title: string; items: string[] }) {
+function InfoBox({ block, title, items }: { block?: SiteContentBlock; title: string; items: string[] }) {
+  const finalItems = block?.items.length ? block.items : items
   return (
     <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-6 backdrop-blur-xl">
-      <p className="mb-5 text-xs font-bold uppercase tracking-[0.22em] text-accent-cyan">{title}</p>
+      <p className="mb-5 text-xs font-bold uppercase tracking-[0.22em] text-accent-cyan">{block?.eyebrow || block?.title || title}</p>
+      {block?.body ? <p className="mb-5 text-sm leading-7 text-muted">{block.body}</p> : null}
       <ul className="grid gap-3">
-        {items.map((item) => (
+        {finalItems.map((item) => (
           <li key={item} className="flex gap-3 text-sm leading-6 text-text/85">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-gold" />
             <span>{item}</span>
