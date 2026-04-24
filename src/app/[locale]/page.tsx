@@ -12,6 +12,7 @@ import FaqSection from '@/components/sections/FaqSection'
 import ContactSection from '@/components/sections/ContactSection'
 import CustomerInfoSection from '@/components/sections/CustomerInfoSection'
 import ServiceDepthSection from '@/components/sections/ServiceDepthSection'
+import ConversionRail from '@/components/sections/ConversionRail'
 import {
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
@@ -65,6 +66,7 @@ export default async function LocaleHome({
           secondaryCtaHref={`/${locale}/services`}
         />
 
+        <ConversionRail locale={locale} global={global} home={home} />
         <ServicesGrid services={services} locale={locale} />
         <ServiceDepthSection locale={locale} />
         <CustomerInfoSection locale={locale} />
@@ -110,6 +112,8 @@ export default async function LocaleHome({
 
         <ReviewsSection title={home.reviewsTitle} items={reviews} />
         <FaqSection title={home.faqTitle} items={faq} />
+
+        <ConversionRail locale={locale} global={global} home={home} />
 
         <ContactSection
           title={home.contactTitle}
