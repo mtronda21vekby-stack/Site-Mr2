@@ -1,27 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-
-const groups = [
-  {
-    title: 'Core',
-    items: [
-      { href: '/admin/direct', label: 'Dashboard' },
-      { href: '/admin/orders', label: 'Orders' },
-      { href: '/admin/settings', label: 'Settings' },
-    ],
-  },
-  {
-    title: 'Content',
-    items: [
-      { href: '/admin/home', label: 'Home' },
-      { href: '/admin/reviews', label: 'Reviews' },
-      { href: '/admin/faq', label: 'FAQ' },
-      { href: '/admin/services', label: 'Services' },
-      { href: '/admin/areas', label: 'Areas' },
-    ],
-  },
-]
+import { adminNavGroups } from './admin-nav'
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -92,7 +72,7 @@ export default function AdminSidebar() {
       </div>
 
       <div style={{ display: 'grid', gap: 18 }}>
-        {groups.map((group) => (
+        {adminNavGroups.map((group) => (
           <div key={group.title}>
             <p
               style={{
