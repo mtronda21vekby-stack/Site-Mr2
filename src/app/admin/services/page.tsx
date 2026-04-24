@@ -43,13 +43,8 @@ function createEmptyRow(locale: Locale, sortOrder = 0): ServiceFormRow {
 export default function AdminServicesPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
-
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
-  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, ServiceFormRow[]>>({
-    en: [],
-    es: [],
-    ru: [],
-  })
+  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, ServiceFormRow[]>>({ en: [], es: [], ru: [] })
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -65,37 +60,22 @@ export default function AdminServicesPage() {
       try {
         setErrorMessage('')
         setSuccessMessage('')
-
         const sessionResult = await supabase.auth.getSession()
         const session = sessionResult?.data?.session
-
-        if (!session) {
-          router.replace('/admin/login')
-          return
-        }
+        if (!session) { router.replace('/admin/login'); return }
 
         const result = await (supabase.from('services') as any)
-          .select(
-            'id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published'
-          )
+          .select('id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published')
           .order('sort_order', { ascending: true })
 
-        if (result.error) {
-          throw new Error(result.error.message)
-        }
+        if (result.error) throw new Error(result.error.message)
 
-        const nextRows: Record<Locale, ServiceFormRow[]> = {
-          en: [],
-          es: [],
-          ru: [],
-        }
-
+        const nextRows: Record<Locale, ServiceFormRow[]> = { en: [], es: [], ru: [] }
         const rows = Array.isArray(result.data) ? result.data : []
 
         for (const row of rows) {
           const locale = row.locale as Locale
           if (!locales.includes(locale)) continue
-
           nextRows[locale].push({
             id: row.id ?? '',
             locale,
@@ -121,10 +101,7 @@ export default function AdminServicesPage() {
     }
 
     boot()
-
-    return () => {
-      mounted = false
-    }
+    return () => { mounted = false }
   }, [router, supabase])
 
   function updateRow(index: number, patch: Partial<ServiceFormRow>) {
@@ -146,7 +123,6 @@ export default function AdminServicesPage() {
   async function deleteRow(index: number) {
     setErrorMessage('')
     setSuccessMessage('')
-
     const row = rowsByLocale[activeLocale][index]
     if (!row) return
 
@@ -162,13 +138,11 @@ export default function AdminServicesPage() {
 
     const ok = window.confirm('Delete this service permanently?')
     if (!ok) return
-
     setDeletingId(row.id)
 
     try {
       const result = await (supabase.from('services') as any).delete().eq('id', row.id)
       if (result.error) throw new Error(result.error.message)
-
       setRowsByLocale((prev) => {
         const copy = [...prev[activeLocale]]
         copy.splice(index, 1)
@@ -192,16 +166,32 @@ export default function AdminServicesPage() {
       const currentRows = rowsByLocale[activeLocale]
 
       for (const row of currentRows) {
-        if (!row.slug.trim()) throw new Error(`Slug is required for locale ${activeLocale.toUpperCase()}`)
+        const slug = row.slug.trim()
+        const title = row.title.trim()
+        const excerpt = row.excerpt.trim()
+        const intro = row.intro.trim()
+        const seoTitle = row.seoTitle.trim()
+        const seoDescription = row.seoDescription.trim()
+        const label = title || slug || `service #${currentRows.indexOf(row) + 1}`
+
+        if (!slug) throw new Error(`Slug is required for ${label}.`)
+
+        if (row.isPublished) {
+          if (!title) throw new Error(`Published service "${label}" must have a title.`)
+          if (excerpt.length < 80) throw new Error(`Published service "${label}" needs an excerpt of at least 80 characters.`)
+          if (intro.length < 350) throw new Error(`Published service "${label}" needs an intro of at least 350 characters.`)
+          if (!seoTitle) throw new Error(`Published service "${label}" must have an SEO title.`)
+          if (seoDescription.length < 120) throw new Error(`Published service "${label}" needs an SEO description of at least 120 characters.`)
+        }
 
         const payload = {
           locale: row.locale,
-          slug: row.slug.trim(),
-          title: row.title.trim(),
-          excerpt: row.excerpt.trim(),
-          intro: row.intro.trim(),
-          seo_title: row.seoTitle.trim() || null,
-          seo_description: row.seoDescription.trim() || null,
+          slug,
+          title,
+          excerpt,
+          intro,
+          seo_title: seoTitle || null,
+          seo_description: seoDescription || null,
           sort_order: Number(row.sortOrder || 0),
           is_published: row.isPublished,
         }
@@ -232,9 +222,7 @@ export default function AdminServicesPage() {
     return matchesSearch && matchesPublish
   })
 
-  if (isBooting) {
-    return <div style={{ paddingTop: 20 }}><p style={{ color: '#95A0B8', margin: 0 }}>Loading services...</p></div>
-  }
+  if (isBooting) return <div style={{ paddingTop: 20 }}><p style={{ color: '#95A0B8', margin: 0 }}>Loading services...</p></div>
 
   return (
     <div>
@@ -250,7 +238,6 @@ export default function AdminServicesPage() {
       />
 
       <FilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search slug, title, excerpt" filterValue={publishFilter} onFilterChange={(value) => setPublishFilter(value as PublishFilter)} filterOptions={[{ value: 'all', label: 'All services' }, { value: 'published', label: 'Published' }, { value: 'draft', label: 'Draft' }]} />
-
       {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
       {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
 
@@ -279,7 +266,6 @@ export default function AdminServicesPage() {
         })}
         {!filteredRows.length ? <div style={emptyStateStyle}>No services match the current filters.</div> : null}
       </form>
-
       <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label={`Save ${activeLocale.toUpperCase()} Services`} note={`Service changes for ${activeLocale.toUpperCase()} stay ready at the bottom while you scroll.`} />
     </div>
   )
@@ -293,18 +279,9 @@ function FilterBar({ search, onSearchChange, searchPlaceholder, filterValue, onF
   return <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12, marginBottom: 16 }}><input value={search} onChange={(e) => onSearchChange(e.target.value)} placeholder={searchPlaceholder} style={inputStyle} /><select value={filterValue} onChange={(e) => onFilterChange(e.target.value)} style={inputStyle}>{filterOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div>
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label>
-}
-
-function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label>
-}
-
-function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) {
-  const isError = type === 'error'
-  return <div style={{ borderRadius: 12, border: isError ? '1px solid rgba(255,122,122,0.25)' : '1px solid rgba(77,162,255,0.25)', background: isError ? 'rgba(255,122,122,0.08)' : 'rgba(77,162,255,0.08)', color: isError ? '#FF9A9A' : '#A9D0FF', padding: '12px 14px', fontSize: 14, lineHeight: 1.5, marginBottom: 16 }}>{children}</div>
-}
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label> }
+function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label> }
+function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) { const isError = type === 'error'; return <div style={{ borderRadius: 12, border: isError ? '1px solid rgba(255,122,122,0.25)' : '1px solid rgba(77,162,255,0.25)', background: isError ? 'rgba(255,122,122,0.08)' : 'rgba(77,162,255,0.08)', color: isError ? '#FF9A9A' : '#A9D0FF', padding: '12px 14px', fontSize: 14, lineHeight: 1.5, marginBottom: 16 }}>{children}</div> }
 
 const inputStyle: CSSProperties = { width: '100%', minHeight: 48, borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
 const textAreaStyle: CSSProperties = { width: '100%', borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', padding: '12px 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', resize: 'vertical', WebkitAppearance: 'none' }
