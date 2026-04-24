@@ -31,7 +31,16 @@ const statusOptions = [
   'cancelled',
 ]
 
-const urgencyOptions = ['all', 'normal', 'urgent', 'same_day']
+const urgencyOptions = ['all', 'asap', 'same_day', 'scheduled', 'normal', 'urgent']
+
+const urgencyLabels: Record<string, string> = {
+  all: 'All urgency',
+  asap: 'ASAP / locked out now',
+  same_day: 'Same day',
+  scheduled: 'Scheduled appointment',
+  normal: 'Not urgent / normal',
+  urgent: 'Urgent',
+}
 
 export default function AdminOrdersPage() {
   const router = useRouter()
@@ -307,7 +316,7 @@ export default function AdminOrdersPage() {
         >
           {urgencyOptions.map((urgency) => (
             <option key={urgency} value={urgency}>
-              {urgency === 'all' ? 'All urgency' : urgency}
+              {urgencyLabels[urgency] ?? urgency}
             </option>
           ))}
         </select>
@@ -358,7 +367,7 @@ export default function AdminOrdersPage() {
                   <div>Vehicle: {row.vehicle_make_model || '—'}</div>
                   <div>Year: {row.vehicle_year || '—'}</div>
                   <div>Location: {row.location || '—'}</div>
-                  <div>Urgency: {row.urgency || '—'}</div>
+                  <div>Urgency: {urgencyLabels[row.urgency] ?? row.urgency ?? '—'}</div>
                   <div>Preferred time: {row.preferred_time || '—'}</div>
                   <div>Created: {row.created_at || '—'}</div>
                 </div>
