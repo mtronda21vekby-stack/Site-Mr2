@@ -113,7 +113,13 @@ export default async function LocaleHome({
           title={home.emergencyTitle}
           intro={home.emergencyText}
         />
-        <CustomerInfoSection locale={locale} />
+        <CustomerInfoSection
+          eyebrow={home.contactTitle}
+          title={home.contactTitle}
+          intro={home.contactText}
+          services={services}
+          faq={faq}
+        />
         <WhyChoose items={home.whyChoose} />
 
         <EmergencyStrip
