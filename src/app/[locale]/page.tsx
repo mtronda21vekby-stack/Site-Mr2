@@ -14,6 +14,7 @@ import ContactSection from '@/components/sections/ContactSection'
 import CustomerInfoSection from '@/components/sections/CustomerInfoSection'
 import ServiceDepthSection from '@/components/sections/ServiceDepthSection'
 import ConversionRail from '@/components/sections/ConversionRail'
+import AreasShowcase from '@/components/sections/AreasShowcase'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -136,35 +137,15 @@ export default async function LocaleHome({
           locale={locale}
         />
 
-        {featuredAreas.length ? (
-          <section className="relative overflow-hidden bg-transparent py-16 sm:py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                <div className="max-w-3xl">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-accent-cyan">{areaSectionBlock?.eyebrow || home.contactTitle}</p>
-                  <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">{areaSectionBlock?.title || home.heroSecondaryCta}</h2>
-                  <p className="mt-4 text-sm leading-7 text-muted">{areaSectionBlock?.body || home.contactText}</p>
-                </div>
-                <a href={areaSectionBlock?.ctaHref || `/${locale}/areas`} className="inline-flex w-fit rounded-full border border-white/15 bg-white/[0.035] px-5 py-3 text-xs font-bold uppercase tracking-[0.16em] text-accent-blue backdrop-blur-xl transition hover:border-accent-blue/50 hover:bg-accent-blue/10">{areaSectionBlock?.ctaLabel || home.heroSecondaryCta} →</a>
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {featuredAreas.map((area, index) => (
-                  <a key={area.slug} href={`/${locale}/areas/${area.slug}`} className="group relative block overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_20px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl transition hover:border-accent-blue/40 hover:bg-white/[0.06]">
-                    <div className="absolute right-[-3rem] top-[-3rem] h-28 w-28 rounded-full border border-accent-blue/20" />
-                    <div className="relative">
-                      <p className="mb-4 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-accent-gold">Area {String(index + 1).padStart(2, '0')}</p>
-                      <h3 className="text-xl font-semibold tracking-[-0.02em] text-text">{area.title}</h3>
-                      <p className="mt-2 text-sm text-muted">{[area.city, area.state].filter(Boolean).join(', ')}</p>
-                      <p className="mt-4 text-sm leading-7 text-muted">{area.intro}</p>
-                      <span className="mt-5 inline-flex text-xs font-bold uppercase tracking-[0.16em] text-accent-blue transition group-hover:text-accent-cyan">{areaSectionBlock?.ctaLabel || home.heroSecondaryCta} →</span>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
+        <AreasShowcase
+          locale={locale}
+          areas={featuredAreas}
+          block={areaSectionBlock}
+          fallbackEyebrow={home.contactTitle}
+          fallbackTitle={home.heroSecondaryCta}
+          fallbackText={home.contactText}
+          fallbackCta={home.heroSecondaryCta}
+        />
 
         <ReviewsSection title={home.reviewsTitle} items={reviews} />
         <FaqSection title={home.faqTitle} items={faq} />
