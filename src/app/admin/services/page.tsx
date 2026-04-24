@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 type Locale = 'en' | 'es' | 'ru'
+type PublishFilter = 'all' | 'published' | 'draft'
 
 type ServiceFormRow = {
   id: string
@@ -48,6 +49,9 @@ export default function AdminServicesPage() {
   })
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [publishFilter, setPublishFilter] = useState<PublishFilter>('all')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -149,15 +153,51 @@ export default function AdminServicesPage() {
     })
   }
 
-  function removeRow(index: number) {
-    setRowsByLocale((prev) => {
-      const copy = [...prev[activeLocale]]
-      copy.splice(index, 1)
-      return {
-        ...prev,
-        [activeLocale]: copy,
+  async function deleteRow(index: number) {
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    const row = rowsByLocale[activeLocale][index]
+    if (!row) return
+
+    if (!row.id) {
+      setRowsByLocale((prev) => {
+        const copy = [...prev[activeLocale]]
+        copy.splice(index, 1)
+        return { ...prev, [activeLocale]: copy }
+      })
+      setSuccessMessage('Unsaved service removed from form')
+      return
+    }
+
+    const ok = window.confirm('Delete this service permanently?')
+    if (!ok) return
+
+    setDeletingId(row.id)
+
+    try {
+      const result = await (supabase.from('services') as any)
+        .delete()
+        .eq('id', row.id)
+
+      if (result.error) {
+        throw new Error(result.error.message)
       }
-    })
+
+      setRowsByLocale((prev) => {
+        const copy = [...prev[activeLocale]]
+        copy.splice(index, 1)
+        return { ...prev, [activeLocale]: copy }
+      })
+
+      setSuccessMessage('Service deleted')
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Failed to delete service'
+      )
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
@@ -210,32 +250,6 @@ export default function AdminServicesPage() {
       }
 
       setSuccessMessage(`Services saved for ${activeLocale.toUpperCase()}`)
-
-      const reload = await (supabase.from('services') as any)
-        .select(
-          'id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published'
-        )
-        .eq('locale', activeLocale)
-        .order('sort_order', { ascending: true })
-
-      if (!reload.error) {
-        const rows = Array.isArray(reload.data) ? reload.data : []
-        setRowsByLocale((prev) => ({
-          ...prev,
-          [activeLocale]: rows.map((row: any) => ({
-            id: row.id ?? '',
-            locale: activeLocale,
-            slug: row.slug ?? '',
-            title: row.title ?? '',
-            excerpt: row.excerpt ?? '',
-            intro: row.intro ?? '',
-            seoTitle: row.seo_title ?? '',
-            seoDescription: row.seo_description ?? '',
-            sortOrder: Number(row.sort_order ?? 0),
-            isPublished: Boolean(row.is_published ?? true),
-          })),
-        }))
-      }
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : 'Failed to save services'
@@ -246,193 +260,179 @@ export default function AdminServicesPage() {
   }
 
   const currentRows = rowsByLocale[activeLocale]
+  const filteredRows = currentRows.filter((row) => {
+    const q = search.trim().toLowerCase()
+
+    const matchesSearch =
+      !q ||
+      row.slug.toLowerCase().includes(q) ||
+      row.title.toLowerCase().includes(q) ||
+      row.excerpt.toLowerCase().includes(q)
+
+    const matchesPublish =
+      publishFilter === 'all'
+        ? true
+        : publishFilter === 'published'
+          ? row.isPublished
+          : !row.isPublished
+
+    return matchesSearch && matchesPublish
+  })
 
   if (isBooting) {
     return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: '#05070B',
-          color: '#F5F7FB',
-          padding: '24px 16px 40px',
-          fontFamily: 'Inter, sans-serif',
-        }}
-      >
-        <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 14 }}>
-            Loading services...
-          </p>
-        </div>
-      </main>
+      <div style={{ paddingTop: 20 }}>
+        <p style={{ color: '#95A0B8', margin: 0 }}>Loading services...</p>
+      </div>
     )
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: '#05070B',
-        color: '#F5F7FB',
-        padding: '20px 16px 40px',
-        fontFamily: 'Inter, sans-serif',
-      }}
-    >
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
-        <div style={{ marginBottom: 20 }}>
-          <a
-            href="/admin/direct"
-            style={{
-              display: 'inline-block',
-              marginBottom: 10,
-              color: '#95A0B8',
-              textDecoration: 'none',
-              fontSize: 14,
-            }}
-          >
-            ← Back to dashboard
-          </a>
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
+          Planetlocksmiths / Admin / Services
+        </p>
+        <h1 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
+          Services
+        </h1>
+      </div>
 
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
-            Planetlocksmiths / Admin / Services
-          </p>
-
-          <h1 style={{ margin: '8px 0 0', fontSize: 32, lineHeight: 1.1 }}>
-            Services
-          </h1>
-        </div>
-
-        <div
-          style={{
-            display: 'flex',
-            gap: 10,
-            flexWrap: 'wrap',
-            marginBottom: 16,
-          }}
-        >
-          {locales.map((locale) => (
-            <button
-              key={locale}
-              type="button"
-              onClick={() => {
-                setSuccessMessage('')
-                setErrorMessage('')
-                setActiveLocale(locale)
-              }}
-              style={{
-                minHeight: 42,
-                padding: '0 14px',
-                borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.10)',
-                background: activeLocale === locale ? '#4DA2FF' : '#11192E',
-                color: activeLocale === locale ? '#05070B' : '#F5F7FB',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              {locale.toUpperCase()}
-            </button>
-          ))}
-
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          flexWrap: 'wrap',
+          marginBottom: 16,
+        }}
+      >
+        {locales.map((locale) => (
           <button
+            key={locale}
             type="button"
-            onClick={addRow}
+            onClick={() => {
+              setSuccessMessage('')
+              setErrorMessage('')
+              setActiveLocale(locale)
+            }}
             style={{
               minHeight: 42,
               padding: '0 14px',
               borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.10)',
-              background: '#11192E',
-              color: '#F5F7FB',
+              background: activeLocale === locale ? '#4DA2FF' : '#11192E',
+              color: activeLocale === locale ? '#05070B' : '#F5F7FB',
               fontWeight: 700,
               cursor: 'pointer',
             }}
           >
-            + Add service
+            {locale.toUpperCase()}
           </button>
-        </div>
+        ))}
 
-        <form onSubmit={handleSave} style={{ display: 'grid', gap: 16 }}>
-          {currentRows.map((row, index) => (
+        <button
+          type="button"
+          onClick={addRow}
+          style={ghostButtonStyle}
+        >
+          + Add service
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr',
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search slug, title, excerpt"
+          style={inputStyle}
+        />
+
+        <select
+          value={publishFilter}
+          onChange={(e) => setPublishFilter(e.target.value as PublishFilter)}
+          style={inputStyle}
+        >
+          <option value="all">All services</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
+      {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
+
+      <form onSubmit={handleSave} style={{ display: 'grid', gap: 16 }}>
+        {filteredRows.map((row) => {
+          const realIndex = currentRows.indexOf(row)
+
+          return (
             <div
-              key={row.id || `${row.locale}-${index}`}
-              style={{
-                display: 'grid',
-                gap: 12,
-                background: '#0B1020',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 20,
-                padding: 18,
-              }}
+              key={row.id || `${row.locale}-${realIndex}`}
+              style={cardStyle}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 10,
-                  flexWrap: 'wrap',
-                }}
-              >
-                <strong style={{ fontSize: 18 }}>Service #{index + 1}</strong>
+              <div style={cardHeaderStyle}>
+                <strong style={{ fontSize: 18 }}>Service #{realIndex + 1}</strong>
 
                 <button
                   type="button"
-                  onClick={() => removeRow(index)}
-                  style={{
-                    minHeight: 38,
-                    padding: '0 12px',
-                    borderRadius: 10,
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    background: 'transparent',
-                    color: '#FF9A9A',
-                    cursor: 'pointer',
-                  }}
+                  onClick={() => deleteRow(realIndex)}
+                  disabled={deletingId === row.id}
+                  style={dangerGhostButtonStyle}
                 >
-                  Remove from form
+                  {deletingId === row.id ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
 
               <Field
                 label="Slug"
                 value={row.slug}
-                onChange={(value) => updateRow(index, { slug: value })}
+                onChange={(value) => updateRow(realIndex, { slug: value })}
               />
 
               <Field
                 label="Title"
                 value={row.title}
-                onChange={(value) => updateRow(index, { title: value })}
+                onChange={(value) => updateRow(realIndex, { title: value })}
               />
 
               <TextAreaField
                 label="Excerpt"
                 value={row.excerpt}
-                onChange={(value) => updateRow(index, { excerpt: value })}
+                onChange={(value) => updateRow(realIndex, { excerpt: value })}
               />
 
               <TextAreaField
                 label="Intro"
                 value={row.intro}
-                onChange={(value) => updateRow(index, { intro: value })}
+                onChange={(value) => updateRow(realIndex, { intro: value })}
               />
 
               <Field
                 label="SEO Title"
                 value={row.seoTitle}
-                onChange={(value) => updateRow(index, { seoTitle: value })}
+                onChange={(value) => updateRow(realIndex, { seoTitle: value })}
               />
 
               <TextAreaField
                 label="SEO Description"
                 value={row.seoDescription}
-                onChange={(value) => updateRow(index, { seoDescription: value })}
+                onChange={(value) =>
+                  updateRow(realIndex, { seoDescription: value })
+                }
               />
 
               <Field
                 label="Sort Order"
                 value={String(row.sortOrder)}
                 onChange={(value) =>
-                  updateRow(index, { sortOrder: Number(value || 0) })
+                  updateRow(realIndex, { sortOrder: Number(value || 0) })
                 }
               />
 
@@ -441,66 +441,28 @@ export default function AdminServicesPage() {
                   type="checkbox"
                   checked={row.isPublished}
                   onChange={(event) =>
-                    updateRow(index, { isPublished: event.target.checked })
+                    updateRow(realIndex, { isPublished: event.target.checked })
                   }
                 />
                 <span>Published</span>
               </label>
             </div>
-          ))}
+          )
+        })}
 
-          {errorMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(255,122,122,0.25)',
-                background: 'rgba(255,122,122,0.08)',
-                color: '#FF9A9A',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {errorMessage}
-            </div>
-          ) : null}
+        {!filteredRows.length ? (
+          <div style={emptyStateStyle}>No services match the current filters.</div>
+        ) : null}
 
-          {successMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(77,162,255,0.25)',
-                background: 'rgba(77,162,255,0.08)',
-                color: '#A9D0FF',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {successMessage}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            style={{
-              minHeight: 50,
-              borderRadius: 14,
-              border: 'none',
-              background: '#4DA2FF',
-              color: '#05070B',
-              fontWeight: 700,
-              fontSize: 16,
-              cursor: isSaving ? 'default' : 'pointer',
-              opacity: isSaving ? 0.7 : 1,
-            }}
-          >
-            {isSaving ? 'Saving...' : `Save ${activeLocale.toUpperCase()} Services`}
-          </button>
-        </form>
-      </div>
-    </main>
+        <button
+          type="submit"
+          disabled={isSaving}
+          style={primaryButtonStyle(isSaving)}
+        >
+          {isSaving ? 'Saving...' : `Save ${activeLocale.toUpperCase()} Services`}
+        </button>
+      </form>
+    </div>
   )
 }
 
@@ -519,19 +481,7 @@ function Field({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        style={{
-          width: '100%',
-          minHeight: 50,
-          borderRadius: 14,
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: '#11192E',
-          color: '#F5F7FB',
-          padding: '0 14px',
-          outline: 'none',
-          fontSize: 16,
-          boxSizing: 'border-box',
-          WebkitAppearance: 'none',
-        }}
+        style={inputStyle}
       />
     </label>
   )
@@ -553,20 +503,127 @@ function TextAreaField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         rows={4}
-        style={{
-          width: '100%',
-          borderRadius: 14,
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: '#11192E',
-          color: '#F5F7FB',
-          padding: '12px 14px',
-          outline: 'none',
-          fontSize: 16,
-          boxSizing: 'border-box',
-          resize: 'vertical',
-          WebkitAppearance: 'none',
-        }}
+        style={textAreaStyle}
       />
     </label>
   )
+}
+
+function MessageBox({
+  type,
+  children,
+}: {
+  type: 'error' | 'success'
+  children: React.ReactNode
+}) {
+  const isError = type === 'error'
+
+  return (
+    <div
+      style={{
+        borderRadius: 12,
+        border: isError
+          ? '1px solid rgba(255,122,122,0.25)'
+          : '1px solid rgba(77,162,255,0.25)',
+        background: isError
+          ? 'rgba(255,122,122,0.08)'
+          : 'rgba(77,162,255,0.08)',
+        color: isError ? '#FF9A9A' : '#A9D0FF',
+        padding: '12px 14px',
+        fontSize: 14,
+        lineHeight: 1.5,
+        marginBottom: 16,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  minHeight: 48,
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  padding: '0 14px',
+  outline: 'none',
+  fontSize: 16,
+  boxSizing: 'border-box',
+  WebkitAppearance: 'none',
+}
+
+const textAreaStyle: React.CSSProperties = {
+  width: '100%',
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  padding: '12px 14px',
+  outline: 'none',
+  fontSize: 16,
+  boxSizing: 'border-box',
+  resize: 'vertical',
+  WebkitAppearance: 'none',
+}
+
+const cardStyle: React.CSSProperties = {
+  display: 'grid',
+  gap: 12,
+  background: '#0B1020',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 20,
+  padding: 18,
+}
+
+const cardHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 10,
+  flexWrap: 'wrap',
+}
+
+const ghostButtonStyle: React.CSSProperties = {
+  minHeight: 42,
+  padding: '0 14px',
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  fontWeight: 700,
+  cursor: 'pointer',
+}
+
+const dangerGhostButtonStyle: React.CSSProperties = {
+  minHeight: 38,
+  padding: '0 12px',
+  borderRadius: 10,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: 'transparent',
+  color: '#FF9A9A',
+  cursor: 'pointer',
+}
+
+const emptyStateStyle: React.CSSProperties = {
+  background: '#0B1020',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 18,
+  padding: 18,
+  color: '#95A0B8',
+}
+
+function primaryButtonStyle(disabled: boolean): React.CSSProperties {
+  return {
+    minHeight: 50,
+    borderRadius: 14,
+    border: 'none',
+    background: '#4DA2FF',
+    color: '#05070B',
+    fontWeight: 700,
+    fontSize: 16,
+    cursor: disabled ? 'default' : 'pointer',
+    opacity: disabled ? 0.7 : 1,
+  }
 }
