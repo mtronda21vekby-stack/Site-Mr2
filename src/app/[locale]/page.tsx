@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
+import JsonLd from '@/components/seo/JsonLd'
 import Hero from '@/components/hero/Hero'
 import ServicesGrid from '@/components/sections/ServicesGrid'
 import WhyChoose from '@/components/sections/WhyChoose'
@@ -38,6 +39,7 @@ export default async function LocaleHome({
   noStore()
 
   const { locale } = await params
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
 
   const [global, home, reviews, faq, services, areas] = await Promise.all([
     getGlobalSettingsFromSource(),
@@ -49,9 +51,45 @@ export default async function LocaleHome({
   ])
 
   const featuredAreas = areas.slice(0, 6)
+  const pageUrl = `${siteUrl}/${locale}`
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'AutomotiveBusiness',
+      '@id': `${pageUrl}#business`,
+      name: global.brandName,
+      url: pageUrl,
+      telephone: global.phoneDisplay,
+      description: home.heroSubtitle,
+      areaServed: areas.map((area) => [area.city, area.state].filter(Boolean).join(', ')).filter(Boolean),
+      openingHours: global.serviceHours,
+      makesOffer: services.map((service) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: service.title,
+          description: service.excerpt,
+          url: `${siteUrl}/${locale}/services/${service.slug}`,
+        },
+      })),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faq.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    },
+  ]
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
+      <JsonLd data={jsonLd} />
       <CinematicBackground />
       <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
 
