@@ -11,11 +11,41 @@ interface HeaderProps {
   phonePrimary: string
 }
 
-const navItems = [
-  { label: 'Home', slug: '' },
-  { label: 'Services', slug: 'services' },
-  { label: 'Service Areas', slug: 'areas' },
-] as const
+const navConfig: Record<
+  Locale,
+  Array<{ label: string; href: (locale: Locale) => string }>
+> = {
+  en: [
+    { label: 'Home', href: (locale) => `/${locale}` },
+    { label: 'Services', href: (locale) => `/${locale}/services` },
+    { label: 'Service Areas', href: (locale) => `/${locale}/areas` },
+  ],
+  es: [
+    { label: 'Inicio', href: (locale) => `/${locale}` },
+    { label: 'Servicios', href: (locale) => `/${locale}/services` },
+    { label: 'Áreas', href: (locale) => `/${locale}/areas` },
+  ],
+  ru: [
+    { label: 'Главная', href: (locale) => `/${locale}` },
+    { label: 'Услуги', href: (locale) => `/${locale}/services` },
+    { label: 'Районы', href: (locale) => `/${locale}/areas` },
+  ],
+}
+
+const ctaLabels: Record<Locale, { request: string; call: string }> = {
+  en: {
+    request: 'Request Service',
+    call: 'Call',
+  },
+  es: {
+    request: 'Заказать сервис',
+    call: 'Llamar',
+  },
+  ru: {
+    request: 'Заказать услугу',
+    call: 'Позвонить',
+  },
+}
 
 export default function Header({
   locale,
@@ -24,16 +54,15 @@ export default function Header({
 }: HeaderProps) {
   const [open, setOpen] = useState(false)
 
-  const getHref = (slug: string) => {
-    return slug ? `/${locale}/${slug}` : `/${locale}`
-  }
+  const navItems = navConfig[locale]
+  const labels = ctaLabels[locale]
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/50 bg-bg/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
-          href={getHref('')}
-          className="text-lg font-bold text-text"
+          href={`/${locale}`}
+          className="min-w-0 truncate text-lg font-bold text-text"
           aria-label="Planetlocksmiths home"
         >
           Planetlocksmiths
@@ -43,7 +72,7 @@ export default function Header({
           {navItems.map((item) => (
             <Link
               key={item.label}
-              href={getHref(item.slug)}
+              href={item.href(locale)}
               className="text-sm text-muted transition-colors hover:text-text"
             >
               {item.label}
@@ -56,14 +85,14 @@ export default function Header({
             href={`tel:${phonePrimary}`}
             className="rounded-full border border-line px-4 py-2 text-sm text-text transition-colors hover:border-line/70 hover:bg-white/5"
           >
-            Request Service
+            {labels.request}
           </a>
 
           <a
             href={`tel:${phonePrimary}`}
             className="rounded-full bg-accent-blue px-4 py-2 text-sm font-medium text-black transition-colors hover:brightness-110"
           >
-            Call {phoneDisplay}
+            {labels.call} {phoneDisplay}
           </a>
         </div>
 
@@ -84,7 +113,7 @@ export default function Header({
             {navItems.map((item) => (
               <Link
                 key={item.label}
-                href={getHref(item.slug)}
+                href={item.href(locale)}
                 className="py-3 text-base text-muted transition-colors hover:text-text"
                 onClick={() => setOpen(false)}
               >
@@ -97,14 +126,14 @@ export default function Header({
                 href={`tel:${phonePrimary}`}
                 className="rounded-full border border-line px-4 py-3 text-center text-sm text-text"
               >
-                Request Service
+                {labels.request}
               </a>
 
               <a
                 href={`tel:${phonePrimary}`}
                 className="rounded-full bg-accent-blue px-4 py-3 text-center text-sm font-medium text-black"
               >
-                Call {phoneDisplay}
+                {labels.call} {phoneDisplay}
               </a>
             </div>
           </nav>
