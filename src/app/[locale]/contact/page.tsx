@@ -1,6 +1,7 @@
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
+import CinematicBackground from '@/components/layout/CinematicBackground'
 import ContactSection from '@/components/sections/ContactSection'
 import {
   getGlobalSettingsFromSource,
@@ -23,11 +24,12 @@ export default async function ContactPage({
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
+      <CinematicBackground />
       <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
 
       <main className="flex flex-col">
         <section className="px-4 py-14 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl sm:p-8">
+          <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.05] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.28)] backdrop-blur-xl sm:p-8">
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-accent-cyan">Contact Planetlocksmiths</p>
             <h1 className="max-w-4xl text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Request mobile automotive locksmith service</h1>
             <p className="mt-5 max-w-3xl text-sm leading-7 text-muted">
