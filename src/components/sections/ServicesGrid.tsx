@@ -1,26 +1,58 @@
-import Link from 'next/link';
-import type { Locale } from '@/components/layout/Header';
+import Link from 'next/link'
+import type { Locale } from '@/components/layout/Header'
 
 interface Service {
-  title: string;
-  excerpt: string;
-  slug: string;
+  title: string
+  excerpt: string
+  slug: string
+}
+
+function getCopy(locale: Locale) {
+  switch (locale) {
+    case 'es':
+      return {
+        title: 'Nuestros Servicios',
+        cta: 'Ver más',
+      }
+    case 'ru':
+      return {
+        title: 'Наши услуги',
+        cta: 'Подробнее',
+      }
+    case 'en':
+    default:
+      return {
+        title: 'Our Services',
+        cta: 'Learn more',
+      }
+  }
 }
 
 export default function ServicesGrid({
   services,
   locale,
 }: {
-  services: Service[];
-  locale: Locale;
+  services: Service[]
+  locale: Locale
 }) {
+  const copy = getCopy(locale)
+
   return (
     <section className="bg-surface py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-8 text-2xl font-heading font-semibold text-text">
-          {/* It’s okay to hardcode this heading for now. In the future this could be localised via JSON. */}
-          Our Services
-        </h2>
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <h2 className="text-2xl font-heading font-semibold text-text">
+            {copy.title}
+          </h2>
+
+          <Link
+            href={`/${locale}/services`}
+            className="text-sm font-semibold text-[var(--accent-blue)]"
+          >
+            {copy.cta} →
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <Link
@@ -35,12 +67,12 @@ export default function ServicesGrid({
                 {service.excerpt}
               </p>
               <span className="mt-4 inline-block text-sm font-medium text-accent-blue underline">
-                Learn more
+                {copy.cta}
               </span>
             </Link>
           ))}
         </div>
       </div>
     </section>
-  );
+  )
 }
