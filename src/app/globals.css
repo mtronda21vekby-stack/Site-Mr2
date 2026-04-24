@@ -2,15 +2,120 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global styles */
 :root {
-  /* Place any CSS variables here if needed */
+  --planet-blue: #4da2ff;
+  --planet-cyan: #2de2e6;
+  --planet-copper: #d6a85f;
+  --planet-brass: #f1c978;
+  --planet-void: #02040a;
+  --planet-glass: rgba(10, 18, 34, 0.62);
+  --planet-line: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--planet-void);
 }
 
 body {
   @apply bg-bg text-text font-body;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% -20%, rgba(77, 162, 255, 0.18), transparent 38rem),
+    radial-gradient(circle at 85% 8%, rgba(214, 168, 95, 0.1), transparent 30rem),
+    linear-gradient(180deg, #02040a 0%, #05070b 44%, #02040a 100%);
+  text-rendering: geometricPrecision;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   @apply font-heading;
+}
+
+::selection {
+  background: rgba(77, 162, 255, 0.36);
+  color: #ffffff;
+}
+
+.cinematic-shell {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.024) 1px, transparent 1px),
+    radial-gradient(circle at 50% 0%, rgba(77, 162, 255, 0.1), transparent 36rem),
+    #02040a;
+  background-size: 72px 72px, 72px 72px, auto, auto;
+}
+
+.cinematic-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(45, 226, 230, 0.08), transparent 24rem),
+    radial-gradient(circle at 88% 30%, rgba(214, 168, 95, 0.08), transparent 26rem),
+    radial-gradient(circle at 50% 100%, rgba(77, 162, 255, 0.12), transparent 34rem);
+}
+
+.cinematic-shell::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 100% 4px;
+  mask-image: linear-gradient(180deg, transparent, black 10%, black 86%, transparent);
+}
+
+@keyframes planet-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes planet-rotate-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes signal-pulse {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.62;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }
