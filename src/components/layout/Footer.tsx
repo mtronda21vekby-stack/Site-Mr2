@@ -104,7 +104,7 @@ export default function Footer({ locale }: FooterProps) {
               <Link href={`/${locale}/contact`} className="text-sm hover:text-text">{labels.contact}</Link>
               <Link href={`/${locale}/privacy`} className="text-sm hover:text-text">{labels.privacy}</Link>
               <Link href={`/${locale}/terms`} className="text-sm hover:text-text">{labels.terms}</Link>
-              <a href="#request-service" className="text-sm hover:text-text">{labels.request}</a>
+              <Link href={`/${locale}/contact#request-service`} className="text-sm hover:text-text">{labels.request}</Link>
             </nav>
           </div>
         </div>
