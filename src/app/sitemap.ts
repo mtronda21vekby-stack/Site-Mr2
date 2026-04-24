@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { ACTIVE_LOCALES, type Locale } from '@/lib/locales'
+import { ACTIVE_LOCALES } from '@/lib/locales'
+import type { Locale } from '@/lib/content'
 import {
   getAreasListFromSource,
   getServicesListFromSource,
@@ -23,6 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   for (const locale of ACTIVE_LOCALES) {
+    const typedLocale = locale as Locale
+
     for (const route of staticRoutes) {
       pages.push({
         url: `${baseUrl}/${locale}${route.path}`,
@@ -34,8 +37,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     try {
       const [services, areas] = await Promise.all([
-        getServicesListFromSource(locale as Locale),
-        getAreasListFromSource(locale as Locale),
+        getServicesListFromSource(typedLocale),
+        getAreasListFromSource(typedLocale),
       ])
 
       for (const service of services) {
