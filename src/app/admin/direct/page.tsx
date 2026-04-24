@@ -31,15 +31,7 @@ type QualityItem = {
   note: string
 }
 
-const initialMetrics: Metrics = {
-  newOrders: 0,
-  activeOrders: 0,
-  completedOrders: 0,
-  reviews: 0,
-  faq: 0,
-  services: 0,
-  areas: 0,
-}
+const initialMetrics: Metrics = { newOrders: 0, activeOrders: 0, completedOrders: 0, reviews: 0, faq: 0, services: 0, areas: 0 }
 
 export default function AdminDashboardPage() {
   const router = useRouter()
@@ -52,12 +44,10 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     let mounted = true
-
     async function loadDashboard() {
       try {
         setErrorMessage('')
         setIsRefreshing(true)
-
         const [newOrders, activeOrders, completedOrders, reviews, faq, services, areas, recent] = await Promise.all([
           (supabase.from('orders') as any).select('*', { count: 'exact', head: true }).eq('status', 'new'),
           (supabase.from('orders') as any).select('*', { count: 'exact', head: true }).in('status', ['contacted', 'scheduled', 'in_progress']),
@@ -68,33 +58,11 @@ export default function AdminDashboardPage() {
           (supabase.from('areas') as any).select('*', { count: 'exact', head: true }).eq('is_published', true),
           (supabase.from('orders') as any).select('id, name, phone, service_needed, status, created_at').order('created_at', { ascending: false }).limit(5),
         ])
-
         const firstError = newOrders.error || activeOrders.error || completedOrders.error || reviews.error || faq.error || services.error || areas.error || recent.error
         if (firstError) throw new Error(firstError.message)
         if (!mounted) return
-
-        setMetrics({
-          newOrders: newOrders.count ?? 0,
-          activeOrders: activeOrders.count ?? 0,
-          completedOrders: completedOrders.count ?? 0,
-          reviews: reviews.count ?? 0,
-          faq: faq.count ?? 0,
-          services: services.count ?? 0,
-          areas: areas.count ?? 0,
-        })
-
-        setRecentOrders(
-          Array.isArray(recent.data)
-            ? recent.data.map((row: any) => ({
-                id: row.id ?? '',
-                name: row.name ?? '',
-                phone: row.phone ?? '',
-                service_needed: row.service_needed ?? '',
-                status: row.status ?? 'new',
-                created_at: row.created_at ?? '',
-              }))
-            : []
-        )
+        setMetrics({ newOrders: newOrders.count ?? 0, activeOrders: activeOrders.count ?? 0, completedOrders: completedOrders.count ?? 0, reviews: reviews.count ?? 0, faq: faq.count ?? 0, services: services.count ?? 0, areas: areas.count ?? 0 })
+        setRecentOrders(Array.isArray(recent.data) ? recent.data.map((row: any) => ({ id: row.id ?? '', name: row.name ?? '', phone: row.phone ?? '', service_needed: row.service_needed ?? '', status: row.status ?? 'new', created_at: row.created_at ?? '' })) : [])
       } catch (error) {
         if (!mounted) return
         setErrorMessage(error instanceof Error ? error.message : 'Failed to load dashboard')
@@ -102,91 +70,33 @@ export default function AdminDashboardPage() {
         if (mounted) setIsRefreshing(false)
       }
     }
-
     async function boot() {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        router.replace('/admin/login')
-        return
-      }
+      if (!session) { router.replace('/admin/login'); return }
       if (mounted) setIsChecking(false)
       await loadDashboard()
     }
-
     boot()
     return () => { mounted = false }
   }, [router, supabase])
 
   const qualityItems = getQualityItems(metrics)
-
-  if (isChecking) {
-    return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Planetlocksmiths cockpit</p><h1 style={titleStyle}>Loading admin...</h1></div></div>
-  }
+  if (isChecking) return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Planetlocksmiths cockpit</p><h1 style={titleStyle}>Loading admin...</h1></div></div>
 
   return (
     <div style={pageStyle}>
-      <div style={ambientBlueStyle} />
-      <div style={ambientGoldStyle} />
-
-      <section style={heroPanelStyle}>
-        <div>
-          <p style={eyebrowStyle}>Planetlocksmiths / Workers control room</p>
-          <h1 style={heroTitleStyle}>Operations + Quality Dashboard</h1>
-          <p style={heroTextStyle}>Manage Supabase content, emergency leads, local landing pages, Ads-readiness, reviews, FAQ, and service coverage from one command center.</p>
-        </div>
-        <div style={heroActionsStyle}>
-          <a href="/en" style={ghostButtonStyle}>View site</a>
-          <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Refreshing...' : 'Refresh signal'}</button>
-        </div>
-      </section>
-
+      <div style={ambientBlueStyle} /><div style={ambientGoldStyle} />
+      <section style={heroPanelStyle}><div><p style={eyebrowStyle}>Planetlocksmiths / Workers control room</p><h1 style={heroTitleStyle}>Operations + Quality Dashboard</h1><p style={heroTextStyle}>Manage Supabase content, emergency leads, local landing pages, Ads-readiness, reviews, FAQ, and service coverage from one command center.</p></div><div style={heroActionsStyle}><a href="/admin/audit" style={ghostButtonStyle}>Audit center</a><a href="/en" style={ghostButtonStyle}>View site</a><button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Refreshing...' : 'Refresh signal'}</button></div></section>
       {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
-
-      <div style={statsGridStyle}>
-        <AdminStatCard title="New Orders" value={String(metrics.newOrders)} note="Fresh requests waiting for action." />
-        <AdminStatCard title="Active Orders" value={String(metrics.activeOrders)} note="Contacted, scheduled, or in progress." />
-        <AdminStatCard title="Completed" value={String(metrics.completedOrders)} note="Closed requests marked completed." />
-        <AdminStatCard title="Services" value={String(metrics.services)} note="Published service landing pages." />
-        <AdminStatCard title="Areas" value={String(metrics.areas)} note="Published local coverage pages." />
-        <AdminStatCard title="FAQ" value={String(metrics.faq)} note="Published customer answers." />
-        <AdminStatCard title="Reviews" value={String(metrics.reviews)} note="Published proof cards." />
-      </div>
-
-      <section style={panelStyle}>
-        <div style={panelHeadingRowStyle}>
-          <div><p style={panelEyebrowStyle}>Quality control</p><h2 style={panelTitleStyle}>Ads / SEO / UX Readiness</h2></div>
-          <span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} ready</span>
-        </div>
-        <div style={qualityGridStyle}>
-          {qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}
-        </div>
-      </section>
-
-      <div style={twoColumnStyle}>
-        <section style={panelStyle}>
-          <div style={panelHeadingRowStyle}>
-            <div><p style={panelEyebrowStyle}>Admin modules</p><h2 style={panelTitleStyle}>Quick Access</h2></div>
-            <span style={statusPillStyle}>Online</span>
-          </div>
-          <div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Open module →</span></a>)}</div>
-        </section>
-
-        <section style={panelStyle}>
-          <div style={panelHeadingRowStyle}>
-            <div><p style={panelEyebrowStyle}>Dispatch feed</p><h2 style={panelTitleStyle}>Latest Orders</h2></div>
-            <a href="/admin/orders" style={smallTextLinkStyle}>All orders →</a>
-          </div>
-          <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
-            {recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Order'}</strong><p style={mutedLineStyle}>{order.name || 'No name'} · {order.phone || 'No phone'}</p><p style={statusTextStyle}>{order.status}</p></a>)}
-            {!recentOrders.length ? <div style={emptyStateStyle}>No recent orders yet. New requests will appear here after the contact form starts receiving leads.</div> : null}
-          </div>
-        </section>
-      </div>
+      <div style={statsGridStyle}><AdminStatCard title="New Orders" value={String(metrics.newOrders)} note="Fresh requests waiting for action." /><AdminStatCard title="Active Orders" value={String(metrics.activeOrders)} note="Contacted, scheduled, or in progress." /><AdminStatCard title="Completed" value={String(metrics.completedOrders)} note="Closed requests marked completed." /><AdminStatCard title="Services" value={String(metrics.services)} note="Published service landing pages." /><AdminStatCard title="Areas" value={String(metrics.areas)} note="Published local coverage pages." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Published customer answers." /><AdminStatCard title="Reviews" value={String(metrics.reviews)} note="Published proof cards." /></div>
+      <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Quality control</p><h2 style={panelTitleStyle}>Ads / SEO / UX Readiness</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} ready</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
+      <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Admin modules</p><h2 style={panelTitleStyle}>Quick Access</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Open module →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Dispatch feed</p><h2 style={panelTitleStyle}>Latest Orders</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>All orders →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Order'}</strong><p style={mutedLineStyle}>{order.name || 'No name'} · {order.phone || 'No phone'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>No recent orders yet. New requests will appear here after the contact form starts receiving leads.</div> : null}</div></section></div>
     </div>
   )
 }
 
 const links = [
+  { title: 'Audit', href: '/admin/audit', description: 'Detailed page quality audit for services and areas.', accent: '#FF9A9A' },
   { title: 'Orders', href: '/admin/orders', description: 'Incoming leads, statuses, notes, field workflow.', accent: '#4DA2FF' },
   { title: 'Settings', href: '/admin/settings', description: 'Brand, phone, email, service hours, emergency routing.', accent: '#D6A85F' },
   { title: 'Home', href: '/admin/home', description: 'Hero, CTA copy, conversion rails, contact block.', accent: '#2DE2E6' },
@@ -198,6 +108,7 @@ const links = [
 
 function getQualityItems(metrics: Metrics): QualityItem[] {
   return [
+    { title: 'Content audit', href: '/admin/audit', status: 'warn', note: 'Open detailed audit for SEO, intro length, slugs, highlights, and supported services.' },
     { title: 'Service pages', href: '/admin/services', status: metrics.services >= 6 ? 'good' : metrics.services >= 3 ? 'warn' : 'danger', note: metrics.services >= 6 ? 'Strong service coverage.' : 'Add more published service landing pages.' },
     { title: 'Area pages', href: '/admin/areas', status: metrics.areas >= 6 ? 'good' : metrics.areas >= 3 ? 'warn' : 'danger', note: metrics.areas >= 6 ? 'Good local coverage depth.' : 'Add more local service-area pages.' },
     { title: 'FAQ depth', href: '/admin/faq', status: metrics.faq >= 8 ? 'good' : metrics.faq >= 4 ? 'warn' : 'danger', note: metrics.faq >= 8 ? 'Good answer base for Ads trust.' : 'Add FAQ about pricing, authorization, keys, timing, and service limits.' },
@@ -206,10 +117,7 @@ function getQualityItems(metrics: Metrics): QualityItem[] {
   ]
 }
 
-function QualityCard({ item }: { item: QualityItem }) {
-  const color = item.status === 'good' ? '#2DE2E6' : item.status === 'warn' ? '#D6A85F' : '#FF9A9A'
-  return <a href={item.href} style={{ ...infoWindowStyle, textDecoration: 'none', color: '#F5F7FB', borderColor: `${color}55` }}><span style={{ display: 'inline-flex', marginBottom: 10, color, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8 }}>{item.status}</span><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.note}</p><span style={{ ...quickCtaStyle, color }}>Fix / review →</span></a>
-}
+function QualityCard({ item }: { item: QualityItem }) { const color = item.status === 'good' ? '#2DE2E6' : item.status === 'warn' ? '#D6A85F' : '#FF9A9A'; return <a href={item.href} style={{ ...infoWindowStyle, textDecoration: 'none', color: '#F5F7FB', borderColor: `${color}55` }}><span style={{ display: 'inline-flex', marginBottom: 10, color, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8 }}>{item.status}</span><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.note}</p><span style={{ ...quickCtaStyle, color }}>Fix / review →</span></a> }
 
 const pageStyle: CSSProperties = { position: 'relative', minWidth: 0, overflow: 'hidden', paddingBottom: 24 }
 const ambientBlueStyle: CSSProperties = { position: 'fixed', right: -180, top: -120, width: 460, height: 460, borderRadius: 999, background: 'rgba(77,162,255,0.12)', filter: 'blur(80px)', pointerEvents: 'none' }
