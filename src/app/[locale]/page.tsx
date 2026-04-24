@@ -13,6 +13,8 @@ import {
   getHomeContentFromSource,
   getReviewsFromSource,
   getFaqFromSource,
+  getServicesListFromSource,
+  getAreasListFromSource,
 } from '@/lib/content.server'
 
 export const dynamic = 'force-dynamic'
@@ -36,13 +38,15 @@ export default async function LocaleHome({
   const { locale } = await params
 
   const [global, home, reviews, faq, services, areas] = await Promise.all([
-  getGlobalSettingsFromSource(),
-  getHomeContentFromSource(locale),
-  getReviewsFromSource(locale),
-  getFaqFromSource(locale),
-  getServicesListFromSource(locale),
-  getAreasListFromSource(locale),
-])
+    getGlobalSettingsFromSource(),
+    getHomeContentFromSource(locale),
+    getReviewsFromSource(locale),
+    getFaqFromSource(locale),
+    getServicesListFromSource(locale),
+    getAreasListFromSource(locale),
+  ])
+
+  const featuredAreas = areas.slice(0, 6)
 
   return (
     <>
@@ -60,10 +64,10 @@ export default async function LocaleHome({
           primaryCtaLabel={home.heroPrimaryCta}
           primaryCtaHref={`tel:${global.phonePrimary}`}
           secondaryCtaLabel={home.heroSecondaryCta}
-          secondaryCtaHref={`/${locale}/contact`}
+          secondaryCtaHref={`/${locale}/services`}
         />
 
-        <ServicesGrid services={home.featuredServices} locale={locale} />
+        <ServicesGrid services={services} locale={locale} />
 
         <WhyChoose items={home.whyChoose} />
 
@@ -75,9 +79,59 @@ export default async function LocaleHome({
           locale={locale}
         />
 
+        {featuredAreas.length ? (
+          <section className="bg-surface py-16">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="mb-8 flex items-end justify-between gap-4">
+                <div>
+                  <p className="mb-2 text-xs uppercase tracking-[0.24em] text-muted">
+                    Coverage
+                  </p>
+                  <h2 className="text-2xl font-heading font-semibold text-text sm:text-3xl">
+                    Service Areas
+                  </h2>
+                </div>
+
+                <a
+                  href={`/${locale}/areas`}
+                  className="text-sm font-semibold text-[var(--accent-blue)]"
+                >
+                  View all →
+                </a>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {featuredAreas.map((area) => (
+                  <a
+                    key={area.slug}
+                    href={`/${locale}/areas/${area.slug}`}
+                    className="block rounded-2xl border border-white/10 bg-bg/60 p-5 transition hover:border-white/20 hover:bg-white/5"
+                  >
+                    <h3 className="text-xl font-heading font-semibold text-text">
+                      {area.title}
+                    </h3>
+
+                    <p className="mt-2 text-sm text-muted">
+                      {[area.city, area.state].filter(Boolean).join(', ')}
+                    </p>
+
+                    <p className="mt-3 text-sm leading-6 text-muted">
+                      {area.intro}
+                    </p>
+
+                    <span className="mt-4 inline-flex text-sm font-semibold text-[var(--accent-blue)]">
+                      Open area page →
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
         <ReviewsSection title={home.reviewsTitle} items={reviews} />
 
-        <FaqSection title={home.faqTitle} items={faqs} />
+        <FaqSection title={home.faqTitle} items={faq} />
 
         <ContactSection
           title={home.contactTitle}
