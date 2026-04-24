@@ -50,7 +50,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-bg/70 shadow-[0_18px_70px_rgba(0,0,0,0.28)] backdrop-blur-2xl supports-[backdrop-filter]:bg-bg/58">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-blue/45 to-transparent" />
-      <div className="mx-auto flex h-17 max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-[4.25rem] max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link href={`/${locale}`} className="group flex min-w-0 items-center gap-3" aria-label="Planetlocksmiths home">
           <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-accent-blue/25 bg-accent-blue/10 shadow-[0_0_34px_rgba(77,162,255,0.18)]">
             <span className="h-3.5 w-3.5 rounded-full bg-accent-blue shadow-[0_0_22px_rgba(77,162,255,0.95)]" />
