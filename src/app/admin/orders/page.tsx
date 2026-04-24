@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
@@ -222,7 +222,7 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div>
+    <div style={{ minWidth: 0 }}>
       <div
         style={{
           marginBottom: 20,
@@ -233,28 +233,26 @@ export default function AdminOrdersPage() {
           flexWrap: 'wrap',
         }}
       >
-        <div>
+        <div style={{ minWidth: 0 }}>
           <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
             Planetlocksmiths / Admin / Orders
           </p>
-          <h1 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
+          <h2
+            style={{
+              margin: '8px 0 0',
+              fontSize: 36,
+              lineHeight: 1.1,
+              wordBreak: 'break-word',
+            }}
+          >
             Orders
-          </h1>
+          </h2>
         </div>
 
         <button
           type="button"
           onClick={() => window.location.reload()}
-          style={{
-            minHeight: 42,
-            padding: '0 14px',
-            borderRadius: 12,
-            border: '1px solid rgba(255,255,255,0.10)',
-            background: '#11192E',
-            color: '#F5F7FB',
-            fontWeight: 700,
-            cursor: 'pointer',
-          }}
+          style={refreshButtonStyle}
         >
           Refresh
         </button>
@@ -277,7 +275,7 @@ export default function AdminOrdersPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: 12,
           marginBottom: 18,
         }}
@@ -315,39 +313,8 @@ export default function AdminOrdersPage() {
         </select>
       </div>
 
-      {errorMessage ? (
-        <div
-          style={{
-            borderRadius: 12,
-            border: '1px solid rgba(255,122,122,0.25)',
-            background: 'rgba(255,122,122,0.08)',
-            color: '#FF9A9A',
-            padding: '12px 14px',
-            fontSize: 14,
-            lineHeight: 1.5,
-            marginBottom: 16,
-          }}
-        >
-          {errorMessage}
-        </div>
-      ) : null}
-
-      {successMessage ? (
-        <div
-          style={{
-            borderRadius: 12,
-            border: '1px solid rgba(77,162,255,0.25)',
-            background: 'rgba(77,162,255,0.08)',
-            color: '#A9D0FF',
-            padding: '12px 14px',
-            fontSize: 14,
-            lineHeight: 1.5,
-            marginBottom: 16,
-          }}
-        >
-          {successMessage}
-        </div>
-      ) : null}
+      {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
+      {successMessage ? <div style={messageSuccessStyle}>{successMessage}</div> : null}
 
       <div style={{ display: 'grid', gap: 16 }}>
         {filteredRows.map((row) => (
@@ -360,6 +327,7 @@ export default function AdminOrdersPage() {
               padding: 18,
               display: 'grid',
               gap: 14,
+              minWidth: 0,
             }}
           >
             <div
@@ -371,12 +339,19 @@ export default function AdminOrdersPage() {
                 flexWrap: 'wrap',
               }}
             >
-              <div style={{ display: 'grid', gap: 8 }}>
-                <strong style={{ fontSize: 18 }}>
+              <div style={{ display: 'grid', gap: 8, minWidth: 0 }}>
+                <strong style={{ fontSize: 18, wordBreak: 'break-word' }}>
                   {row.service_needed || 'Order'}
                 </strong>
 
-                <div style={{ color: '#95A0B8', fontSize: 14, lineHeight: 1.6 }}>
+                <div
+                  style={{
+                    color: '#95A0B8',
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                    wordBreak: 'break-word',
+                  }}
+                >
                   <div>Name: {row.name || '—'}</div>
                   <div>Phone: {row.phone || '—'}</div>
                   <div>Email: {row.email || '—'}</div>
@@ -393,16 +368,7 @@ export default function AdminOrdersPage() {
                 type="button"
                 onClick={() => deleteRow(row.id)}
                 disabled={isDeletingId === row.id}
-                style={{
-                  minHeight: 40,
-                  padding: '0 12px',
-                  borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  background: 'transparent',
-                  color: '#FF9A9A',
-                  cursor: isDeletingId === row.id ? 'default' : 'pointer',
-                  opacity: isDeletingId === row.id ? 0.7 : 1,
-                }}
+                style={deleteButtonStyle(isDeletingId === row.id)}
               >
                 {isDeletingId === row.id ? 'Deleting...' : 'Delete'}
               </button>
@@ -417,6 +383,7 @@ export default function AdminOrdersPage() {
                   color: '#F5F7FB',
                   fontSize: 14,
                   lineHeight: 1.6,
+                  wordBreak: 'break-word',
                 }}
               >
                 {row.message}
@@ -468,17 +435,7 @@ export default function AdminOrdersPage() {
                 type="button"
                 onClick={() => saveRow(row.id)}
                 disabled={isSavingId === row.id}
-                style={{
-                  minHeight: 46,
-                  borderRadius: 12,
-                  border: 'none',
-                  background: '#4DA2FF',
-                  color: '#05070B',
-                  fontWeight: 700,
-                  fontSize: 15,
-                  cursor: isSavingId === row.id ? 'default' : 'pointer',
-                  opacity: isSavingId === row.id ? 0.7 : 1,
-                }}
+                style={saveButtonStyle(isSavingId === row.id)}
               >
                 {isSavingId === row.id ? 'Saving...' : 'Save Order'}
               </button>
@@ -528,7 +485,7 @@ function StatBlock({
   )
 }
 
-const inputStyle: React.CSSProperties = {
+const inputStyle: CSSProperties = {
   width: '100%',
   minHeight: 48,
   borderRadius: 12,
@@ -542,7 +499,7 @@ const inputStyle: React.CSSProperties = {
   WebkitAppearance: 'none',
 }
 
-const textAreaStyle: React.CSSProperties = {
+const textAreaStyle: CSSProperties = {
   width: '100%',
   borderRadius: 12,
   border: '1px solid rgba(255,255,255,0.10)',
@@ -554,4 +511,64 @@ const textAreaStyle: React.CSSProperties = {
   boxSizing: 'border-box',
   resize: 'vertical',
   WebkitAppearance: 'none',
+}
+
+const refreshButtonStyle: CSSProperties = {
+  minHeight: 42,
+  padding: '0 14px',
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  fontWeight: 700,
+  cursor: 'pointer',
+}
+
+function deleteButtonStyle(disabled: boolean): CSSProperties {
+  return {
+    minHeight: 40,
+    padding: '0 12px',
+    borderRadius: 10,
+    border: '1px solid rgba(255,255,255,0.10)',
+    background: 'transparent',
+    color: '#FF9A9A',
+    cursor: disabled ? 'default' : 'pointer',
+    opacity: disabled ? 0.7 : 1,
+  }
+}
+
+function saveButtonStyle(disabled: boolean): CSSProperties {
+  return {
+    minHeight: 46,
+    borderRadius: 12,
+    border: 'none',
+    background: '#4DA2FF',
+    color: '#05070B',
+    fontWeight: 700,
+    fontSize: 15,
+    cursor: disabled ? 'default' : 'pointer',
+    opacity: disabled ? 0.7 : 1,
+  }
+}
+
+const messageErrorStyle: CSSProperties = {
+  borderRadius: 12,
+  border: '1px solid rgba(255,122,122,0.25)',
+  background: 'rgba(255,122,122,0.08)',
+  color: '#FF9A9A',
+  padding: '12px 14px',
+  fontSize: 14,
+  lineHeight: 1.5,
+  marginBottom: 16,
+}
+
+const messageSuccessStyle: CSSProperties = {
+  borderRadius: 12,
+  border: '1px solid rgba(77,162,255,0.25)',
+  background: 'rgba(77,162,255,0.08)',
+  color: '#A9D0FF',
+  padding: '12px 14px',
+  fontSize: 14,
+  lineHeight: 1.5,
+  marginBottom: 16,
 }
