@@ -280,6 +280,106 @@ export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
   }
 }
 
+export async function getServicesListFromSource(
+  locale: Locale
+): Promise<ServiceContent[]> {
+  noStore()
+
+  const fileFallback = getFileHomeContent(locale).featuredServices.map((item) => ({
+    slug: item.slug,
+    title: item.title,
+    excerpt: item.excerpt,
+    intro: item.excerpt,
+    seoTitle: item.title,
+    seoDescription: item.excerpt,
+  }))
+
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    return fileFallback
+  }
+
+  try {
+    const result = await (supabase.from('services') as any)
+      .select(
+        'id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published'
+      )
+      .eq('locale', locale)
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+
+    if (result.error) {
+      console.error('services list select error:', result.error)
+      return fileFallback
+    }
+
+    const rows = Array.isArray(result.data) ? (result.data as ServiceRow[]) : []
+
+    if (!rows.length) {
+      return fileFallback
+    }
+
+    return rows.map((row) => ({
+      slug: row.slug,
+      title: row.title ?? '',
+      excerpt: row.excerpt ?? '',
+      intro: row.intro ?? row.excerpt ?? '',
+      seoTitle: row.seo_title ?? row.title ?? '',
+      seoDescription: row.seo_description ?? row.excerpt ?? '',
+    }))
+  } catch (error) {
+    console.error('getServicesListFromSource failed:', error)
+    return fileFallback
+  }
+}
+
+export async function getAreasListFromSource(
+  locale: Locale
+): Promise<AreaContent[]> {
+  noStore()
+
+  const supabase = getSupabaseServerClient()
+
+  if (!supabase) {
+    return []
+  }
+
+  try {
+    const result = await (supabase.from('areas') as any)
+      .select(
+        'id, locale, slug, city, state, title, intro, highlights, supported_services, seo_title, seo_description, sort_order, is_published'
+      )
+      .eq('locale', locale)
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+
+    if (result.error) {
+      console.error('areas list select error:', result.error)
+      return []
+    }
+
+    const rows = Array.isArray(result.data) ? (result.data as AreaRow[]) : []
+
+    return rows.map((row) => ({
+      slug: row.slug,
+      city: row.city ?? '',
+      state: row.state ?? '',
+      title: row.title ?? '',
+      intro: row.intro ?? '',
+      highlights: Array.isArray(row.highlights) ? row.highlights : [],
+      supportedServices: Array.isArray(row.supported_services)
+        ? row.supported_services
+        : [],
+      seoTitle: row.seo_title ?? row.title ?? '',
+      seoDescription: row.seo_description ?? row.intro ?? '',
+    }))
+  } catch (error) {
+    console.error('getAreasListFromSource failed:', error)
+    return []
+  }
+}
+
 export async function getServicePageFromSource(
   locale: Locale,
   slug: string
