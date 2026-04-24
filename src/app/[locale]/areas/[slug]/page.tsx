@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { unstable_noStore as noStore } from 'next/cache'
 import { notFound } from 'next/navigation'
 import Header from '@/components/layout/Header'
@@ -18,6 +19,40 @@ type Locale = 'en' | 'es' | 'ru'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale; slug: string }>
+}): Promise<Metadata> {
+  const { locale, slug } = await params
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
+  const area = await getAreaPageFromSource(locale, slug)
+
+  if (!area) {
+    return {
+      title: 'Service Area Not Found | Planetlocksmiths',
+      robots: { index: false, follow: false },
+    }
+  }
+
+  const url = `${siteUrl}/${locale}/areas/${area.slug}`
+  const title = area.seoTitle || area.title
+  const description = area.seoDescription || area.intro
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'website',
+      url,
+      title,
+      description,
+      siteName: 'Planetlocksmiths',
+    },
+  }
+}
 
 const labels: Record<Locale, {
   eyebrow: string
