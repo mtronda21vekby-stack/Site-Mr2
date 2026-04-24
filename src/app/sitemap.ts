@@ -32,31 +32,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     }
 
-    const [services, areas] = await Promise.all([
-      getServicesListFromSource(locale as Locale),
-      getAreasListFromSource(locale as Locale),
-    ])
+    try {
+      const [services, areas] = await Promise.all([
+        getServicesListFromSource(locale as Locale),
+        getAreasListFromSource(locale as Locale),
+      ])
 
-    for (const service of services) {
-      if (!service.slug) continue
+      for (const service of services) {
+        if (!service.slug) continue
 
-      pages.push({
-        url: `${baseUrl}/${locale}/services/${service.slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.78,
-      })
-    }
+        pages.push({
+          url: `${baseUrl}/${locale}/services/${service.slug}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.78,
+        })
+      }
 
-    for (const area of areas) {
-      if (!area.slug) continue
+      for (const area of areas) {
+        if (!area.slug) continue
 
-      pages.push({
-        url: `${baseUrl}/${locale}/areas/${area.slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.76,
-      })
+        pages.push({
+          url: `${baseUrl}/${locale}/areas/${area.slug}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.76,
+        })
+      }
+    } catch (error) {
+      console.error(`sitemap dynamic routes failed for ${locale}:`, error)
     }
   }
 
