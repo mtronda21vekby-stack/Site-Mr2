@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 
 type Locale = 'en' | 'es' | 'ru'
 type PublishFilter = 'all' | 'published' | 'draft'
@@ -21,6 +22,7 @@ type ServiceFormRow = {
 }
 
 const locales: Locale[] = ['en', 'es', 'ru']
+const FORM_ID = 'admin-services-form'
 
 function createEmptyRow(locale: Locale, sortOrder = 0): ServiceFormRow {
   return {
@@ -289,86 +291,40 @@ export default function AdminServicesPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
-        <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
-          Planetlocksmiths / Admin / Services
-        </p>
-        <h1 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
-          Services
-        </h1>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          gap: 10,
-          flexWrap: 'wrap',
-          marginBottom: 16,
+      <HeaderBlock
+        breadcrumb="Planetlocksmiths / Admin / Services"
+        title="Services"
+        activeLocale={activeLocale}
+        onLocaleChange={(locale) => {
+          setSuccessMessage('')
+          setErrorMessage('')
+          setActiveLocale(locale)
         }}
-      >
-        {locales.map((locale) => (
-          <button
-            key={locale}
-            type="button"
-            onClick={() => {
-              setSuccessMessage('')
-              setErrorMessage('')
-              setActiveLocale(locale)
-            }}
-            style={{
-              minHeight: 42,
-              padding: '0 14px',
-              borderRadius: 12,
-              border: '1px solid rgba(255,255,255,0.10)',
-              background: activeLocale === locale ? '#4DA2FF' : '#11192E',
-              color: activeLocale === locale ? '#05070B' : '#F5F7FB',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            {locale.toUpperCase()}
+        previewHref={`/${activeLocale}/services`}
+        extraButton={
+          <button type="button" onClick={addRow} style={ghostButtonStyle}>
+            + Add service
           </button>
-        ))}
+        }
+      />
 
-        <button
-          type="button"
-          onClick={addRow}
-          style={ghostButtonStyle}
-        >
-          + Add service
-        </button>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search slug, title, excerpt"
-          style={inputStyle}
-        />
-
-        <select
-          value={publishFilter}
-          onChange={(e) => setPublishFilter(e.target.value as PublishFilter)}
-          style={inputStyle}
-        >
-          <option value="all">All services</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-        </select>
-      </div>
+      <FilterBar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search slug, title, excerpt"
+        filterValue={publishFilter}
+        onFilterChange={(value) => setPublishFilter(value as PublishFilter)}
+        filterOptions={[
+          { value: 'all', label: 'All services' },
+          { value: 'published', label: 'Published' },
+          { value: 'draft', label: 'Draft' },
+        ]}
+      />
 
       {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
       {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
 
-      <form onSubmit={handleSave} style={{ display: 'grid', gap: 16 }}>
+      <form id={FORM_ID} onSubmit={handleSave} style={{ display: 'grid', gap: 16 }}>
         {filteredRows.map((row) => {
           const realIndex = currentRows.indexOf(row)
 
@@ -378,7 +334,23 @@ export default function AdminServicesPage() {
               style={cardStyle}
             >
               <div style={cardHeaderStyle}>
-                <strong style={{ fontSize: 18 }}>Service #{realIndex + 1}</strong>
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <strong style={{ fontSize: 18 }}>Service #{realIndex + 1}</strong>
+                  {row.slug ? (
+                    <a
+                      href={`/${activeLocale}/services/${row.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        color: '#A9D0FF',
+                        fontSize: 13,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Preview /{activeLocale}/services/{row.slug}
+                    </a>
+                  ) : null}
+                </div>
 
                 <button
                   type="button"
@@ -453,15 +425,131 @@ export default function AdminServicesPage() {
         {!filteredRows.length ? (
           <div style={emptyStateStyle}>No services match the current filters.</div>
         ) : null}
-
-        <button
-          type="submit"
-          disabled={isSaving}
-          style={primaryButtonStyle(isSaving)}
-        >
-          {isSaving ? 'Saving...' : `Save ${activeLocale.toUpperCase()} Services`}
-        </button>
       </form>
+
+      <AdminStickySaveBar
+        formId={FORM_ID}
+        isSaving={isSaving}
+        label={`Save ${activeLocale.toUpperCase()} Services`}
+        note={`Service changes for ${activeLocale.toUpperCase()} stay ready at the bottom while you scroll.`}
+      />
+    </div>
+  )
+}
+
+function HeaderBlock({
+  breadcrumb,
+  title,
+  activeLocale,
+  onLocaleChange,
+  previewHref,
+  extraButton,
+}: {
+  breadcrumb: string
+  title: string
+  activeLocale: Locale
+  onLocaleChange: (locale: Locale) => void
+  previewHref?: string
+  extraButton?: ReactNode
+}) {
+  return (
+    <div
+      style={{
+        marginBottom: 20,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: 12,
+        flexWrap: 'wrap',
+      }}
+    >
+      <div>
+        <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>{breadcrumb}</p>
+        <h2 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
+          {title}
+        </h2>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {locales.map((locale) => (
+          <button
+            key={locale}
+            type="button"
+            onClick={() => onLocaleChange(locale)}
+            style={{
+              minHeight: 42,
+              padding: '0 14px',
+              borderRadius: 12,
+              border: '1px solid rgba(255,255,255,0.10)',
+              background: activeLocale === locale ? '#4DA2FF' : '#11192E',
+              color: activeLocale === locale ? '#05070B' : '#F5F7FB',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {locale.toUpperCase()}
+          </button>
+        ))}
+
+        {previewHref ? (
+          <a
+            href={previewHref}
+            target="_blank"
+            rel="noreferrer"
+            style={ghostLinkStyle}
+          >
+            Preview
+          </a>
+        ) : null}
+
+        {extraButton}
+      </div>
+    </div>
+  )
+}
+
+function FilterBar({
+  search,
+  onSearchChange,
+  searchPlaceholder,
+  filterValue,
+  onFilterChange,
+  filterOptions,
+}: {
+  search: string
+  onSearchChange: (value: string) => void
+  searchPlaceholder: string
+  filterValue: string
+  onFilterChange: (value: string) => void
+  filterOptions: Array<{ value: string; label: string }>
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr',
+        gap: 12,
+        marginBottom: 16,
+      }}
+    >
+      <input
+        value={search}
+        onChange={(e) => onSearchChange(e.target.value)}
+        placeholder={searchPlaceholder}
+        style={inputStyle}
+      />
+
+      <select
+        value={filterValue}
+        onChange={(e) => onFilterChange(e.target.value)}
+        style={inputStyle}
+      >
+        {filterOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }
@@ -478,11 +566,7 @@ function Field({
   return (
     <label style={{ display: 'grid', gap: 8 }}>
       <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        style={inputStyle}
-      />
+      <input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} />
     </label>
   )
 }
@@ -514,7 +598,7 @@ function MessageBox({
   children,
 }: {
   type: 'error' | 'success'
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const isError = type === 'error'
 
@@ -540,7 +624,7 @@ function MessageBox({
   )
 }
 
-const inputStyle: React.CSSProperties = {
+const inputStyle: CSSProperties = {
   width: '100%',
   minHeight: 48,
   borderRadius: 12,
@@ -554,7 +638,7 @@ const inputStyle: React.CSSProperties = {
   WebkitAppearance: 'none',
 }
 
-const textAreaStyle: React.CSSProperties = {
+const textAreaStyle: CSSProperties = {
   width: '100%',
   borderRadius: 12,
   border: '1px solid rgba(255,255,255,0.10)',
@@ -568,7 +652,7 @@ const textAreaStyle: React.CSSProperties = {
   WebkitAppearance: 'none',
 }
 
-const cardStyle: React.CSSProperties = {
+const cardStyle: CSSProperties = {
   display: 'grid',
   gap: 12,
   background: '#0B1020',
@@ -577,7 +661,7 @@ const cardStyle: React.CSSProperties = {
   padding: 18,
 }
 
-const cardHeaderStyle: React.CSSProperties = {
+const cardHeaderStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -585,7 +669,7 @@ const cardHeaderStyle: React.CSSProperties = {
   flexWrap: 'wrap',
 }
 
-const ghostButtonStyle: React.CSSProperties = {
+const ghostButtonStyle: CSSProperties = {
   minHeight: 42,
   padding: '0 14px',
   borderRadius: 12,
@@ -596,7 +680,7 @@ const ghostButtonStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-const dangerGhostButtonStyle: React.CSSProperties = {
+const dangerGhostButtonStyle: CSSProperties = {
   minHeight: 38,
   padding: '0 12px',
   borderRadius: 10,
@@ -606,24 +690,24 @@ const dangerGhostButtonStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-const emptyStateStyle: React.CSSProperties = {
+const ghostLinkStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: 42,
+  padding: '0 14px',
+  borderRadius: 12,
+  textDecoration: 'none',
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  fontWeight: 700,
+}
+
+const emptyStateStyle: CSSProperties = {
   background: '#0B1020',
   border: '1px solid rgba(255,255,255,0.08)',
   borderRadius: 18,
   padding: 18,
   color: '#95A0B8',
-}
-
-function primaryButtonStyle(disabled: boolean): React.CSSProperties {
-  return {
-    minHeight: 50,
-    borderRadius: 14,
-    border: 'none',
-    background: '#4DA2FF',
-    color: '#05070B',
-    fontWeight: 700,
-    fontSize: 16,
-    cursor: disabled ? 'default' : 'pointer',
-    opacity: disabled ? 0.7 : 1,
-  }
 }
