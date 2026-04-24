@@ -172,8 +172,15 @@ export default function AdminDashboardPage() {
 
   if (isChecking) {
     return (
-      <div style={{ paddingTop: 20 }}>
-        <p style={{ color: '#95A0B8', margin: 0 }}>Loading admin...</p>
+      <div style={loadingShellStyle}>
+        <div style={loadingCardStyle}>
+          <p style={{ color: '#A9D0FF', margin: 0, letterSpacing: 2, textTransform: 'uppercase', fontSize: 12, fontWeight: 800 }}>
+            Planetlocksmiths cockpit
+          </p>
+          <h1 style={{ color: '#F5F7FB', margin: '10px 0 0', fontSize: 34 }}>
+            Loading admin...
+          </h1>
+        </div>
       </div>
     )
   }
@@ -182,99 +189,84 @@ export default function AdminDashboardPage() {
     {
       title: 'Orders',
       href: '/admin/orders',
-      description: 'Incoming leads, filters, statuses, admin notes, delete',
+      description: 'Incoming leads, statuses, notes, field workflow, delete controls.',
+      accent: '#4DA2FF',
     },
     {
       title: 'Settings',
       href: '/admin/settings',
-      description: 'Global brand, phones, email, service hours',
+      description: 'Global brand, phone lines, email, service hours, emergency routing.',
+      accent: '#D6A85F',
     },
     {
       title: 'Home',
       href: '/admin/home',
-      description: 'Hero, CTA, emergency, reviews heading, contact text',
+      description: 'Hero, CTA copy, emergency banner, trust text, contact block.',
+      accent: '#2DE2E6',
     },
     {
       title: 'Reviews',
       href: '/admin/reviews',
-      description: 'Localized reviews, search, publish and delete',
+      description: 'Localized proof cards, rating signals, publish controls.',
+      accent: '#D6A85F',
     },
     {
       title: 'FAQ',
       href: '/admin/faq',
-      description: 'Localized FAQ, search, publish and delete',
+      description: 'Operator answers for emergency, keys, programming, coverage.',
+      accent: '#4DA2FF',
     },
     {
       title: 'Services',
       href: '/admin/services',
-      description: 'Service pages, SEO, search, publish and delete',
+      description: 'Premium service pages, SEO fields, excerpts, live publishing.',
+      accent: '#2DE2E6',
     },
     {
       title: 'Areas',
       href: '/admin/areas',
-      description: 'Localized area pages, highlights, publish and delete',
+      description: 'Orbital coverage pages, city highlights, supported services.',
+      accent: '#D6A85F',
     },
   ]
 
+  const contentHealth = [
+    { label: 'Live services', value: metrics.services, note: 'Visible service modules' },
+    { label: 'Coverage sectors', value: metrics.areas, note: 'Published area pages' },
+    { label: 'Public proof', value: metrics.reviews, note: 'Reviews currently live' },
+    { label: 'Answer base', value: metrics.faq, note: 'FAQ entries live' },
+  ]
+
   return (
-    <div style={{ minWidth: 0 }}>
-      <div
-        style={{
-          marginBottom: 20,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
+    <div style={pageStyle}>
+      <div style={ambientBlueStyle} />
+      <div style={ambientGoldStyle} />
+
+      <section style={heroPanelStyle}>
         <div style={{ minWidth: 0 }}>
-          <p
-            style={{
-              margin: 0,
-              color: '#95A0B8',
-              fontSize: 13,
-            }}
-          >
-            Planetlocksmiths / Admin
+          <p style={eyebrowStyle}>Planetlocksmiths / Workers control room</p>
+          <h1 style={heroTitleStyle}>Cinematic Operations Dashboard</h1>
+          <p style={heroTextStyle}>
+            Manage live Supabase content, emergency leads, city coverage, service pages, reviews, and FAQ from one premium command center.
           </p>
+        </div>
 
-          <h2
-            style={{
-              margin: '8px 0 0',
-              fontSize: 36,
-              lineHeight: 1.1,
-              wordBreak: 'break-word',
-            }}
+        <div style={heroActionsStyle}>
+          <a href="/en" style={ghostButtonStyle}>View site</a>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            disabled={isRefreshing}
+            style={primaryButtonStyle(isRefreshing)}
           >
-            Technical Dashboard
-          </h2>
+            {isRefreshing ? 'Refreshing...' : 'Refresh signal'}
+          </button>
         </div>
+      </section>
 
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          disabled={isRefreshing}
-          style={buttonStyle(isRefreshing)}
-        >
-          {isRefreshing ? 'Refreshing...' : 'Refresh'}
-        </button>
-      </div>
+      {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
 
-      {errorMessage ? (
-        <div style={messageErrorStyle}>
-          {errorMessage}
-        </div>
-      ) : null}
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 14,
-          marginBottom: 18,
-        }}
-      >
+      <div style={statsGridStyle}>
         <AdminStatCard title="New Orders" value={String(metrics.newOrders)} note="Fresh incoming requests waiting for action." />
         <AdminStatCard title="Active Orders" value={String(metrics.activeOrders)} note="Contacted, scheduled, or currently in progress." />
         <AdminStatCard title="Completed Orders" value={String(metrics.completedOrders)} note="Closed requests marked as completed." />
@@ -284,153 +276,400 @@ export default function AdminDashboardPage() {
         <AdminStatCard title="Areas" value={String(metrics.areas)} note="Published area landing pages available by locale." />
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 14,
-          minWidth: 0,
-        }}
-      >
-        <div style={panelStyle}>
-          <h3 style={panelTitleStyle}>Quick Access</h3>
+      <div style={twoColumnStyle}>
+        <section style={panelStyle}>
+          <div style={panelHeadingRowStyle}>
+            <div>
+              <p style={panelEyebrowStyle}>Admin modules</p>
+              <h2 style={panelTitleStyle}>Quick Access</h2>
+            </div>
+            <span style={statusPillStyle}>Online</span>
+          </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 12,
-              marginTop: 14,
-            }}
-          >
+          <div style={quickGridStyle}>
             {links.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                style={quickLinkStyle}
-              >
-                <strong style={{ display: 'block', fontSize: 18 }}>
-                  {item.title}
-                </strong>
-
-                <p
-                  style={{
-                    margin: '8px 0 0',
-                    color: '#95A0B8',
-                    fontSize: 14,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {item.description}
-                </p>
+              <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}>
+                <span style={quickOrbStyle(item.accent)} />
+                <strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong>
+                <p style={quickDescriptionStyle}>{item.description}</p>
+                <span style={quickCtaStyle}>Open module →</span>
               </a>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div style={panelStyle}>
-          <h3 style={panelTitleStyle}>Latest Orders</h3>
+        <section style={panelStyle}>
+          <div style={panelHeadingRowStyle}>
+            <div>
+              <p style={panelEyebrowStyle}>Dispatch feed</p>
+              <h2 style={panelTitleStyle}>Latest Orders</h2>
+            </div>
+            <a href="/admin/orders" style={smallTextLinkStyle}>All orders →</a>
+          </div>
 
-          <div style={{ display: 'grid', gap: 10, marginTop: 14 }}>
+          <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
             {recentOrders.map((order) => (
-              <a
-                key={order.id}
-                href="/admin/orders"
-                style={quickLinkStyle}
-              >
+              <a key={order.id} href="/admin/orders" style={orderCardStyle}>
                 <strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>
                   {order.service_needed || 'Order'}
                 </strong>
-                <p
-                  style={{
-                    margin: '6px 0 0',
-                    color: '#95A0B8',
-                    fontSize: 14,
-                    lineHeight: 1.5,
-                    wordBreak: 'break-word',
-                  }}
-                >
+                <p style={mutedLineStyle}>
                   {order.name || 'No name'} · {order.phone || 'No phone'}
                 </p>
-                <p
-                  style={{
-                    margin: '6px 0 0',
-                    color: '#A9D0FF',
-                    fontSize: 13,
-                    lineHeight: 1.5,
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.6,
-                  }}
-                >
-                  {order.status}
-                </p>
+                <p style={statusTextStyle}>{order.status}</p>
               </a>
             ))}
 
             {!recentOrders.length ? (
-              <div
-                style={{
-                  color: '#95A0B8',
-                  fontSize: 14,
-                  lineHeight: 1.6,
-                }}
-              >
-                No recent orders yet.
+              <div style={emptyStateStyle}>
+                No recent orders yet. New requests will appear here after the contact form starts receiving leads.
               </div>
             ) : null}
           </div>
-        </div>
+        </section>
       </div>
+
+      <section style={panelStyle}>
+        <div style={panelHeadingRowStyle}>
+          <div>
+            <p style={panelEyebrowStyle}>Content health</p>
+            <h2 style={panelTitleStyle}>Site Information Windows</h2>
+          </div>
+          <span style={statusPillStyle}>Supabase live</span>
+        </div>
+
+        <div style={healthGridStyle}>
+          {contentHealth.map((item) => (
+            <div key={item.label} style={infoWindowStyle}>
+              <p style={panelEyebrowStyle}>{item.label}</p>
+              <strong style={{ display: 'block', color: '#F5F7FB', fontSize: 30, marginTop: 8 }}>
+                {item.value}
+              </strong>
+              <p style={quickDescriptionStyle}>{item.note}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }
 
-function buttonStyle(disabled: boolean): CSSProperties {
+const pageStyle: CSSProperties = {
+  position: 'relative',
+  minWidth: 0,
+  overflow: 'hidden',
+  paddingBottom: 24,
+}
+
+const ambientBlueStyle: CSSProperties = {
+  position: 'fixed',
+  right: -180,
+  top: -120,
+  width: 460,
+  height: 460,
+  borderRadius: 999,
+  background: 'rgba(77,162,255,0.12)',
+  filter: 'blur(80px)',
+  pointerEvents: 'none',
+}
+
+const ambientGoldStyle: CSSProperties = {
+  position: 'fixed',
+  left: -180,
+  bottom: -160,
+  width: 420,
+  height: 420,
+  borderRadius: 999,
+  background: 'rgba(214,168,95,0.09)',
+  filter: 'blur(80px)',
+  pointerEvents: 'none',
+}
+
+const loadingShellStyle: CSSProperties = {
+  minHeight: '60vh',
+  display: 'grid',
+  placeItems: 'center',
+}
+
+const loadingCardStyle: CSSProperties = {
+  width: 'min(560px, 100%)',
+  borderRadius: 28,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: 'linear-gradient(145deg, rgba(17,25,46,0.82), rgba(5,7,11,0.78))',
+  padding: 28,
+  boxShadow: '0 30px 100px rgba(0,0,0,0.36)',
+}
+
+const heroPanelStyle: CSSProperties = {
+  position: 'relative',
+  overflow: 'hidden',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+  gap: 20,
+  alignItems: 'end',
+  border: '1px solid rgba(77,162,255,0.22)',
+  borderRadius: 30,
+  padding: 24,
+  marginBottom: 18,
+  background:
+    'radial-gradient(circle at 12% 0%, rgba(77,162,255,0.20), transparent 320px), linear-gradient(145deg, rgba(17,25,46,0.78), rgba(3,5,11,0.86))',
+  boxShadow: '0 32px 110px rgba(0,0,0,0.36)',
+  backdropFilter: 'blur(20px)',
+}
+
+const eyebrowStyle: CSSProperties = {
+  margin: 0,
+  color: '#2DE2E6',
+  fontSize: 11,
+  fontWeight: 900,
+  textTransform: 'uppercase',
+  letterSpacing: 3,
+}
+
+const heroTitleStyle: CSSProperties = {
+  margin: '12px 0 0',
+  color: '#F5F7FB',
+  fontSize: 'clamp(34px, 6vw, 64px)',
+  lineHeight: 0.95,
+  letterSpacing: -2.8,
+}
+
+const heroTextStyle: CSSProperties = {
+  maxWidth: 760,
+  margin: '18px 0 0',
+  color: '#95A0B8',
+  fontSize: 15,
+  lineHeight: 1.8,
+}
+
+const heroActionsStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  gap: 10,
+  flexWrap: 'wrap',
+}
+
+function primaryButtonStyle(disabled: boolean): CSSProperties {
   return {
-    minHeight: 42,
-    padding: '0 14px',
-    borderRadius: 12,
-    border: '1px solid rgba(255,255,255,0.10)',
-    background: '#11192E',
-    color: '#F5F7FB',
-    fontWeight: 700,
+    minHeight: 46,
+    padding: '0 18px',
+    borderRadius: 999,
+    border: '1px solid rgba(77,162,255,0.32)',
+    background: '#4DA2FF',
+    color: '#02040A',
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    letterSpacing: 1.8,
     cursor: disabled ? 'default' : 'pointer',
     opacity: disabled ? 0.7 : 1,
+    boxShadow: '0 0 34px rgba(77,162,255,0.26)',
   }
 }
 
+const ghostButtonStyle: CSSProperties = {
+  minHeight: 46,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0 18px',
+  borderRadius: 999,
+  border: '1px solid rgba(255,255,255,0.14)',
+  background: 'rgba(255,255,255,0.035)',
+  color: '#F5F7FB',
+  textDecoration: 'none',
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  letterSpacing: 1.6,
+}
+
+const statsGridStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+  gap: 14,
+  marginBottom: 18,
+}
+
+const twoColumnStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+  gap: 14,
+  minWidth: 0,
+  marginBottom: 14,
+}
+
 const panelStyle: CSSProperties = {
-  background: '#0B1020',
-  border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: 18,
+  position: 'relative',
+  overflow: 'hidden',
+  background: 'linear-gradient(145deg, rgba(11,16,32,0.78), rgba(5,7,11,0.82))',
+  border: '1px solid rgba(255,255,255,0.10)',
+  borderRadius: 26,
   padding: 18,
   minWidth: 0,
+  boxShadow: '0 28px 90px rgba(0,0,0,0.26)',
+  backdropFilter: 'blur(18px)',
+}
+
+const panelHeadingRowStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
+  gap: 12,
+  flexWrap: 'wrap',
+}
+
+const panelEyebrowStyle: CSSProperties = {
+  margin: 0,
+  color: '#A9D0FF',
+  fontSize: 10,
+  fontWeight: 900,
+  textTransform: 'uppercase',
+  letterSpacing: 2.4,
 }
 
 const panelTitleStyle: CSSProperties = {
-  margin: 0,
-  fontSize: 22,
-  lineHeight: 1.2,
+  margin: '8px 0 0',
+  fontSize: 24,
+  lineHeight: 1.1,
   color: '#F5F7FB',
+  letterSpacing: -0.7,
 }
 
-const quickLinkStyle: CSSProperties = {
+const statusPillStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  minHeight: 30,
+  borderRadius: 999,
+  border: '1px solid rgba(45,226,230,0.22)',
+  background: 'rgba(45,226,230,0.08)',
+  color: '#2DE2E6',
+  padding: '0 11px',
+  fontSize: 11,
+  fontWeight: 900,
+  textTransform: 'uppercase',
+  letterSpacing: 1.6,
+}
+
+const quickGridStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+  gap: 12,
+  marginTop: 16,
+}
+
+function quickLinkStyle(accent: string): CSSProperties {
+  return {
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'block',
+    textDecoration: 'none',
+    color: '#F5F7FB',
+    background: 'rgba(17,25,46,0.62)',
+    border: `1px solid ${accent}44`,
+    borderRadius: 20,
+    padding: 16,
+    minWidth: 0,
+    boxShadow: `0 0 34px ${accent}12`,
+  }
+}
+
+function quickOrbStyle(accent: string): CSSProperties {
+  return {
+    position: 'absolute',
+    right: -28,
+    top: -28,
+    width: 88,
+    height: 88,
+    borderRadius: 999,
+    border: `1px solid ${accent}55`,
+    background: `${accent}10`,
+  }
+}
+
+const quickDescriptionStyle: CSSProperties = {
+  margin: '8px 0 0',
+  color: '#95A0B8',
+  fontSize: 13,
+  lineHeight: 1.6,
+}
+
+const quickCtaStyle: CSSProperties = {
+  display: 'inline-flex',
+  marginTop: 14,
+  color: '#A9D0FF',
+  fontSize: 11,
+  fontWeight: 900,
+  textTransform: 'uppercase',
+  letterSpacing: 1.7,
+}
+
+const orderCardStyle: CSSProperties = {
   display: 'block',
   textDecoration: 'none',
   color: '#F5F7FB',
-  background: '#11192E',
-  border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: 16,
-  padding: 16,
+  background: 'rgba(17,25,46,0.62)',
+  border: '1px solid rgba(255,255,255,0.10)',
+  borderRadius: 18,
+  padding: 14,
   minWidth: 0,
 }
 
+const mutedLineStyle: CSSProperties = {
+  margin: '6px 0 0',
+  color: '#95A0B8',
+  fontSize: 13,
+  lineHeight: 1.5,
+  wordBreak: 'break-word',
+}
+
+const statusTextStyle: CSSProperties = {
+  margin: '8px 0 0',
+  color: '#A9D0FF',
+  fontSize: 11,
+  lineHeight: 1.5,
+  textTransform: 'uppercase',
+  letterSpacing: 1.5,
+  fontWeight: 900,
+}
+
+const emptyStateStyle: CSSProperties = {
+  color: '#95A0B8',
+  fontSize: 14,
+  lineHeight: 1.7,
+  border: '1px dashed rgba(255,255,255,0.14)',
+  borderRadius: 18,
+  padding: 16,
+}
+
+const healthGridStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+  gap: 12,
+  marginTop: 16,
+}
+
+const infoWindowStyle: CSSProperties = {
+  border: '1px solid rgba(255,255,255,0.10)',
+  borderRadius: 20,
+  background: 'rgba(255,255,255,0.035)',
+  padding: 16,
+}
+
+const smallTextLinkStyle: CSSProperties = {
+  color: '#A9D0FF',
+  textDecoration: 'none',
+  fontSize: 12,
+  fontWeight: 900,
+  textTransform: 'uppercase',
+  letterSpacing: 1.4,
+}
+
 const messageErrorStyle: CSSProperties = {
-  borderRadius: 12,
+  borderRadius: 18,
   border: '1px solid rgba(255,122,122,0.25)',
   background: 'rgba(255,122,122,0.08)',
   color: '#FF9A9A',
-  padding: '12px 14px',
+  padding: '14px 16px',
   fontSize: 14,
   lineHeight: 1.5,
   marginBottom: 16,
