@@ -4,12 +4,17 @@
 
 :root {
   --planet-blue: #4da2ff;
+  --planet-blue-soft: #7bbaff;
   --planet-cyan: #2de2e6;
   --planet-copper: #d6a85f;
   --planet-brass: #f1c978;
   --planet-void: #02040a;
+  --planet-void-2: #05070b;
+  --planet-midnight: #08101f;
   --planet-glass: rgba(10, 18, 34, 0.62);
+  --planet-glass-strong: rgba(12, 21, 40, 0.78);
   --planet-line: rgba(255, 255, 255, 0.1);
+  --planet-line-strong: rgba(255, 255, 255, 0.16);
 }
 
 * {
@@ -49,8 +54,9 @@ h6 {
   isolation: isolate;
   overflow-x: clip;
   background:
-    radial-gradient(circle at 50% 0%, rgba(77, 162, 255, 0.08), transparent 34rem),
-    linear-gradient(180deg, rgba(2, 4, 10, 0.72), rgba(2, 4, 10, 0.96));
+    radial-gradient(circle at 50% -10%, rgba(77, 162, 255, 0.1), transparent 34rem),
+    radial-gradient(circle at 100% 18%, rgba(214, 168, 95, 0.08), transparent 28rem),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.72), rgba(2, 4, 10, 0.98));
 }
 
 .cinematic-shell::before {
@@ -60,10 +66,10 @@ h6 {
   z-index: -20;
   pointer-events: none;
   background:
-    radial-gradient(circle at 15% 15%, rgba(45, 226, 230, 0.08), transparent 24rem),
+    radial-gradient(circle at 12% 14%, rgba(45, 226, 230, 0.09), transparent 22rem),
     radial-gradient(circle at 88% 30%, rgba(214, 168, 95, 0.08), transparent 26rem),
-    radial-gradient(circle at 50% 100%, rgba(77, 162, 255, 0.12), transparent 34rem),
-    #02040a;
+    radial-gradient(circle at 50% 100%, rgba(77, 162, 255, 0.12), transparent 36rem),
+    linear-gradient(180deg, #02040a 0%, #05070b 52%, #02040a 100%);
 }
 
 .cinematic-shell::after {
@@ -72,33 +78,53 @@ h6 {
   inset: 0;
   z-index: -5;
   pointer-events: none;
-  opacity: 0.35;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 100% 4px;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px);
+  background-size: 100% 4px, 92px 92px;
   mask-image: linear-gradient(180deg, transparent, black 10%, black 86%, transparent);
 }
 
+.premium-panel {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.028)),
+    rgba(6, 12, 24, 0.62);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(22px);
+}
+
+.premium-hairline {
+  position: relative;
+}
+
+.premium-hairline::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(77, 162, 255, 0.55), rgba(255, 255, 255, 0.06), rgba(214, 168, 95, 0.34));
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
 @keyframes planet-rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes planet-rotate-reverse {
-  from {
-    transform: rotate(360deg);
-  }
-  to {
-    transform: rotate(0deg);
-  }
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
 }
 
 @keyframes signal-pulse {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 0.24;
     transform: scale(0.92);
   }
@@ -108,9 +134,31 @@ h6 {
   }
 }
 
+@keyframes premium-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes premium-scan {
+  0% { transform: translateY(-16%); opacity: 0; }
+  18%, 68% { opacity: 0.5; }
+  100% { transform: translateY(116%); opacity: 0; }
+}
+
+@keyframes premium-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes premium-orbit-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
 @media (max-width: 767px) {
   .cinematic-shell::after {
-    opacity: 0.2;
+    opacity: 0.18;
+    background-size: 100% 4px, 64px 64px;
   }
 }
 
