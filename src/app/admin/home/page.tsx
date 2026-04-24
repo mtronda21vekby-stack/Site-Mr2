@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 
 type Locale = 'en' | 'es' | 'ru'
 
@@ -22,6 +23,7 @@ type HomePageForm = {
 }
 
 const locales: Locale[] = ['en', 'es', 'ru']
+const FORM_ID = 'admin-home-form'
 
 const emptyForm = (locale: Locale): HomePageForm => ({
   id: '',
@@ -190,66 +192,34 @@ export default function AdminHomePage() {
 
   if (isBooting) {
     return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: '#05070B',
-          color: '#F5F7FB',
-          padding: '24px 16px 40px',
-          fontFamily: 'Inter, sans-serif',
-        }}
-      >
-        <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 14 }}>
-            Loading home content...
-          </p>
-        </div>
-      </main>
+      <div style={{ paddingTop: 20 }}>
+        <p style={{ color: '#95A0B8', margin: 0 }}>Loading home content...</p>
+      </div>
     )
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: '#05070B',
-        color: '#F5F7FB',
-        padding: '20px 16px 40px',
-        fontFamily: 'Inter, sans-serif',
-      }}
-    >
-      <div style={{ maxWidth: 860, margin: '0 auto' }}>
-        <div style={{ marginBottom: 20 }}>
-          <a
-            href="/admin/direct"
-            style={{
-              display: 'inline-block',
-              marginBottom: 10,
-              color: '#95A0B8',
-              textDecoration: 'none',
-              fontSize: 14,
-            }}
-          >
-            ← Back to dashboard
-          </a>
-
+    <div>
+      <div
+        style={{
+          marginBottom: 20,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
           <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
             Planetlocksmiths / Admin / Home
           </p>
-
-          <h1 style={{ margin: '8px 0 0', fontSize: 32, lineHeight: 1.1 }}>
+          <h2 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
             Home Content
-          </h1>
+          </h2>
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: 10,
-            flexWrap: 'wrap',
-            marginBottom: 16,
-          }}
-        >
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           {locales.map((locale) => (
             <button
               key={locale}
@@ -273,131 +243,144 @@ export default function AdminHomePage() {
               {locale.toUpperCase()}
             </button>
           ))}
-        </div>
 
-        <form
-          onSubmit={handleSave}
-          style={{
-            display: 'grid',
-            gap: 16,
-            background: '#0B1020',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 20,
-            padding: 18,
-          }}
-        >
-          <Field
-            label="Hero Title"
-            value={form.heroTitle}
-            onChange={(value) => updateField('heroTitle', value)}
-          />
-
-          <TextAreaField
-            label="Hero Subtitle"
-            value={form.heroSubtitle}
-            onChange={(value) => updateField('heroSubtitle', value)}
-          />
-
-          <Field
-            label="Primary CTA"
-            value={form.heroPrimaryCta}
-            onChange={(value) => updateField('heroPrimaryCta', value)}
-          />
-
-          <Field
-            label="Secondary CTA"
-            value={form.heroSecondaryCta}
-            onChange={(value) => updateField('heroSecondaryCta', value)}
-          />
-
-          <Field
-            label="Emergency Title"
-            value={form.emergencyTitle}
-            onChange={(value) => updateField('emergencyTitle', value)}
-          />
-
-          <TextAreaField
-            label="Emergency Text"
-            value={form.emergencyText}
-            onChange={(value) => updateField('emergencyText', value)}
-          />
-
-          <Field
-            label="Reviews Title"
-            value={form.reviewsTitle}
-            onChange={(value) => updateField('reviewsTitle', value)}
-          />
-
-          <Field
-            label="FAQ Title"
-            value={form.faqTitle}
-            onChange={(value) => updateField('faqTitle', value)}
-          />
-
-          <Field
-            label="Contact Title"
-            value={form.contactTitle}
-            onChange={(value) => updateField('contactTitle', value)}
-          />
-
-          <TextAreaField
-            label="Contact Text"
-            value={form.contactText}
-            onChange={(value) => updateField('contactText', value)}
-          />
-
-          {errorMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(255,122,122,0.25)',
-                background: 'rgba(255,122,122,0.08)',
-                color: '#FF9A9A',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {errorMessage}
-            </div>
-          ) : null}
-
-          {successMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(77,162,255,0.25)',
-                background: 'rgba(77,162,255,0.08)',
-                color: '#A9D0FF',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {successMessage}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={isSaving}
+          <a
+            href={`/${activeLocale}`}
+            target="_blank"
+            rel="noreferrer"
             style={{
-              minHeight: 50,
-              borderRadius: 14,
-              border: 'none',
-              background: '#4DA2FF',
-              color: '#05070B',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: 42,
+              padding: '0 14px',
+              borderRadius: 12,
+              textDecoration: 'none',
+              border: '1px solid rgba(255,255,255,0.10)',
+              background: '#11192E',
+              color: '#F5F7FB',
               fontWeight: 700,
-              fontSize: 16,
-              cursor: isSaving ? 'default' : 'pointer',
-              opacity: isSaving ? 0.7 : 1,
             }}
           >
-            {isSaving ? 'Saving...' : `Save ${activeLocale.toUpperCase()} Home`}
-          </button>
-        </form>
+            Preview {activeLocale.toUpperCase()}
+          </a>
+        </div>
       </div>
-    </main>
+
+      {errorMessage ? (
+        <div
+          style={{
+            borderRadius: 12,
+            border: '1px solid rgba(255,122,122,0.25)',
+            background: 'rgba(255,122,122,0.08)',
+            color: '#FF9A9A',
+            padding: '12px 14px',
+            fontSize: 14,
+            lineHeight: 1.5,
+            marginBottom: 16,
+          }}
+        >
+          {errorMessage}
+        </div>
+      ) : null}
+
+      {successMessage ? (
+        <div
+          style={{
+            borderRadius: 12,
+            border: '1px solid rgba(77,162,255,0.25)',
+            background: 'rgba(77,162,255,0.08)',
+            color: '#A9D0FF',
+            padding: '12px 14px',
+            fontSize: 14,
+            lineHeight: 1.5,
+            marginBottom: 16,
+          }}
+        >
+          {successMessage}
+        </div>
+      ) : null}
+
+      <form
+        id={FORM_ID}
+        onSubmit={handleSave}
+        style={{
+          display: 'grid',
+          gap: 16,
+          background: '#0B1020',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 20,
+          padding: 18,
+        }}
+      >
+        <Field
+          label="Hero Title"
+          value={form.heroTitle}
+          onChange={(value) => updateField('heroTitle', value)}
+        />
+
+        <TextAreaField
+          label="Hero Subtitle"
+          value={form.heroSubtitle}
+          onChange={(value) => updateField('heroSubtitle', value)}
+        />
+
+        <Field
+          label="Primary CTA"
+          value={form.heroPrimaryCta}
+          onChange={(value) => updateField('heroPrimaryCta', value)}
+        />
+
+        <Field
+          label="Secondary CTA"
+          value={form.heroSecondaryCta}
+          onChange={(value) => updateField('heroSecondaryCta', value)}
+        />
+
+        <Field
+          label="Emergency Title"
+          value={form.emergencyTitle}
+          onChange={(value) => updateField('emergencyTitle', value)}
+        />
+
+        <TextAreaField
+          label="Emergency Text"
+          value={form.emergencyText}
+          onChange={(value) => updateField('emergencyText', value)}
+        />
+
+        <Field
+          label="Reviews Title"
+          value={form.reviewsTitle}
+          onChange={(value) => updateField('reviewsTitle', value)}
+        />
+
+        <Field
+          label="FAQ Title"
+          value={form.faqTitle}
+          onChange={(value) => updateField('faqTitle', value)}
+        />
+
+        <Field
+          label="Contact Title"
+          value={form.contactTitle}
+          onChange={(value) => updateField('contactTitle', value)}
+        />
+
+        <TextAreaField
+          label="Contact Text"
+          value={form.contactText}
+          onChange={(value) => updateField('contactText', value)}
+        />
+      </form>
+
+      <AdminStickySaveBar
+        formId={FORM_ID}
+        isSaving={isSaving}
+        label={`Save ${activeLocale.toUpperCase()} Home`}
+        note={`Sticky save bar is active for ${activeLocale.toUpperCase()} homepage content.`}
+      />
+    </div>
   )
 }
 
@@ -416,19 +399,7 @@ function Field({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        style={{
-          width: '100%',
-          minHeight: 50,
-          borderRadius: 14,
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: '#11192E',
-          color: '#F5F7FB',
-          padding: '0 14px',
-          outline: 'none',
-          fontSize: 16,
-          boxSizing: 'border-box',
-          WebkitAppearance: 'none',
-        }}
+        style={inputStyle}
       />
     </label>
   )
@@ -450,20 +421,36 @@ function TextAreaField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         rows={4}
-        style={{
-          width: '100%',
-          borderRadius: 14,
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: '#11192E',
-          color: '#F5F7FB',
-          padding: '12px 14px',
-          outline: 'none',
-          fontSize: 16,
-          boxSizing: 'border-box',
-          resize: 'vertical',
-          WebkitAppearance: 'none',
-        }}
+        style={textAreaStyle}
       />
     </label>
   )
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  minHeight: 48,
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  padding: '0 14px',
+  outline: 'none',
+  fontSize: 16,
+  boxSizing: 'border-box',
+  WebkitAppearance: 'none',
+}
+
+const textAreaStyle: React.CSSProperties = {
+  width: '100%',
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  padding: '12px 14px',
+  outline: 'none',
+  fontSize: 16,
+  boxSizing: 'border-box',
+  resize: 'vertical',
+  WebkitAppearance: 'none',
 }
