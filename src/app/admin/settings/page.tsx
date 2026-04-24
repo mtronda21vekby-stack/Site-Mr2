@@ -1,19 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 
-type SiteSettingsRow = {
-  id: string
-  brand_name: string | null
-  phone_primary: string | null
-  phone_display: string | null
-  email: string | null
-  service_hours: string | null
-}
-
-type SettingsForm = {
+type SettingsState = {
   id: string
   brandName: string
   phonePrimary: string
@@ -22,7 +14,9 @@ type SettingsForm = {
   serviceHours: string
 }
 
-const defaultForm: SettingsForm = {
+const FORM_ID = 'admin-settings-form'
+
+const initialState: SettingsState = {
   id: '',
   brandName: 'Planetlocksmiths',
   phonePrimary: '+1 (267) 000-0000',
@@ -33,9 +27,9 @@ const defaultForm: SettingsForm = {
 
 export default function AdminSettingsPage() {
   const router = useRouter()
-  const supabase = useMemo(() => getSupabaseClient() as any, [])
+  const supabase: any = useMemo(() => getSupabaseClient() as any, [])
 
-  const [form, setForm] = useState<SettingsForm>(defaultForm)
+  const [form, setForm] = useState<SettingsState>(initialState)
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -57,8 +51,7 @@ export default function AdminSettingsPage() {
           return
         }
 
-        const settingsTable = supabase.from('site_settings') as any
-        const result = await settingsTable
+        const result = await (supabase.from('site_settings') as any)
           .select('id, brand_name, phone_primary, phone_display, email, service_hours')
           .limit(1)
 
@@ -66,22 +59,18 @@ export default function AdminSettingsPage() {
           throw new Error(result.error.message)
         }
 
-        const row = (result.data?.[0] ?? null) as SiteSettingsRow | null
+        const row = Array.isArray(result.data) ? result.data[0] : null
 
-        if (!row) {
-          throw new Error('No row found in site_settings table')
+        if (mounted && row) {
+          setForm({
+            id: row.id ?? '',
+            brandName: row.brand_name ?? initialState.brandName,
+            phonePrimary: row.phone_primary ?? initialState.phonePrimary,
+            phoneDisplay: row.phone_display ?? initialState.phoneDisplay,
+            email: row.email ?? initialState.email,
+            serviceHours: row.service_hours ?? initialState.serviceHours,
+          })
         }
-
-        if (!mounted) return
-
-        setForm({
-          id: row.id ?? '',
-          brandName: row.brand_name ?? defaultForm.brandName,
-          phonePrimary: row.phone_primary ?? defaultForm.phonePrimary,
-          phoneDisplay: row.phone_display ?? defaultForm.phoneDisplay,
-          email: row.email ?? defaultForm.email,
-          serviceHours: row.service_hours ?? defaultForm.serviceHours,
-        })
       } catch (error) {
         if (!mounted) return
         setErrorMessage(
@@ -101,6 +90,16 @@ export default function AdminSettingsPage() {
     }
   }, [router, supabase])
 
+  function updateField<K extends keyof SettingsState>(
+    key: K,
+    value: SettingsState[K]
+  ) {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }))
+  }
+
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
@@ -108,16 +107,14 @@ export default function AdminSettingsPage() {
     setSuccessMessage('')
 
     if (!form.id) {
-      setErrorMessage('Settings row not found')
+      setErrorMessage('Settings row was not found.')
       return
     }
 
     setIsSaving(true)
 
     try {
-      const settingsTable = supabase.from('site_settings') as any
-
-      const updateResult = await settingsTable
+      const result = await (supabase.from('site_settings') as any)
         .update({
           brand_name: form.brandName.trim(),
           phone_primary: form.phonePrimary.trim(),
@@ -127,11 +124,11 @@ export default function AdminSettingsPage() {
         })
         .eq('id', form.id)
 
-      if (updateResult.error) {
-        throw new Error(updateResult.error.message)
+      if (result.error) {
+        throw new Error(result.error.message)
       }
 
-      setSuccessMessage('Settings saved successfully')
+      setSuccessMessage('Global settings saved')
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : 'Failed to save settings'
@@ -141,163 +138,120 @@ export default function AdminSettingsPage() {
     }
   }
 
-  function updateField<K extends keyof SettingsForm>(
-    key: K,
-    value: SettingsForm[K]
-  ) {
-    setForm((prev) => ({
-      ...prev,
-      [key]: value,
-    }))
-  }
-
   if (isBooting) {
     return (
-      <main
-        style={{
-          minHeight: '100vh',
-          background: '#05070B',
-          color: '#F5F7FB',
-          padding: '24px 16px 40px',
-          fontFamily: 'Inter, sans-serif',
-        }}
-      >
-        <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 14 }}>
-            Loading settings...
-          </p>
-        </div>
-      </main>
+      <div style={{ paddingTop: 20 }}>
+        <p style={{ color: '#95A0B8', margin: 0 }}>Loading settings...</p>
+      </div>
     )
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100vh',
-        background: '#05070B',
-        color: '#F5F7FB',
-        padding: '20px 16px 40px',
-        fontFamily: 'Inter, sans-serif',
-      }}
-    >
-      <div style={{ maxWidth: 860, margin: '0 auto' }}>
-        <div style={{ marginBottom: 20 }}>
-          <a
-            href="/admin/direct"
-            style={{
-              display: 'inline-block',
-              marginBottom: 10,
-              color: '#95A0B8',
-              textDecoration: 'none',
-              fontSize: 14,
-            }}
-          >
-            ← Back to dashboard
-          </a>
-
+    <div>
+      <div
+        style={{
+          marginBottom: 20,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
           <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>
             Planetlocksmiths / Admin / Settings
           </p>
-
-          <h1 style={{ margin: '8px 0 0', fontSize: 32, lineHeight: 1.1 }}>
+          <h2 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>
             Settings
-          </h1>
+          </h2>
         </div>
 
-        <form
-          onSubmit={handleSave}
-          style={{
-            display: 'grid',
-            gap: 16,
-            background: '#0B1020',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 20,
-            padding: 18,
-          }}
-        >
-          <Field
-            label="Brand Name"
-            value={form.brandName}
-            onChange={(value) => updateField('brandName', value)}
-          />
-
-          <Field
-            label="Primary Phone"
-            value={form.phonePrimary}
-            onChange={(value) => updateField('phonePrimary', value)}
-          />
-
-          <Field
-            label="Display Phone"
-            value={form.phoneDisplay}
-            onChange={(value) => updateField('phoneDisplay', value)}
-          />
-
-          <Field
-            label="Email"
-            value={form.email}
-            onChange={(value) => updateField('email', value)}
-          />
-
-          <Field
-            label="Service Hours"
-            value={form.serviceHours}
-            onChange={(value) => updateField('serviceHours', value)}
-          />
-
-          {errorMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(255,122,122,0.25)',
-                background: 'rgba(255,122,122,0.08)',
-                color: '#FF9A9A',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {errorMessage}
-            </div>
-          ) : null}
-
-          {successMessage ? (
-            <div
-              style={{
-                borderRadius: 12,
-                border: '1px solid rgba(77,162,255,0.25)',
-                background: 'rgba(77,162,255,0.08)',
-                color: '#A9D0FF',
-                padding: '12px 14px',
-                fontSize: 14,
-                lineHeight: 1.5,
-              }}
-            >
-              {successMessage}
-            </div>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            style={{
-              minHeight: 50,
-              borderRadius: 14,
-              border: 'none',
-              background: '#4DA2FF',
-              color: '#05070B',
-              fontWeight: 700,
-              fontSize: 16,
-              cursor: isSaving ? 'default' : 'pointer',
-              opacity: isSaving ? 0.7 : 1,
-            }}
-          >
-            {isSaving ? 'Saving...' : 'Save Settings'}
-          </button>
-        </form>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <a href="/en" target="_blank" rel="noreferrer" style={ghostLinkStyle}>
+            Open site
+          </a>
+          <a href={`tel:${form.phonePrimary}`} style={ghostLinkStyle}>
+            Call {form.phoneDisplay}
+          </a>
+        </div>
       </div>
-    </main>
+
+      {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
+      {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
+
+      <form
+        id={FORM_ID}
+        onSubmit={handleSave}
+        style={{
+          display: 'grid',
+          gap: 16,
+          background: '#0B1020',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 20,
+          padding: 18,
+        }}
+      >
+        <SectionTitle
+          title="Brand"
+          text="Core global identity and public contact data."
+        />
+
+        <Field
+          label="Brand Name"
+          value={form.brandName}
+          onChange={(value) => updateField('brandName', value)}
+        />
+
+        <Field
+          label="Primary Phone"
+          value={form.phonePrimary}
+          onChange={(value) => updateField('phonePrimary', value)}
+        />
+
+        <Field
+          label="Display Phone"
+          value={form.phoneDisplay}
+          onChange={(value) => updateField('phoneDisplay', value)}
+        />
+
+        <Field
+          label="Email"
+          value={form.email}
+          onChange={(value) => updateField('email', value)}
+        />
+
+        <Field
+          label="Service Hours"
+          value={form.serviceHours}
+          onChange={(value) => updateField('serviceHours', value)}
+        />
+      </form>
+
+      <AdminStickySaveBar
+        formId={FORM_ID}
+        isSaving={isSaving}
+        label="Save Settings"
+        note="Global settings affect header, contact blocks, phone CTAs and shared site metadata."
+      />
+    </div>
+  )
+}
+
+function SectionTitle({
+  title,
+  text,
+}: {
+  title: string
+  text: string
+}) {
+  return (
+    <div style={{ display: 'grid', gap: 6 }}>
+      <strong style={{ fontSize: 18, color: '#F5F7FB' }}>{title}</strong>
+      <span style={{ fontSize: 14, color: '#95A0B8', lineHeight: 1.6 }}>
+        {text}
+      </span>
+    </div>
   )
 }
 
@@ -313,24 +267,70 @@ function Field({
   return (
     <label style={{ display: 'grid', gap: 8 }}>
       <span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span>
-
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        style={{
-          width: '100%',
-          minHeight: 50,
-          borderRadius: 14,
-          border: '1px solid rgba(255,255,255,0.10)',
-          background: '#11192E',
-          color: '#F5F7FB',
-          padding: '0 14px',
-          outline: 'none',
-          fontSize: 16,
-          boxSizing: 'border-box',
-          WebkitAppearance: 'none',
-        }}
+        style={inputStyle}
       />
     </label>
   )
+}
+
+function MessageBox({
+  type,
+  children,
+}: {
+  type: 'error' | 'success'
+  children: ReactNode
+}) {
+  const isError = type === 'error'
+
+  return (
+    <div
+      style={{
+        borderRadius: 12,
+        border: isError
+          ? '1px solid rgba(255,122,122,0.25)'
+          : '1px solid rgba(77,162,255,0.25)',
+        background: isError
+          ? 'rgba(255,122,122,0.08)'
+          : 'rgba(77,162,255,0.08)',
+        color: isError ? '#FF9A9A' : '#A9D0FF',
+        padding: '12px 14px',
+        fontSize: 14,
+        lineHeight: 1.5,
+        marginBottom: 16,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+const inputStyle: CSSProperties = {
+  width: '100%',
+  minHeight: 48,
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  padding: '0 14px',
+  outline: 'none',
+  fontSize: 16,
+  boxSizing: 'border-box',
+  WebkitAppearance: 'none',
+}
+
+const ghostLinkStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: 42,
+  padding: '0 14px',
+  borderRadius: 12,
+  textDecoration: 'none',
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: '#11192E',
+  color: '#F5F7FB',
+  fontWeight: 700,
 }
