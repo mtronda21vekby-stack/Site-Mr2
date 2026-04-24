@@ -35,7 +35,6 @@ function createEmptyRow(locale: Locale, sortOrder = 0): AreaFormRow {
 export default function AdminAreasPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
-
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
   const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, AreaFormRow[]>>({ en: [], es: [], ru: [] })
   const [isBooting, setIsBooting] = useState(true)
@@ -55,10 +54,7 @@ export default function AdminAreasPage() {
         setSuccessMessage('')
         const sessionResult = await supabase.auth.getSession()
         const session = sessionResult?.data?.session
-        if (!session) {
-          router.replace('/admin/login')
-          return
-        }
+        if (!session) { router.replace('/admin/login'); return }
 
         const result = await (supabase.from('areas') as any)
           .select('id, locale, slug, city, state, title, intro, highlights, supported_services, seo_title, seo_description, sort_order, is_published')
@@ -164,18 +160,40 @@ export default function AdminAreasPage() {
     try {
       const currentRows = rowsByLocale[activeLocale]
       for (const row of currentRows) {
-        if (!row.slug.trim()) throw new Error(`Slug is required for locale ${activeLocale.toUpperCase()}`)
+        const slug = row.slug.trim()
+        const city = row.city.trim()
+        const state = row.state.trim()
+        const title = row.title.trim()
+        const intro = row.intro.trim()
+        const highlights = row.highlightsText.split('\n').map((item) => item.trim()).filter(Boolean)
+        const supportedServices = row.supportedServicesText.split('\n').map((item) => item.trim()).filter(Boolean)
+        const seoTitle = row.seoTitle.trim()
+        const seoDescription = row.seoDescription.trim()
+        const label = title || city || slug || `area #${currentRows.indexOf(row) + 1}`
+
+        if (!slug) throw new Error(`Slug is required for ${label}.`)
+
+        if (row.isPublished) {
+          if (!city) throw new Error(`Published area "${label}" must have a city.`)
+          if (!title) throw new Error(`Published area "${label}" must have a title.`)
+          if (intro.length < 300) throw new Error(`Published area "${label}" needs an intro of at least 300 characters.`)
+          if (highlights.length < 3) throw new Error(`Published area "${label}" needs at least 3 highlights.`)
+          if (supportedServices.length < 4) throw new Error(`Published area "${label}" needs at least 4 supported services.`)
+          if (!seoTitle) throw new Error(`Published area "${label}" must have an SEO title.`)
+          if (seoDescription.length < 120) throw new Error(`Published area "${label}" needs an SEO description of at least 120 characters.`)
+        }
+
         const payload = {
           locale: row.locale,
-          slug: row.slug.trim(),
-          city: row.city.trim(),
-          state: row.state.trim(),
-          title: row.title.trim(),
-          intro: row.intro.trim(),
-          highlights: row.highlightsText.split('\n').map((item) => item.trim()).filter(Boolean),
-          supported_services: row.supportedServicesText.split('\n').map((item) => item.trim()).filter(Boolean),
-          seo_title: row.seoTitle.trim() || null,
-          seo_description: row.seoDescription.trim() || null,
+          slug,
+          city,
+          state,
+          title,
+          intro,
+          highlights,
+          supported_services: supportedServices,
+          seo_title: seoTitle || null,
+          seo_description: seoDescription || null,
           sort_order: Number(row.sortOrder || 0),
           is_published: row.isPublished,
         }
@@ -251,7 +269,6 @@ export default function AdminAreasPage() {
         })}
         {!filteredRows.length ? <div style={emptyStateStyle}>No areas match the current filters.</div> : null}
       </form>
-
       <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label={`Save ${activeLocale.toUpperCase()} Areas`} note={`Area changes for ${activeLocale.toUpperCase()} stay ready at the bottom while you scroll.`} />
     </div>
   )
