@@ -17,14 +17,9 @@
   --planet-line-strong: rgba(255, 255, 255, 0.16);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-  background: var(--planet-void);
-}
+html { scroll-behavior: smooth; background: var(--planet-void); }
 
 body {
   @apply bg-bg text-text font-body;
@@ -35,28 +30,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @apply font-heading;
-}
+h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 
-::selection {
-  background: rgba(77, 162, 255, 0.36);
-  color: #ffffff;
-}
+::selection { background: rgba(77, 162, 255, 0.36); color: #ffffff; }
 
 .cinematic-shell {
   position: relative;
   isolation: isolate;
   overflow-x: clip;
   background:
-    radial-gradient(circle at 50% -10%, rgba(77, 162, 255, 0.1), transparent 34rem),
-    radial-gradient(circle at 100% 18%, rgba(214, 168, 95, 0.08), transparent 28rem),
-    linear-gradient(180deg, rgba(2, 4, 10, 0.72), rgba(2, 4, 10, 0.98));
+    radial-gradient(circle at 50% -10%, rgba(77, 162, 255, 0.08), transparent 34rem),
+    radial-gradient(circle at 100% 18%, rgba(214, 168, 95, 0.055), transparent 28rem),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.68), rgba(2, 4, 10, 0.98));
 }
 
 .cinematic-shell::before {
@@ -66,9 +51,8 @@ h6 {
   z-index: -20;
   pointer-events: none;
   background:
-    radial-gradient(circle at 12% 14%, rgba(45, 226, 230, 0.09), transparent 22rem),
-    radial-gradient(circle at 88% 30%, rgba(214, 168, 95, 0.08), transparent 26rem),
-    radial-gradient(circle at 50% 100%, rgba(77, 162, 255, 0.12), transparent 36rem),
+    radial-gradient(circle at 12% 14%, rgba(45, 226, 230, 0.055), transparent 22rem),
+    radial-gradient(circle at 88% 30%, rgba(214, 168, 95, 0.055), transparent 26rem),
     linear-gradient(180deg, #02040a 0%, #05070b 52%, #02040a 100%);
 }
 
@@ -78,10 +62,10 @@ h6 {
   inset: 0;
   z-index: -5;
   pointer-events: none;
-  opacity: 0.28;
+  opacity: 0.22;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
   background-size: 100% 4px, 92px 92px;
   mask-image: linear-gradient(180deg, transparent, black 10%, black 86%, transparent);
 }
@@ -97,9 +81,7 @@ h6 {
   backdrop-filter: blur(22px);
 }
 
-.premium-hairline {
-  position: relative;
-}
+.premium-hairline { position: relative; }
 
 .premium-hairline::before {
   content: '';
@@ -113,61 +95,90 @@ h6 {
   mask-composite: exclude;
 }
 
-@keyframes planet-rotate {
+.planet-key-mark {
+  --planet-scroll-rotate: 0deg;
+  --planet-scroll-drift: 0px;
+  position: absolute;
+  left: 50%;
+  top: clamp(3rem, 8vh, 6rem);
+  width: min(78vw, 760px);
+  aspect-ratio: 1;
+  transform: translate3d(-50%, var(--planet-scroll-drift), 0);
+  opacity: 0.42;
+  filter: saturate(1.05) contrast(1.04);
+}
+
+.planet-key-mark__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: perspective(1100px) rotateX(58deg) rotateZ(calc(-12deg + var(--planet-scroll-rotate)));
+  transform-style: preserve-3d;
+}
+
+.planet-key-mark__halo {
+  position: absolute;
+  inset: 12%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(77, 162, 255, 0.18), transparent 36%),
+    radial-gradient(circle at 62% 38%, rgba(214, 168, 95, 0.08), transparent 32%);
+  filter: blur(28px);
+  opacity: 0.78;
+}
+
+.planet-key-mark__svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.planet-key-mark__outer { transform-origin: 310px 310px; animation: pkm-spin 34s linear infinite; }
+.planet-key-mark__latitudes { transform-origin: 310px 310px; animation: pkm-spin 26s linear infinite reverse; }
+.planet-key-mark__longitudes { transform-origin: 310px 310px; animation: pkm-spin 42s linear infinite; }
+.planet-key-mark__orbit { transform-origin: 310px 310px; animation: pkm-orbit 18s linear infinite; opacity: 0.82; }
+.planet-key-mark__key { transform-origin: 310px 310px; animation: pkm-key-float 7s ease-in-out infinite; }
+
+@keyframes pkm-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-@keyframes planet-rotate-reverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+@keyframes pkm-orbit {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.025); }
+  to { transform: rotate(360deg) scale(1); }
 }
 
-@keyframes signal-pulse {
-  0%, 100% {
-    opacity: 0.24;
-    transform: scale(0.92);
-  }
-  50% {
-    opacity: 0.62;
-    transform: scale(1.04);
-  }
+@keyframes pkm-key-float {
+  0%, 100% { transform: translate3d(0, 0, 22px) rotate(-2deg); }
+  50% { transform: translate3d(4px, -8px, 38px) rotate(1.5deg); }
 }
 
-@keyframes premium-drift {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -10px, 0); }
-}
-
-@keyframes premium-scan {
-  0% { transform: translateY(-16%); opacity: 0; }
-  18%, 68% { opacity: 0.5; }
-  100% { transform: translateY(116%); opacity: 0; }
-}
-
-@keyframes premium-orbit {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes premium-orbit-reverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
-}
+@keyframes planet-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes planet-rotate-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+@keyframes signal-pulse { 0%, 100% { opacity: 0.24; transform: scale(0.92); } 50% { opacity: 0.62; transform: scale(1.04); } }
+@keyframes premium-drift { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -10px, 0); } }
+@keyframes premium-scan { 0% { transform: translateY(-16%); opacity: 0; } 18%, 68% { opacity: 0.5; } 100% { transform: translateY(116%); opacity: 0; } }
+@keyframes premium-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes premium-orbit-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
 @media (max-width: 767px) {
-  .cinematic-shell::after {
-    opacity: 0.18;
-    background-size: 100% 4px, 64px 64px;
+  .cinematic-shell::after { opacity: 0.14; background-size: 100% 4px, 64px 64px; }
+  .planet-key-mark {
+    top: 6rem;
+    width: 138vw;
+    opacity: 0.24;
   }
+  .planet-key-mark__stage { transform: perspective(900px) rotateX(62deg) rotateZ(calc(-10deg + var(--planet-scroll-rotate))); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
+  .planet-key-mark { transform: translate3d(-50%, 0, 0); }
 }
