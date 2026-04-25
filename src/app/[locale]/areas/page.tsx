@@ -5,26 +5,29 @@ import CinematicBackground from '@/components/layout/CinematicBackground'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import {
   getAreasListFromSource,
+  getContentBlocksFromSource,
   getGlobalSettingsFromSource,
 } from '@/lib/content.server'
 
 type Locale = 'en' | 'es' | 'ru'
+type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const copy: Record<Locale, { eyebrow: string; title: string; intro: string; call: string; request: string; cardPrefix: string; open: string; empty: string; sideTitle: string; sideText: string }> = {
+const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro: string; call: string; request: string; cardPrefix: string; open: string; empty: string; sideTitle: string; sideText: string; countLabel: string }> = {
   en: {
     eyebrow: 'Planetlocksmiths / coverage',
     title: 'Service Areas',
     intro: 'Mobile automotive locksmith coverage pages help customers understand where service may be available, what support is offered, and what vehicle details are needed before requesting help.',
     call: 'Call',
     request: 'Request service',
-    cardPrefix: 'Coverage',
-    open: 'Open page',
+    cardPrefix: 'Area',
+    open: 'Open area',
     empty: 'No published areas yet.',
-    sideTitle: 'Orbital coverage grid',
+    sideTitle: 'Coverage ready',
     sideText: 'Coverage depends on technician availability, location, distance, vehicle type, parts, timing, and job complexity.',
+    countLabel: 'Published areas',
   },
   es: {
     eyebrow: 'Planetlocksmiths / cobertura',
@@ -32,92 +35,91 @@ const copy: Record<Locale, { eyebrow: string; title: string; intro: string; call
     intro: 'Las páginas de cobertura móvil ayudan a los clientes a entender dónde puede estar disponible el servicio, qué soporte se ofrece y qué datos del vehículo se necesitan antes de solicitar ayuda.',
     call: 'Llamar',
     request: 'Solicitar servicio',
-    cardPrefix: 'Cobertura',
-    open: 'Abrir página',
+    cardPrefix: 'Área',
+    open: 'Abrir área',
     empty: 'No hay áreas publicadas todavía.',
-    sideTitle: 'Mapa de cobertura',
+    sideTitle: 'Cobertura lista',
     sideText: 'La cobertura depende de disponibilidad, ubicación, distancia, tipo de vehículo, piezas, horario y complejidad.',
-  },
-  ru: {
-    eyebrow: 'Planetlocksmiths / покрытие',
-    title: 'Районы обслуживания',
-    intro: 'Страницы мобильного покрытия помогают клиентам понять, где может быть доступен сервис, какие услуги возможны и какие данные автомобиля нужны перед заявкой.',
-    call: 'Позвонить',
-    request: 'Оставить заявку',
-    cardPrefix: 'Покрытие',
-    open: 'Открыть страницу',
-    empty: 'Пока нет опубликованных районов.',
-    sideTitle: 'Сетка покрытия',
-    sideText: 'Покрытие зависит от доступности техника, локации, расстояния, типа автомобиля, деталей, времени и сложности.',
+    countLabel: 'Áreas publicadas',
   },
 }
 
-export default async function AreasIndexPage({
-  params,
-}: {
-  params: Promise<{ locale: Locale }>
-}) {
+export default async function AreasIndexPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params
-  const labels = copy[locale]
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const fallback = fallbackCopy[activeLocale]
 
-  const [global, areas] = await Promise.all([
+  const [global, areas, blocks] = await Promise.all([
     getGlobalSettingsFromSource(),
-    getAreasListFromSource(locale),
+    getAreasListFromSource(activeLocale),
+    getContentBlocksFromSource(activeLocale, 'areas'),
   ])
+
+  const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
+  const heroBlock = blockBySlot.get('hero')
+  const sideBlock = blockBySlot.get('side')
+  const cardsBlock = blockBySlot.get('cards')
+  const emptyBlock = blockBySlot.get('empty')
+
+  const heroEyebrow = heroBlock?.eyebrow || fallback.eyebrow
+  const heroTitle = heroBlock?.title || fallback.title
+  const heroIntro = heroBlock?.body || fallback.intro
+  const callLabel = heroBlock?.items[0] || fallback.call
+  const requestLabel = heroBlock?.ctaLabel || fallback.request
+  const requestHref = heroBlock?.ctaHref || `/${activeLocale}/contact#request-service`
+  const cardPrefix = cardsBlock?.eyebrow || fallback.cardPrefix
+  const openLabel = cardsBlock?.ctaLabel || fallback.open
+  const countLabel = sideBlock?.items[0] || fallback.countLabel
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
       <CinematicBackground />
-      <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
 
-      <main className="relative overflow-hidden text-text">
+      <main className="relative text-text">
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <div className="premium-panel premium-hairline relative grid gap-8 overflow-hidden rounded-[2.25rem] p-6 sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">
-            <div className="absolute right-[-8rem] top-[-8rem] h-80 w-80 rounded-full border border-accent-cyan/15" />
-            <div className="absolute bottom-[-8rem] left-[-6rem] h-80 w-80 rounded-full bg-accent-blue/10 blur-3xl" />
-
-            <div className="relative">
-              <p className="mb-4 text-xs font-black uppercase tracking-[0.3em] text-accent-cyan">{labels.eyebrow}</p>
-              <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{labels.title}</h1>
-              <p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{labels.intro}</p>
+          <div className="premium-panel premium-hairline grid gap-8 rounded-[2.25rem] p-6 sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">
+            <div className="relative z-10">
+              <p className="mb-4 text-xs font-black uppercase tracking-[0.3em] text-accent-cyan">{heroEyebrow}</p>
+              <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{heroTitle}</h1>
+              <p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{heroIntro}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110">{labels.call} {global.phoneDisplay}</a>
-                <Link href={`/${locale}/contact#request-service`} className="inline-flex min-h-12 items-center justify-center rounded-full border border-accent-gold/35 bg-accent-gold/10 px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-accent-gold transition duration-300 hover:-translate-y-0.5 hover:bg-accent-gold/15">{labels.request}</Link>
+                <a href={`tel:${global.phonePrimary}`} className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no">{callLabel} {global.phoneDisplay}</a>
+                <Link href={requestHref} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">{requestLabel}</Link>
               </div>
             </div>
 
-            <aside className="premium-panel relative rounded-[1.5rem] p-5">
-              <p className="text-xs font-black uppercase tracking-[0.24em] text-accent-gold">{labels.sideTitle}</p>
-              <p className="mt-3 text-sm leading-7 text-muted">{labels.sideText}</p>
-              <div className="mt-5 h-px bg-gradient-to-r from-transparent via-accent-blue/35 to-transparent" />
-              <p className="mt-5 text-3xl font-semibold tracking-[-0.04em] text-text">{areas.length}</p>
-              <p className="mt-1 text-xs font-black uppercase tracking-[0.18em] text-muted">Published zones</p>
+            <aside className="premium-panel relative z-10 rounded-[1.5rem] p-5">
+              <div className="relative z-10">
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-accent-gold">{sideBlock?.title || fallback.sideTitle}</p>
+                <p className="mt-3 text-sm leading-7 text-muted">{sideBlock?.body || fallback.sideText}</p>
+                <div className="mt-5 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                <p className="mt-5 text-3xl font-semibold tracking-[-0.04em] text-text">{areas.length}</p>
+                <p className="mt-1 text-xs font-black uppercase tracking-[0.18em] text-muted">{countLabel}</p>
+              </div>
             </aside>
           </div>
 
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {areas.map((area, index) => (
-              <Link key={area.slug} href={`/${locale}/areas/${area.slug}`} className="group premium-panel premium-hairline relative flex min-h-[19rem] overflow-hidden rounded-[1.75rem] p-6 transition duration-500 hover:-translate-y-1.5 hover:border-accent-blue/40">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_0%,rgba(45,226,230,0.13),transparent_18rem)] opacity-85 transition group-hover:opacity-100" />
-                <div className="absolute right-[-3.5rem] top-[-3.5rem] h-36 w-36 rounded-full border border-accent-blue/20 transition group-hover:scale-110 group-hover:border-accent-blue/35" />
-                <div className="absolute bottom-[-5rem] left-[-4rem] h-40 w-40 rounded-full bg-accent-gold/10 blur-2xl transition group-hover:bg-accent-gold/16" />
-                <div className="relative flex h-full flex-col">
-                  <p className="mb-7 text-[0.65rem] font-black uppercase tracking-[0.22em] text-accent-gold">{labels.cardPrefix} {String(index + 1).padStart(2, '0')}</p>
+              <Link key={area.slug} href={`/${activeLocale}/areas/${area.slug}`} className="group premium-panel premium-hairline flex min-h-[19rem] rounded-[1.75rem] p-6 transition duration-500 hover:-translate-y-1.5 hover:border-accent-blue/40">
+                <div className="relative z-10 flex h-full flex-col">
+                  <p className="mb-7 text-[0.65rem] font-black uppercase tracking-[0.22em] text-accent-gold">{cardPrefix} {String(index + 1).padStart(2, '0')}</p>
                   <h2 className="text-balance text-2xl font-semibold tracking-[-0.035em] text-text">{area.title}</h2>
                   <p className="mt-2 text-sm font-semibold text-accent-cyan/80">{[area.city, area.state].filter(Boolean).join(', ')}</p>
                   <p className="mt-4 flex-1 text-sm leading-7 text-muted">{area.intro}</p>
-                  <span className="mt-7 inline-flex text-xs font-black uppercase tracking-[0.18em] text-accent-blue transition group-hover:text-accent-cyan">{labels.open} <span className="ml-2 transition group-hover:translate-x-1">→</span></span>
+                  <span className="mt-7 inline-flex text-xs font-black uppercase tracking-[0.18em] text-accent-blue transition group-hover:text-accent-cyan">{openLabel} <span className="ml-2 transition group-hover:translate-x-1">→</span></span>
                 </div>
               </Link>
             ))}
           </div>
 
-          {!areas.length ? <div className="premium-panel mt-8 rounded-[1.5rem] p-6 text-muted">{labels.empty}</div> : null}
+          {!areas.length ? <div className="premium-panel mt-8 rounded-[1.5rem] p-6 text-muted"><div className="relative z-10">{emptyBlock?.body || fallback.empty}</div></div> : null}
         </section>
       </main>
 
-      <Footer locale={locale} />
-      <MobileStickyCta locale={locale} phoneNumber={global.phonePrimary} />
+      <Footer locale={activeLocale} />
+      <MobileStickyCta locale={activeLocale} phoneNumber={global.phonePrimary} />
     </div>
   )
 }
