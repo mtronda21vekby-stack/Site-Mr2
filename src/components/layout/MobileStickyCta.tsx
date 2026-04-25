@@ -4,7 +4,7 @@ import type { Locale } from './Header'
 const labels: Record<Locale, { call: string; request: string }> = {
   en: { call: 'Call now', request: 'Request' },
   es: { call: 'Llamar', request: 'Solicitud' },
-  ru: { call: 'Позвонить', request: 'Заявка' },
+  ru: { call: 'Call now', request: 'Request' },
 }
 
 export default function MobileStickyCta({
@@ -14,21 +14,24 @@ export default function MobileStickyCta({
   locale: Locale
   phoneNumber: string
 }) {
-  const copy = labels[locale]
-  const requestHref = `/${locale}/contact#request-service`
+  const activeLocale = locale === 'es' ? 'es' : 'en'
+  const copy = labels[activeLocale]
+  const requestHref = `/${activeLocale}/contact#request-service`
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-bg/95 p-3 backdrop-blur-xl md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-2 gap-3">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/14 bg-[#07101f]/58 p-3 shadow-[0_-18px_70px_rgba(0,0,0,0.34)] backdrop-blur-[30px] md:hidden">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.10),transparent_44%,rgba(77,162,255,0.08))]" />
+      <div className="relative mx-auto grid max-w-md grid-cols-2 gap-3">
         <a
           href={`tel:${phoneNumber}`}
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-4 text-sm font-bold text-black shadow-[0_0_28px_rgba(77,162,255,0.25)]"
+          className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-4 text-sm font-black text-black shadow-[0_0_28px_rgba(77,162,255,0.28)] transition active:scale-[0.98]"
+          translate="no"
         >
           {copy.call}
         </a>
         <Link
           href={requestHref}
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] px-4 text-sm font-bold text-text"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-4 text-sm font-black text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition active:scale-[0.98]"
         >
           {copy.request}
         </Link>
