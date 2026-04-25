@@ -45,6 +45,10 @@ const presets: Preset[] = [
   { label: 'Areas hero', pageKey: 'areas', slot: 'hero', eyebrow: 'Planetlocksmiths / coverage', title: 'Mobile Locksmith Service Areas', body: 'Explore automotive locksmith coverage areas and request help with vehicle lockouts, keys, fobs, programming, and ignition-related service.', itemsText: 'Call', ctaLabel: 'Request service', ctaHref: '/en/contact#request-service' },
   { label: 'Areas side card', pageKey: 'areas', slot: 'side', title: 'Coverage ready', body: 'Select a service area to review local coverage details, then submit the vehicle, location, and urgency.', itemsText: 'Published areas' },
   { label: 'Area cards labels', pageKey: 'areas', slot: 'cards', eyebrow: 'Area', ctaLabel: 'Open area' },
+  { label: 'Area detail prep', pageKey: 'area-detail', slot: 'prep', title: 'What to prepare before service', itemsText: 'Vehicle make, model, and year\nExact address, parking lot, or nearby landmark\nWhether all keys are lost\nWhether the vehicle is locked, running, or in a garage\nPhone number for fast confirmation' },
+  { label: 'Area detail supported services', pageKey: 'area-detail', slot: 'supported-services', title: 'Services commonly requested here', itemsText: 'Car lockout help\nReplacement car keys\nKey fob and transponder programming\nBroken key extraction\nIgnition-related support' },
+  { label: 'Area detail local info', pageKey: 'area-detail', slot: 'local-info', title: 'Local service information', itemsText: 'Mobile service depends on technician availability and location\nResponse times may vary by traffic, distance, weather, and urgency\nFinal price depends on vehicle details, parts, and job complexity' },
+  { label: 'Area detail coverage notes', pageKey: 'area-detail', slot: 'coverage-notes', title: 'Coverage notes', itemsText: 'Mobile service availability is not guaranteed until confirmed\nParts and programming support depend on vehicle details\nFinal service scope should be confirmed before work begins' },
   { label: 'Contact helper', pageKey: 'contact', slot: 'helper', eyebrow: 'Request details', title: 'Fast service needs clear vehicle information', body: 'Phone, service, vehicle make, model, year, current location, and urgency help route the request correctly.' },
   { label: 'Service detail process', pageKey: 'service-detail', slot: 'process', eyebrow: 'How the request works', title: 'Simple request flow', body: 'The process stays clear before any service is confirmed.', itemsText: 'Submit service and vehicle details\nConfirm location, urgency, and phone number\nReview availability, parts, and programming needs\nConfirm next step before service begins' },
   { label: 'Service detail readiness', pageKey: 'service-detail', slot: 'readiness', title: 'Information customers should prepare', body: 'Vehicle make, model, year, current location, urgency, and whether all keys are lost help make the request actionable.' },
@@ -252,43 +256,19 @@ export default function AdminContentBlocksPage() {
   return (
     <div>
       <HeaderBlock breadcrumb="Planetlocksmiths / Admin / Content Blocks" title="Content Blocks" activeLocale={activeLocale} onLocaleChange={(locale) => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} previewHref={`/${activeLocale}`} extraButton={<button type="button" onClick={addRow} style={ghostButtonStyle}>+ Add blank</button>} />
-
-      <div style={guideStyle}>
-        Public module text is controlled here. For services page use page_key <Code>services</Code> with slots <Code>hero</Code>, <Code>side</Code>, <Code>cards</Code>, <Code>empty</Code>. For detail pages use <Code>service-detail</Code> slots <Code>readiness</Code>, <Code>pricing</Code>, <Code>authorization</Code>, <Code>process</Code>. RU is frozen; use EN/ES only.
-      </div>
-
-      <div style={presetBarStyle}>
-        <select value={selectedPreset} onChange={(event) => setSelectedPreset(event.target.value)} style={inputStyle}>{presets.map((preset) => <option key={preset.label} value={preset.label}>{preset.label}</option>)}</select>
-        <button type="button" onClick={addPresetRow} style={primaryButtonStyle}>+ Add preset block</button>
-      </div>
-
+      <div style={guideStyle}>Public module text is controlled here. Use presets first, then edit copy. RU is frozen; use EN/ES only.</div>
+      <div style={guideStyle}>Page keys: <Code>services</Code>, <Code>areas</Code>, <Code>service-detail</Code>, <Code>area-detail</Code>, <Code>contact</Code>, <Code>footer</Code>. Detail overrides can use <Code>service:slug</Code> or <Code>area:slug</Code>.</div>
+      <div style={presetBarStyle}><select value={selectedPreset} onChange={(event) => setSelectedPreset(event.target.value)} style={inputStyle}>{presets.map((preset) => <option key={preset.label} value={preset.label}>{preset.label}</option>)}</select><button type="button" onClick={addPresetRow} style={primaryButtonStyle}>+ Add preset block</button></div>
       <FilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search page key, slot, title, body" filterValue={publishFilter} onFilterChange={(value) => setPublishFilter(value as PublishFilter)} filterOptions={[{ value: 'all', label: 'All blocks' }, { value: 'published', label: 'Published' }, { value: 'draft', label: 'Draft' }]} />
-
       {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
       {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
-
       <form id={FORM_ID} onSubmit={handleSave} style={{ display: 'grid', gap: 16 }}>
         {filteredRows.map((row) => {
           const realIndex = currentRows.indexOf(row)
-          return (
-            <div key={row.id || `${row.locale}-${realIndex}`} style={cardStyle}>
-              <div style={cardHeaderStyle}>
-                <div><strong style={{ fontSize: 18 }}>Block #{realIndex + 1}</strong><p style={{ margin: '6px 0 0', color: '#95A0B8', fontSize: 13 }}>{row.pageKey} / {row.slot}</p></div>
-                <button type="button" onClick={() => deleteRow(realIndex)} disabled={deletingId === row.id} style={dangerGhostButtonStyle}>{deletingId === row.id ? 'Deleting...' : 'Delete'}</button>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}><Field label="Page Key" value={row.pageKey} onChange={(value) => updateRow(realIndex, { pageKey: value })} /><Field label="Slot" value={row.slot} onChange={(value) => updateRow(realIndex, { slot: value })} /><Field label="Sort Order" value={String(row.sortOrder)} onChange={(value) => updateRow(realIndex, { sortOrder: Number(value || 0) })} /></div>
-              <Field label="Eyebrow" value={row.eyebrow} onChange={(value) => updateRow(realIndex, { eyebrow: value })} />
-              <Field label="Title" value={row.title} onChange={(value) => updateRow(realIndex, { title: value })} />
-              <TextAreaField label="Body" value={row.body} onChange={(value) => updateRow(realIndex, { body: value })} />
-              <TextAreaField label="Items (one per line)" value={row.itemsText} onChange={(value) => updateRow(realIndex, { itemsText: value })} />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}><Field label="CTA Label" value={row.ctaLabel} onChange={(value) => updateRow(realIndex, { ctaLabel: value })} /><Field label="CTA Href" value={row.ctaHref} onChange={(value) => updateRow(realIndex, { ctaHref: value })} /></div>
-              <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}><input type="checkbox" checked={row.isPublished} onChange={(event) => updateRow(realIndex, { isPublished: event.target.checked })} /><span>Published</span></label>
-            </div>
-          )
+          return <div key={row.id || `${row.locale}-${realIndex}`} style={cardStyle}><div style={cardHeaderStyle}><div><strong style={{ fontSize: 18 }}>Block #{realIndex + 1}</strong><p style={{ margin: '6px 0 0', color: '#95A0B8', fontSize: 13 }}>{row.pageKey} / {row.slot}</p></div><button type="button" onClick={() => deleteRow(realIndex)} disabled={deletingId === row.id} style={dangerGhostButtonStyle}>{deletingId === row.id ? 'Deleting...' : 'Delete'}</button></div><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}><Field label="Page Key" value={row.pageKey} onChange={(value) => updateRow(realIndex, { pageKey: value })} /><Field label="Slot" value={row.slot} onChange={(value) => updateRow(realIndex, { slot: value })} /><Field label="Sort Order" value={String(row.sortOrder)} onChange={(value) => updateRow(realIndex, { sortOrder: Number(value || 0) })} /></div><Field label="Eyebrow" value={row.eyebrow} onChange={(value) => updateRow(realIndex, { eyebrow: value })} /><Field label="Title" value={row.title} onChange={(value) => updateRow(realIndex, { title: value })} /><TextAreaField label="Body" value={row.body} onChange={(value) => updateRow(realIndex, { body: value })} /><TextAreaField label="Items (one per line)" value={row.itemsText} onChange={(value) => updateRow(realIndex, { itemsText: value })} /><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}><Field label="CTA Label" value={row.ctaLabel} onChange={(value) => updateRow(realIndex, { ctaLabel: value })} /><Field label="CTA Href" value={row.ctaHref} onChange={(value) => updateRow(realIndex, { ctaHref: value })} /></div><label style={{ display: 'flex', gap: 10, alignItems: 'center' }}><input type="checkbox" checked={row.isPublished} onChange={(event) => updateRow(realIndex, { isPublished: event.target.checked })} /><span>Published</span></label></div>
         })}
         {!filteredRows.length ? <div style={emptyStateStyle}>No content blocks match the current filters.</div> : null}
       </form>
-
       <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label={`Save ${activeLocale.toUpperCase()} Blocks`} note={`Content blocks for ${activeLocale.toUpperCase()} stay ready at the bottom while you scroll.`} />
     </div>
   )
