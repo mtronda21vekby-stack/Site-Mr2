@@ -15,13 +15,13 @@ const requestLabels: Record<Locale, { eyebrow: string; request: string; callPref
 }
 
 export default function EmergencyStrip({ title, text, phoneNumber, phoneDisplay, locale }: EmergencyStripProps) {
-  const labels = requestLabels[locale]
+  const labels = requestLabels[locale === 'es' ? 'es' : 'en']
   const activeLocale = locale === 'es' ? 'es' : 'en'
 
   return (
     <section className="relative bg-transparent px-4 py-10 sm:px-6 lg:px-8">
-      <div className="premium-panel mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] p-6 sm:p-8">
-        <div className="relative grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+      <div className="premium-panel mx-auto max-w-7xl rounded-[1.75rem] p-6 sm:p-8">
+        <div className="relative z-10 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="max-w-3xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-accent-cyan">{labels.eyebrow}</p>
             <h2 className="text-balance text-3xl font-semibold tracking-[-0.045em] text-text sm:text-4xl lg:text-5xl">{title}</h2>
@@ -29,10 +29,10 @@ export default function EmergencyStrip({ title, text, phoneNumber, phoneDisplay,
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-            <a href={`tel:${phoneNumber}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_28px_rgba(77,162,255,0.24)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110">
+            <a href={`tel:${phoneNumber}`} className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_28px_rgba(77,162,255,0.28)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no">
               {labels.callPrefix} {phoneDisplay}
             </a>
-            <a href={`/${activeLocale}/contact#request-service`} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.035] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/10 hover:text-accent-gold">
+            <a href={`/${activeLocale}/contact#request-service`} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">
               {labels.request}
             </a>
           </div>
