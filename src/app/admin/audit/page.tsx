@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { ACTIVE_LOCALES } from '@/lib/locales'
 
 type Locale = 'en' | 'es' | 'ru'
+type ActiveLocale = (typeof ACTIVE_LOCALES)[number]
 type IssueLevel = 'good' | 'warn' | 'danger'
 type AuditType = 'home' | 'settings' | 'service' | 'area' | 'content-block'
 
@@ -14,17 +16,10 @@ type HomeRow = { id: string; locale: Locale; hero_title: string | null; hero_sub
 type SettingsRow = { id?: string; brand_name?: string | null; phone_primary?: string | null; phone_display?: string | null; email?: string | null; service_hours?: string | null }
 type ContentBlockRow = { id: string; locale: Locale; page_key: string | null; slot: string | null; eyebrow: string | null; title: string | null; body: string | null; items: unknown; cta_label: string | null; cta_href: string | null; is_published: boolean | null }
 
-type AuditItem = { type: AuditType; locale?: Locale; title: string; slug: string; href: string; previewHref?: string; score: number; level: IssueLevel; issues: string[] }
+type AuditItem = { type: AuditType; locale?: ActiveLocale; title: string; slug: string; href: string; previewHref?: string; score: number; level: IssueLevel; issues: string[] }
+type RequiredBlockGroup = { pageKey: string; label: string; preview: (locale: ActiveLocale) => string; slots: string[] }
 
-type RequiredBlockGroup = {
-  pageKey: string
-  label: string
-  preview: (locale: Locale) => string
-  slots: string[]
-}
-
-const locales: Locale[] = ['en', 'es', 'ru']
-
+const activeLocales = [...ACTIVE_LOCALES]
 const requiredContentBlocks: RequiredBlockGroup[] = [
   { pageKey: 'home', label: 'Homepage editable sections', preview: (locale) => `/${locale}`, slots: ['service-depth', 'customer-info', 'area-section'] },
   { pageKey: 'service-detail', label: 'Service detail editable sections', preview: (locale) => `/${locale}/services`, slots: ['hero', 'overview', 'readiness', 'pricing', 'authorization', 'process'] },
@@ -45,17 +40,12 @@ export default function AdminAuditPage() {
 
   useEffect(() => {
     let mounted = true
-
     async function boot() {
       try {
         setErrorMessage('')
         const sessionResult = await supabase.auth.getSession()
         const session = sessionResult?.data?.session
-
-        if (!session) {
-          router.replace('/admin/login')
-          return
-        }
+        if (!session) { router.replace('/admin/login'); return }
 
         const [servicesResult, areasResult, homeResult, settingsResult] = await Promise.all([
           (supabase.from('services') as any).select('id, locale, slug, title, excerpt, intro, seo_title, seo_description, is_published').order('locale', { ascending: true }),
@@ -69,24 +59,20 @@ export default function AdminAuditPage() {
 
         let contentBlocks: ContentBlockRow[] = []
         let contentBlocksError = ''
-
         try {
           const contentBlocksResult = await (supabase.from('site_content_blocks') as any)
             .select('id, locale, page_key, slot, eyebrow, title, body, items, cta_label, cta_href, is_published')
             .order('locale', { ascending: true })
 
-          if (contentBlocksResult.error) {
-            contentBlocksError = contentBlocksResult.error.message || 'Content blocks table is unavailable'
-          } else {
-            contentBlocks = Array.isArray(contentBlocksResult.data) ? contentBlocksResult.data as ContentBlockRow[] : []
-          }
+          if (contentBlocksResult.error) contentBlocksError = contentBlocksResult.error.message || 'Content blocks table is unavailable'
+          else contentBlocks = filterActiveRows(Array.isArray(contentBlocksResult.data) ? contentBlocksResult.data as ContentBlockRow[] : [])
         } catch (error) {
           contentBlocksError = error instanceof Error ? error.message : 'Content blocks table is unavailable'
         }
 
-        const services = Array.isArray(servicesResult.data) ? servicesResult.data as ServiceRow[] : []
-        const areas = Array.isArray(areasResult.data) ? areasResult.data as AreaRow[] : []
-        const homeRows = Array.isArray(homeResult.data) ? homeResult.data as HomeRow[] : []
+        const services = filterActiveRows(Array.isArray(servicesResult.data) ? servicesResult.data as ServiceRow[] : [])
+        const areas = filterActiveRows(Array.isArray(areasResult.data) ? areasResult.data as AreaRow[] : [])
+        const homeRows = filterActiveRows(Array.isArray(homeResult.data) ? homeResult.data as HomeRow[] : [])
         const settingsRows = Array.isArray(settingsResult.data) ? settingsResult.data as SettingsRow[] : []
 
         const nextItems = [
@@ -106,25 +92,17 @@ export default function AdminAuditPage() {
         if (mounted) setIsBooting(false)
       }
     }
-
     boot()
     return () => { mounted = false }
   }, [router, supabase])
 
-  const filteredItems = items.filter((item) => {
-    const levelOk = filter === 'all' || item.level === filter
-    const typeOk = typeFilter === 'all' || item.type === typeFilter
-    return levelOk && typeOk
-  })
-
+  const filteredItems = items.filter((item) => (filter === 'all' || item.level === filter) && (typeFilter === 'all' || item.type === typeFilter))
   const criticalItems = items.filter((item) => item.level === 'danger')
   const warningItems = items.filter((item) => item.level === 'warn')
   const goodItems = items.filter((item) => item.level === 'good')
   const siteScore = items.length ? Math.round(items.reduce((sum, item) => sum + item.score, 0) / items.length) : 0
 
-  if (isBooting) {
-    return <div style={pageStyle}><div style={panelStyle}><p style={eyebrowStyle}>Audit center</p><h1 style={titleStyle}>Loading content audit...</h1></div></div>
-  }
+  if (isBooting) return <div style={pageStyle}><div style={panelStyle}><p style={eyebrowStyle}>Audit center</p><h1 style={titleStyle}>Loading content audit...</h1></div></div>
 
   return (
     <div style={pageStyle}>
@@ -132,7 +110,7 @@ export default function AdminAuditPage() {
         <div>
           <p style={eyebrowStyle}>Planetlocksmiths / Admin / Audit</p>
           <h1 style={heroTitleStyle}>Content Audit Center</h1>
-          <p style={mutedTextStyle}>Checks Home, Settings, Services, Areas, Footer, Legal pages, and Content Blocks for SEO, Ads-readiness, useful customer information, CTAs, and publish quality.</p>
+          <p style={mutedTextStyle}>Checks active EN/ES content only. RU is frozen legacy content and does not affect the site score.</p>
         </div>
         <div style={heroActionsStyle}>
           <a href="/admin/direct" style={ghostButtonStyle}>Dashboard</a>
@@ -146,7 +124,7 @@ export default function AdminAuditPage() {
       {errorMessage ? <div style={errorStyle}>{errorMessage}</div> : null}
 
       <div style={statsGridStyle}>
-        <Stat title="Site Score" value={`${siteScore}/100`} note="Average score across audited content." tone={siteScore >= 85 ? 'good' : siteScore >= 65 ? 'warn' : 'danger'} />
+        <Stat title="Site Score" value={`${siteScore}/100`} note="Average score across active EN/ES audited content." tone={siteScore >= 85 ? 'good' : siteScore >= 65 ? 'warn' : 'danger'} />
         <Stat title="Audited items" value={String(items.length)} note="Home, settings, services, areas, footer, legal, and content blocks." />
         <Stat title="Good" value={String(goodItems.length)} note="Ready or close to ready." tone="good" />
         <Stat title="Warnings" value={String(warningItems.length)} note="Needs improvement." tone="warn" />
@@ -191,136 +169,26 @@ export default function AdminAuditPage() {
             </select>
           </div>
         </div>
-
-        <div style={auditGridStyle}>
-          {filteredItems.map((item) => <AuditCard key={`${item.type}-${item.locale ?? 'global'}-${item.slug || item.title}`} item={item} />)}
-          {!filteredItems.length ? <div style={emptyStateStyle}>No pages match the selected filters.</div> : null}
-        </div>
+        <div style={auditGridStyle}>{filteredItems.map((item) => <AuditCard key={`${item.type}-${item.locale ?? 'global'}-${item.slug || item.title}`} item={item} />)}{!filteredItems.length ? <div style={emptyStateStyle}>No pages match the selected filters.</div> : null}</div>
       </section>
     </div>
   )
 }
 
-function auditHome(row: HomeRow): AuditItem {
-  const issues: string[] = []
-  const locale = row.locale
-  if (!row.hero_title?.trim()) issues.push('Missing hero title')
-  if ((row.hero_subtitle || '').trim().length < 80) issues.push('Hero subtitle should clearly explain service, location, and value')
-  if (!row.hero_primary_cta?.trim()) issues.push('Missing primary CTA label')
-  if (!row.hero_secondary_cta?.trim()) issues.push('Missing secondary CTA label')
-  if (!row.emergency_title?.trim()) issues.push('Missing emergency title')
-  if ((row.emergency_text || '').trim().length < 80) issues.push('Emergency text should explain urgency, availability, and next step')
-  if (!row.contact_title?.trim()) issues.push('Missing contact title')
-  if ((row.contact_text || '').trim().length < 80) issues.push('Contact text should explain what customer should submit')
-  if (!row.faq_title?.trim()) issues.push('Missing FAQ title')
-  return makeAuditItem({ type: 'home', locale, title: `Home content ${locale.toUpperCase()}`, slug: locale, href: '/admin/home', previewHref: `/${locale}`, issues })
-}
+function isActiveLocale(locale: Locale): locale is ActiveLocale { return (ACTIVE_LOCALES as readonly string[]).includes(locale) }
+function filterActiveRows<T extends { locale: Locale }>(rows: T[]) { return rows.filter((row): row is T & { locale: ActiveLocale } => isActiveLocale(row.locale)) }
 
-function auditSettings(row: SettingsRow | null): AuditItem {
-  const issues: string[] = []
-  if (!row) issues.push('Missing site settings row')
-  if (!row?.brand_name?.trim()) issues.push('Missing brand name')
-  if (!row?.phone_primary?.trim()) issues.push('Missing primary phone number')
-  if (!row?.phone_display?.trim()) issues.push('Missing display phone number')
-  if (!row?.service_hours?.trim()) issues.push('Missing service hours')
-  if (row && 'email' in row && !(row.email || '').trim()) issues.push('Email is empty')
-  return makeAuditItem({ type: 'settings', title: 'Global site settings', slug: 'settings', href: '/admin/settings', previewHref: '/en', issues })
-}
-
-function auditService(row: ServiceRow): AuditItem {
-  const issues: string[] = []
-  const locale = row.locale
-  const slug = row.slug || ''
-  if (!row.is_published) issues.push('Draft: page is not published')
-  if (!slug.trim()) issues.push('Missing slug')
-  if (!row.title?.trim()) issues.push('Missing title')
-  if ((row.excerpt || '').trim().length < 80) issues.push('Excerpt is too short for a clear service card')
-  if ((row.intro || '').trim().length < 350) issues.push('Intro should explain service, vehicle info, pricing factors, limits, and next steps')
-  if (!(row.seo_title || '').trim()) issues.push('Missing SEO title')
-  if ((row.seo_description || '').trim().length < 120) issues.push('SEO description is missing or too short')
-  return makeAuditItem({ type: 'service', locale, title: row.title || slug || 'Untitled service', slug, href: '/admin/services', previewHref: slug ? `/${locale}/services/${slug}` : undefined, issues })
-}
-
-function auditArea(row: AreaRow): AuditItem {
-  const issues: string[] = []
-  const locale = row.locale
-  const slug = row.slug || ''
-  const highlights = Array.isArray(row.highlights) ? row.highlights : []
-  const supported = Array.isArray(row.supported_services) ? row.supported_services : []
-  if (!row.is_published) issues.push('Draft: page is not published')
-  if (!slug.trim()) issues.push('Missing slug')
-  if (!row.city?.trim()) issues.push('Missing city')
-  if (!row.title?.trim()) issues.push('Missing title')
-  if ((row.intro || '').trim().length < 300) issues.push('Intro should explain local coverage, service availability, and customer preparation')
-  if (highlights.length < 3) issues.push('Add at least 3 area highlights')
-  if (supported.length < 4) issues.push('Add at least 4 supported services')
-  if (!(row.seo_title || '').trim()) issues.push('Missing SEO title')
-  if ((row.seo_description || '').trim().length < 120) issues.push('SEO description is missing or too short')
-  return makeAuditItem({ type: 'area', locale, title: row.title || row.city || slug || 'Untitled area', slug, href: '/admin/areas', previewHref: slug ? `/${locale}/areas/${slug}` : undefined, issues })
-}
-
-function auditContentBlocks(rows: ContentBlockRow[], tableError: string): AuditItem[] {
-  if (tableError) {
-    return [makeAuditItem({ type: 'content-block', title: 'Content Blocks table', slug: 'site_content_blocks', href: '/admin/content-blocks', previewHref: '/admin/content-blocks', issues: [`Content blocks unavailable: ${tableError}`, 'Apply the site_content_blocks migration before using editable content sections.'] })]
-  }
-
-  const items: AuditItem[] = []
-
-  for (const locale of locales) {
-    for (const requirement of requiredContentBlocks) {
-      const matching = rows.filter((row) => row.locale === locale && row.page_key === requirement.pageKey && row.is_published !== false)
-      const slots = new Set(matching.map((row) => row.slot).filter(Boolean) as string[])
-      const issues: string[] = []
-
-      for (const slot of requirement.slots) {
-        if (!slots.has(slot)) issues.push(`Missing content block slot: ${requirement.pageKey} / ${slot}`)
-      }
-
-      for (const block of matching) {
-        const slot = block.slot || 'unknown'
-        const blockItems = Array.isArray(block.items) ? block.items : []
-        const hasContent = Boolean(block.eyebrow?.trim() || block.title?.trim() || block.body?.trim() || blockItems.length || block.cta_label?.trim())
-        if (!hasContent) issues.push(`Empty published block: ${requirement.pageKey} / ${slot}`)
-        if (block.cta_label?.trim() && !block.cta_href?.trim()) issues.push(`CTA label without CTA href: ${requirement.pageKey} / ${slot}`)
-        if (block.cta_href?.trim() && !isSafeHref(block.cta_href)) issues.push(`CTA href should be internal, tel, mailto, or https: ${requirement.pageKey} / ${slot}`)
-      }
-
-      items.push(makeAuditItem({ type: 'content-block', locale, title: `${requirement.label} ${locale.toUpperCase()}`, slug: requirement.pageKey, href: '/admin/content-blocks', previewHref: requirement.preview(locale), issues }))
-    }
-  }
-
-  return items
-}
-
-function isSafeHref(href: string) {
-  return href.startsWith('/') || href.startsWith('#') || href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('https://')
-}
-
-function makeAuditItem(input: Omit<AuditItem, 'score' | 'level'>): AuditItem {
-  const score = Math.max(0, 100 - input.issues.length * 14)
-  const level: IssueLevel = input.issues.length === 0 ? 'good' : input.issues.length <= 3 ? 'warn' : 'danger'
-  return { ...input, score, level }
-}
-
-function IssueColumn({ title, items, tone }: { title: string; items: AuditItem[]; tone: IssueLevel }) {
-  const color = getToneColor(tone)
-  return <div style={{ ...issueColumnStyle, borderColor: `${color}44` }}><h3 style={{ ...columnTitleStyle, color }}>{title}</h3><div style={{ display: 'grid', gap: 10, marginTop: 12 }}>{items.map((item) => <a key={`${item.type}-${item.locale ?? 'global'}-${item.slug}`} href={item.href} style={miniIssueStyle}><strong style={{ display: 'block', color: '#F5F7FB', fontSize: 14 }}>{item.title}</strong><span style={{ display: 'block', color: '#95A0B8', fontSize: 12, lineHeight: 1.45, marginTop: 4 }}>{item.issues[0] || 'No obvious content issues found.'}</span></a>)}{!items.length ? <div style={miniEmptyStyle}>No items.</div> : null}</div></div>
-}
-
-function AuditCard({ item }: { item: AuditItem }) {
-  const color = getToneColor(item.level)
-  const typeLabel = item.locale ? `${item.type} · ${item.locale.toUpperCase()}` : item.type
-  return <article style={{ ...cardStyle, borderColor: `${color}55` }}><div style={cardTopStyle}><span style={{ ...pillStyle, color, borderColor: `${color}55`, background: `${color}14` }}>{item.level}</span><span style={scoreStyle}>{item.score}/100</span></div><p style={smallCapsStyle}>{typeLabel}</p><h3 style={cardTitleStyle}>{item.title}</h3>{item.slug ? <p style={slugStyle}>{item.previewHref || item.slug}</p> : null}{item.issues.length ? <ul style={issueListStyle}>{item.issues.map((issue) => <li key={issue}>{issue}</li>)}</ul> : <p style={goodTextStyle}>No obvious content issues found.</p>}<div style={cardActionsStyle}><a href={item.href} style={inlineLinkStyle}>Edit content →</a>{item.previewHref ? <a href={item.previewHref} target="_blank" rel="noreferrer" style={inlineLinkStyle}>Preview →</a> : null}</div></article>
-}
-
-function Stat({ title, value, note, tone = 'neutral' }: { title: string; value: string; note: string; tone?: 'neutral' | IssueLevel }) {
-  const color = tone === 'neutral' ? '#A9D0FF' : getToneColor(tone)
-  return <div style={{ ...statStyle, borderColor: `${color}44` }}><p style={{ ...smallCapsStyle, color }}>{title}</p><strong style={statValueStyle}>{value}</strong><p style={mutedSmallStyle}>{note}</p></div>
-}
-
-function getToneColor(tone: IssueLevel) {
-  return tone === 'good' ? '#2DE2E6' : tone === 'warn' ? '#D6A85F' : '#FF9A9A'
-}
+function auditHome(row: HomeRow & { locale: ActiveLocale }): AuditItem { const issues: string[] = []; const locale = row.locale; if (!row.hero_title?.trim()) issues.push('Missing hero title'); if ((row.hero_subtitle || '').trim().length < 80) issues.push('Hero subtitle should clearly explain service, location, and value'); if (!row.hero_primary_cta?.trim()) issues.push('Missing primary CTA label'); if (!row.hero_secondary_cta?.trim()) issues.push('Missing secondary CTA label'); if (!row.emergency_title?.trim()) issues.push('Missing emergency title'); if ((row.emergency_text || '').trim().length < 80) issues.push('Emergency text should explain urgency, availability, and next step'); if (!row.contact_title?.trim()) issues.push('Missing contact title'); if ((row.contact_text || '').trim().length < 80) issues.push('Contact text should explain what customer should submit'); if (!row.faq_title?.trim()) issues.push('Missing FAQ title'); return makeAuditItem({ type: 'home', locale, title: `Home content ${locale.toUpperCase()}`, slug: locale, href: '/admin/home', previewHref: `/${locale}`, issues }) }
+function auditSettings(row: SettingsRow | null): AuditItem { const issues: string[] = []; if (!row) issues.push('Missing site settings row'); if (!row?.brand_name?.trim()) issues.push('Missing brand name'); if (!row?.phone_primary?.trim()) issues.push('Missing primary phone number'); if (!row?.phone_display?.trim()) issues.push('Missing display phone number'); if (!row?.service_hours?.trim()) issues.push('Missing service hours'); if (row && 'email' in row && !(row.email || '').trim()) issues.push('Email is empty'); return makeAuditItem({ type: 'settings', title: 'Global site settings', slug: 'settings', href: '/admin/settings', previewHref: '/en', issues }) }
+function auditService(row: ServiceRow & { locale: ActiveLocale }): AuditItem { const issues: string[] = []; const locale = row.locale; const slug = row.slug || ''; if (!row.is_published) issues.push('Draft: page is not published'); if (!slug.trim()) issues.push('Missing slug'); if (!row.title?.trim()) issues.push('Missing title'); if ((row.excerpt || '').trim().length < 80) issues.push('Excerpt is too short for a clear service card'); if ((row.intro || '').trim().length < 350) issues.push('Intro should explain service, vehicle info, pricing factors, limits, and next steps'); if (!(row.seo_title || '').trim()) issues.push('Missing SEO title'); if ((row.seo_description || '').trim().length < 120) issues.push('SEO description is missing or too short'); return makeAuditItem({ type: 'service', locale, title: row.title || slug || 'Untitled service', slug, href: '/admin/services', previewHref: slug ? `/${locale}/services/${slug}` : undefined, issues }) }
+function auditArea(row: AreaRow & { locale: ActiveLocale }): AuditItem { const issues: string[] = []; const locale = row.locale; const slug = row.slug || ''; const highlights = Array.isArray(row.highlights) ? row.highlights : []; const supported = Array.isArray(row.supported_services) ? row.supported_services : []; if (!row.is_published) issues.push('Draft: page is not published'); if (!slug.trim()) issues.push('Missing slug'); if (!row.city?.trim()) issues.push('Missing city'); if (!row.title?.trim()) issues.push('Missing title'); if ((row.intro || '').trim().length < 300) issues.push('Intro should explain local coverage, service availability, and customer preparation'); if (highlights.length < 3) issues.push('Add at least 3 area highlights'); if (supported.length < 4) issues.push('Add at least 4 supported services'); if (!(row.seo_title || '').trim()) issues.push('Missing SEO title'); if ((row.seo_description || '').trim().length < 120) issues.push('SEO description is missing or too short'); return makeAuditItem({ type: 'area', locale, title: row.title || row.city || slug || 'Untitled area', slug, href: '/admin/areas', previewHref: slug ? `/${locale}/areas/${slug}` : undefined, issues }) }
+function auditContentBlocks(rows: Array<ContentBlockRow & { locale: ActiveLocale }>, tableError: string): AuditItem[] { if (tableError) return [makeAuditItem({ type: 'content-block', title: 'Content Blocks table', slug: 'site_content_blocks', href: '/admin/content-blocks', previewHref: '/admin/content-blocks', issues: [`Content blocks unavailable: ${tableError}`, 'Apply the site_content_blocks migration before using editable content sections.'] })]; const items: AuditItem[] = []; for (const locale of activeLocales) { for (const requirement of requiredContentBlocks) { const matching = rows.filter((row) => row.locale === locale && row.page_key === requirement.pageKey && row.is_published !== false); const slots = new Set(matching.map((row) => row.slot).filter(Boolean) as string[]); const issues: string[] = []; for (const slot of requirement.slots) if (!slots.has(slot)) issues.push(`Missing content block slot: ${requirement.pageKey} / ${slot}`); for (const block of matching) { const slot = block.slot || 'unknown'; const blockItems = Array.isArray(block.items) ? block.items : []; const hasContent = Boolean(block.eyebrow?.trim() || block.title?.trim() || block.body?.trim() || blockItems.length || block.cta_label?.trim()); if (!hasContent) issues.push(`Empty published block: ${requirement.pageKey} / ${slot}`); if (block.cta_label?.trim() && !block.cta_href?.trim()) issues.push(`CTA label without CTA href: ${requirement.pageKey} / ${slot}`); if (block.cta_href?.trim() && !isSafeHref(block.cta_href)) issues.push(`CTA href should be internal, tel, mailto, or https: ${requirement.pageKey} / ${slot}`) } items.push(makeAuditItem({ type: 'content-block', locale, title: `${requirement.label} ${locale.toUpperCase()}`, slug: requirement.pageKey, href: '/admin/content-blocks', previewHref: requirement.preview(locale), issues })) } } return items }
+function isSafeHref(href: string) { return href.startsWith('/') || href.startsWith('#') || href.startsWith('tel:') || href.startsWith('mailto:') || href.startsWith('https://') }
+function makeAuditItem(input: Omit<AuditItem, 'score' | 'level'>): AuditItem { const score = Math.max(0, 100 - input.issues.length * 14); const level: IssueLevel = input.issues.length === 0 ? 'good' : input.issues.length <= 3 ? 'warn' : 'danger'; return { ...input, score, level } }
+function IssueColumn({ title, items, tone }: { title: string; items: AuditItem[]; tone: IssueLevel }) { const color = getToneColor(tone); return <div style={{ ...issueColumnStyle, borderColor: `${color}44` }}><h3 style={{ ...columnTitleStyle, color }}>{title}</h3><div style={{ display: 'grid', gap: 10, marginTop: 12 }}>{items.map((item) => <a key={`${item.type}-${item.locale ?? 'global'}-${item.slug}`} href={item.href} style={miniIssueStyle}><strong style={{ display: 'block', color: '#F5F7FB', fontSize: 14 }}>{item.title}</strong><span style={{ display: 'block', color: '#95A0B8', fontSize: 12, lineHeight: 1.45, marginTop: 4 }}>{item.issues[0] || 'No obvious content issues found.'}</span></a>)}{!items.length ? <div style={miniEmptyStyle}>No items.</div> : null}</div></div> }
+function AuditCard({ item }: { item: AuditItem }) { const color = getToneColor(item.level); const typeLabel = item.locale ? `${item.type} · ${item.locale.toUpperCase()}` : item.type; return <article style={{ ...cardStyle, borderColor: `${color}55` }}><div style={cardTopStyle}><span style={{ ...pillStyle, color, borderColor: `${color}55`, background: `${color}14` }}>{item.level}</span><span style={scoreStyle}>{item.score}/100</span></div><p style={smallCapsStyle}>{typeLabel}</p><h3 style={cardTitleStyle}>{item.title}</h3>{item.slug ? <p style={slugStyle}>{item.previewHref || item.slug}</p> : null}{item.issues.length ? <ul style={issueListStyle}>{item.issues.map((issue) => <li key={issue}>{issue}</li>)}</ul> : <p style={goodTextStyle}>No obvious content issues found.</p>}<div style={cardActionsStyle}><a href={item.href} style={inlineLinkStyle}>Edit content →</a>{item.previewHref ? <a href={item.previewHref} target="_blank" rel="noreferrer" style={inlineLinkStyle}>Preview →</a> : null}</div></article> }
+function Stat({ title, value, note, tone = 'neutral' }: { title: string; value: string; note: string; tone?: 'neutral' | IssueLevel }) { const color = tone === 'neutral' ? '#A9D0FF' : getToneColor(tone); return <div style={{ ...statStyle, borderColor: `${color}44` }}><p style={{ ...smallCapsStyle, color }}>{title}</p><strong style={statValueStyle}>{value}</strong><p style={mutedSmallStyle}>{note}</p></div> }
+function getToneColor(tone: IssueLevel) { return tone === 'good' ? '#2DE2E6' : tone === 'warn' ? '#D6A85F' : '#FF9A9A' }
 
 const pageStyle: CSSProperties = { position: 'relative', display: 'grid', gap: 18, paddingBottom: 24 }
 const heroStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, alignItems: 'end', border: '1px solid rgba(77,162,255,0.22)', borderRadius: 30, padding: 24, background: 'radial-gradient(circle at 12% 0%, rgba(77,162,255,0.20), transparent 320px), linear-gradient(145deg, rgba(17,25,46,0.78), rgba(3,5,11,0.86))', boxShadow: '0 32px 110px rgba(0,0,0,0.36)' }
