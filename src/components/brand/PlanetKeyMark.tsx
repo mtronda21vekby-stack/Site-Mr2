@@ -1,6 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
+
+type PlanetKeyStyle = CSSProperties & {
+  '--planet-scroll-rotate': string
+  '--planet-scroll-drift': string
+}
 
 export default function PlanetKeyMark() {
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -27,32 +32,21 @@ export default function PlanetKeyMark() {
 
   const rotate = scrollProgress * 54
   const drift = scrollProgress * -42
+  const style: PlanetKeyStyle = {
+    '--planet-scroll-rotate': `${rotate}deg`,
+    '--planet-scroll-drift': `${drift}px`,
+  }
 
   return (
-    <div className="planet-key-mark" style={{ '--planet-scroll-rotate': `${rotate}deg`, '--planet-scroll-drift': `${drift}px` } as React.CSSProperties} aria-hidden="true">
+    <div className="planet-key-mark" style={style} aria-hidden="true">
       <div className="planet-key-mark__stage">
         <div className="planet-key-mark__halo" />
         <svg className="planet-key-mark__svg" viewBox="0 0 620 620">
           <defs>
-            <linearGradient id="pkmBrass" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#FFE0A1" />
-              <stop offset="38%" stopColor="#A96E2D" />
-              <stop offset="100%" stopColor="#F5C86D" />
-            </linearGradient>
-            <linearGradient id="pkmSteel" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.24)" />
-              <stop offset="48%" stopColor="rgba(77,162,255,0.52)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0.06)" />
-            </linearGradient>
-            <radialGradient id="pkmCore" cx="38%" cy="26%" r="74%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.16)" />
-              <stop offset="38%" stopColor="rgba(77,162,255,0.08)" />
-              <stop offset="100%" stopColor="rgba(0,0,0,0.08)" />
-            </radialGradient>
-            <filter id="pkmGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="7" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
+            <linearGradient id="pkmBrass" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#FFE0A1" /><stop offset="38%" stopColor="#A96E2D" /><stop offset="100%" stopColor="#F5C86D" /></linearGradient>
+            <linearGradient id="pkmSteel" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="rgba(255,255,255,0.24)" /><stop offset="48%" stopColor="rgba(77,162,255,0.52)" /><stop offset="100%" stopColor="rgba(255,255,255,0.06)" /></linearGradient>
+            <radialGradient id="pkmCore" cx="38%" cy="26%" r="74%"><stop offset="0%" stopColor="rgba(255,255,255,0.16)" /><stop offset="38%" stopColor="rgba(77,162,255,0.08)" /><stop offset="100%" stopColor="rgba(0,0,0,0.08)" /></radialGradient>
+            <filter id="pkmGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
           </defs>
 
           <g className="planet-key-mark__outer">
