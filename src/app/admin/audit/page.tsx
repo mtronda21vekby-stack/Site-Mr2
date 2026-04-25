@@ -57,7 +57,7 @@ export default function AdminAuditPage() {
         const errors = [servicesResult.error, areasResult.error, homeResult.error, settingsResult.error].filter(Boolean)
         if (errors.length) throw new Error(errors.map((error: any) => error.message).join(' / '))
 
-        let contentBlocks: ContentBlockRow[] = []
+        let contentBlocks: Array<ContentBlockRow & { locale: ActiveLocale }> = []
         let contentBlocksError = ''
         try {
           const contentBlocksResult = await (supabase.from('site_content_blocks') as any)
@@ -120,9 +120,7 @@ export default function AdminAuditPage() {
           <a href="/en" target="_blank" rel="noreferrer" style={primaryLinkStyle}>View site</a>
         </div>
       </section>
-
       {errorMessage ? <div style={errorStyle}>{errorMessage}</div> : null}
-
       <div style={statsGridStyle}>
         <Stat title="Site Score" value={`${siteScore}/100`} note="Average score across active EN/ES audited content." tone={siteScore >= 85 ? 'good' : siteScore >= 65 ? 'warn' : 'danger'} />
         <Stat title="Audited items" value={String(items.length)} note="Home, settings, services, areas, footer, legal, and content blocks." />
@@ -130,7 +128,6 @@ export default function AdminAuditPage() {
         <Stat title="Warnings" value={String(warningItems.length)} note="Needs improvement." tone="warn" />
         <Stat title="Critical" value={String(criticalItems.length)} note="Fix before Ads push." tone="danger" />
       </div>
-
       <section style={panelStyle}>
         <div style={filterRowStyle}>
           <div><p style={eyebrowStyle}>Priority fixes</p><h2 style={sectionTitleStyle}>Critical / Warnings / Good</h2></div>
@@ -148,24 +145,15 @@ export default function AdminAuditPage() {
           <IssueColumn title="Good" items={goodItems.slice(0, 8)} tone="good" />
         </div>
       </section>
-
       <section style={panelStyle}>
         <div style={filterRowStyle}>
           <div><p style={eyebrowStyle}>Detailed checks</p><h2 style={sectionTitleStyle}>Page-level issues</h2></div>
           <div style={filterControlsStyle}>
             <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as 'all' | AuditType)} style={selectStyle}>
-              <option value="all">All types</option>
-              <option value="home">Home</option>
-              <option value="settings">Settings</option>
-              <option value="service">Services</option>
-              <option value="area">Areas</option>
-              <option value="content-block">Content Blocks</option>
+              <option value="all">All types</option><option value="home">Home</option><option value="settings">Settings</option><option value="service">Services</option><option value="area">Areas</option><option value="content-block">Content Blocks</option>
             </select>
             <select value={filter} onChange={(e) => setFilter(e.target.value as 'all' | IssueLevel)} style={selectStyle}>
-              <option value="all">All statuses</option>
-              <option value="danger">Critical</option>
-              <option value="warn">Warnings</option>
-              <option value="good">Good</option>
+              <option value="all">All statuses</option><option value="danger">Critical</option><option value="warn">Warnings</option><option value="good">Good</option>
             </select>
           </div>
         </div>
@@ -177,7 +165,6 @@ export default function AdminAuditPage() {
 
 function isActiveLocale(locale: Locale): locale is ActiveLocale { return (ACTIVE_LOCALES as readonly string[]).includes(locale) }
 function filterActiveRows<T extends { locale: Locale }>(rows: T[]) { return rows.filter((row): row is T & { locale: ActiveLocale } => isActiveLocale(row.locale)) }
-
 function auditHome(row: HomeRow & { locale: ActiveLocale }): AuditItem { const issues: string[] = []; const locale = row.locale; if (!row.hero_title?.trim()) issues.push('Missing hero title'); if ((row.hero_subtitle || '').trim().length < 80) issues.push('Hero subtitle should clearly explain service, location, and value'); if (!row.hero_primary_cta?.trim()) issues.push('Missing primary CTA label'); if (!row.hero_secondary_cta?.trim()) issues.push('Missing secondary CTA label'); if (!row.emergency_title?.trim()) issues.push('Missing emergency title'); if ((row.emergency_text || '').trim().length < 80) issues.push('Emergency text should explain urgency, availability, and next step'); if (!row.contact_title?.trim()) issues.push('Missing contact title'); if ((row.contact_text || '').trim().length < 80) issues.push('Contact text should explain what customer should submit'); if (!row.faq_title?.trim()) issues.push('Missing FAQ title'); return makeAuditItem({ type: 'home', locale, title: `Home content ${locale.toUpperCase()}`, slug: locale, href: '/admin/home', previewHref: `/${locale}`, issues }) }
 function auditSettings(row: SettingsRow | null): AuditItem { const issues: string[] = []; if (!row) issues.push('Missing site settings row'); if (!row?.brand_name?.trim()) issues.push('Missing brand name'); if (!row?.phone_primary?.trim()) issues.push('Missing primary phone number'); if (!row?.phone_display?.trim()) issues.push('Missing display phone number'); if (!row?.service_hours?.trim()) issues.push('Missing service hours'); if (row && 'email' in row && !(row.email || '').trim()) issues.push('Email is empty'); return makeAuditItem({ type: 'settings', title: 'Global site settings', slug: 'settings', href: '/admin/settings', previewHref: '/en', issues }) }
 function auditService(row: ServiceRow & { locale: ActiveLocale }): AuditItem { const issues: string[] = []; const locale = row.locale; const slug = row.slug || ''; if (!row.is_published) issues.push('Draft: page is not published'); if (!slug.trim()) issues.push('Missing slug'); if (!row.title?.trim()) issues.push('Missing title'); if ((row.excerpt || '').trim().length < 80) issues.push('Excerpt is too short for a clear service card'); if ((row.intro || '').trim().length < 350) issues.push('Intro should explain service, vehicle info, pricing factors, limits, and next steps'); if (!(row.seo_title || '').trim()) issues.push('Missing SEO title'); if ((row.seo_description || '').trim().length < 120) issues.push('SEO description is missing or too short'); return makeAuditItem({ type: 'service', locale, title: row.title || slug || 'Untitled service', slug, href: '/admin/services', previewHref: slug ? `/${locale}/services/${slug}` : undefined, issues }) }
@@ -189,7 +176,6 @@ function IssueColumn({ title, items, tone }: { title: string; items: AuditItem[]
 function AuditCard({ item }: { item: AuditItem }) { const color = getToneColor(item.level); const typeLabel = item.locale ? `${item.type} · ${item.locale.toUpperCase()}` : item.type; return <article style={{ ...cardStyle, borderColor: `${color}55` }}><div style={cardTopStyle}><span style={{ ...pillStyle, color, borderColor: `${color}55`, background: `${color}14` }}>{item.level}</span><span style={scoreStyle}>{item.score}/100</span></div><p style={smallCapsStyle}>{typeLabel}</p><h3 style={cardTitleStyle}>{item.title}</h3>{item.slug ? <p style={slugStyle}>{item.previewHref || item.slug}</p> : null}{item.issues.length ? <ul style={issueListStyle}>{item.issues.map((issue) => <li key={issue}>{issue}</li>)}</ul> : <p style={goodTextStyle}>No obvious content issues found.</p>}<div style={cardActionsStyle}><a href={item.href} style={inlineLinkStyle}>Edit content →</a>{item.previewHref ? <a href={item.previewHref} target="_blank" rel="noreferrer" style={inlineLinkStyle}>Preview →</a> : null}</div></article> }
 function Stat({ title, value, note, tone = 'neutral' }: { title: string; value: string; note: string; tone?: 'neutral' | IssueLevel }) { const color = tone === 'neutral' ? '#A9D0FF' : getToneColor(tone); return <div style={{ ...statStyle, borderColor: `${color}44` }}><p style={{ ...smallCapsStyle, color }}>{title}</p><strong style={statValueStyle}>{value}</strong><p style={mutedSmallStyle}>{note}</p></div> }
 function getToneColor(tone: IssueLevel) { return tone === 'good' ? '#2DE2E6' : tone === 'warn' ? '#D6A85F' : '#FF9A9A' }
-
 const pageStyle: CSSProperties = { position: 'relative', display: 'grid', gap: 18, paddingBottom: 24 }
 const heroStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, alignItems: 'end', border: '1px solid rgba(77,162,255,0.22)', borderRadius: 30, padding: 24, background: 'radial-gradient(circle at 12% 0%, rgba(77,162,255,0.20), transparent 320px), linear-gradient(145deg, rgba(17,25,46,0.78), rgba(3,5,11,0.86))', boxShadow: '0 32px 110px rgba(0,0,0,0.36)' }
 const panelStyle: CSSProperties = { border: '1px solid rgba(255,255,255,0.10)', borderRadius: 26, padding: 18, background: 'linear-gradient(145deg, rgba(11,16,32,0.78), rgba(5,7,11,0.82))', boxShadow: '0 28px 90px rgba(0,0,0,0.26)' }
