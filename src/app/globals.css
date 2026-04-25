@@ -39,9 +39,9 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   isolation: isolate;
   overflow-x: clip;
   background:
-    radial-gradient(circle at 50% -10%, rgba(77, 162, 255, 0.08), transparent 34rem),
-    radial-gradient(circle at 100% 18%, rgba(214, 168, 95, 0.055), transparent 28rem),
-    linear-gradient(180deg, rgba(2, 4, 10, 0.68), rgba(2, 4, 10, 0.98));
+    radial-gradient(circle at 50% -10%, rgba(77, 162, 255, 0.1), transparent 34rem),
+    radial-gradient(circle at 100% 18%, rgba(214, 168, 95, 0.075), transparent 28rem),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.62), rgba(2, 4, 10, 0.98));
 }
 
 .cinematic-shell::before {
@@ -51,8 +51,8 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   z-index: -20;
   pointer-events: none;
   background:
-    radial-gradient(circle at 12% 14%, rgba(45, 226, 230, 0.055), transparent 22rem),
-    radial-gradient(circle at 88% 30%, rgba(214, 168, 95, 0.055), transparent 26rem),
+    radial-gradient(circle at 12% 14%, rgba(45, 226, 230, 0.07), transparent 22rem),
+    radial-gradient(circle at 88% 30%, rgba(214, 168, 95, 0.07), transparent 26rem),
     linear-gradient(180deg, #02040a 0%, #05070b 52%, #02040a 100%);
 }
 
@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   inset: 0;
   z-index: -5;
   pointer-events: none;
-  opacity: 0.22;
+  opacity: 0.18;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
@@ -100,12 +100,12 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   --planet-scroll-drift: 0px;
   position: absolute;
   left: 50%;
-  top: clamp(3rem, 8vh, 6rem);
-  width: min(78vw, 760px);
+  top: clamp(2.5rem, 7vh, 5rem);
+  width: min(82vw, 820px);
   aspect-ratio: 1;
   transform: translate3d(-50%, var(--planet-scroll-drift), 0);
-  opacity: 0.42;
-  filter: saturate(1.05) contrast(1.04);
+  opacity: 0.58;
+  filter: saturate(1.28) contrast(1.1) brightness(1.18) drop-shadow(0 0 34px rgba(77, 162, 255, 0.18)) drop-shadow(0 0 22px rgba(214, 168, 95, 0.1));
 }
 
 .planet-key-mark__stage {
@@ -118,13 +118,13 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 
 .planet-key-mark__halo {
   position: absolute;
-  inset: 12%;
+  inset: 7%;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 50% 48%, rgba(77, 162, 255, 0.18), transparent 36%),
-    radial-gradient(circle at 62% 38%, rgba(214, 168, 95, 0.08), transparent 32%);
-  filter: blur(28px);
-  opacity: 0.78;
+    radial-gradient(circle at 50% 48%, rgba(77, 162, 255, 0.34), transparent 38%),
+    radial-gradient(circle at 62% 38%, rgba(214, 168, 95, 0.18), transparent 34%);
+  filter: blur(24px);
+  opacity: 0.98;
 }
 
 .planet-key-mark__svg {
@@ -134,27 +134,15 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   overflow: visible;
 }
 
-.planet-key-mark__outer { transform-origin: 310px 310px; animation: pkm-spin 34s linear infinite; }
-.planet-key-mark__latitudes { transform-origin: 310px 310px; animation: pkm-spin 26s linear infinite reverse; }
-.planet-key-mark__longitudes { transform-origin: 310px 310px; animation: pkm-spin 42s linear infinite; }
-.planet-key-mark__orbit { transform-origin: 310px 310px; animation: pkm-orbit 18s linear infinite; opacity: 0.82; }
+.planet-key-mark__outer { transform-origin: 310px 310px; animation: pkm-spin 34s linear infinite; opacity: 1; }
+.planet-key-mark__latitudes { transform-origin: 310px 310px; animation: pkm-spin 26s linear infinite reverse; opacity: 1; }
+.planet-key-mark__longitudes { transform-origin: 310px 310px; animation: pkm-spin 42s linear infinite; opacity: 1; }
+.planet-key-mark__orbit { transform-origin: 310px 310px; animation: pkm-orbit 18s linear infinite; opacity: 1; }
 .planet-key-mark__key { transform-origin: 310px 310px; animation: pkm-key-float 7s ease-in-out infinite; }
 
-@keyframes pkm-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pkm-orbit {
-  from { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.025); }
-  to { transform: rotate(360deg) scale(1); }
-}
-
-@keyframes pkm-key-float {
-  0%, 100% { transform: translate3d(0, 0, 22px) rotate(-2deg); }
-  50% { transform: translate3d(4px, -8px, 38px) rotate(1.5deg); }
-}
+@keyframes pkm-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pkm-orbit { from { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.025); } to { transform: rotate(360deg) scale(1); } }
+@keyframes pkm-key-float { 0%, 100% { transform: translate3d(0, 0, 22px) rotate(-2deg); } 50% { transform: translate3d(4px, -8px, 38px) rotate(1.5deg); } }
 
 @keyframes planet-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes planet-rotate-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
@@ -165,20 +153,17 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 @keyframes premium-orbit-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
 @media (max-width: 767px) {
-  .cinematic-shell::after { opacity: 0.14; background-size: 100% 4px, 64px 64px; }
+  .cinematic-shell::after { opacity: 0.12; background-size: 100% 4px, 64px 64px; }
   .planet-key-mark {
-    top: 6rem;
-    width: 138vw;
-    opacity: 0.24;
+    top: 5.5rem;
+    width: 145vw;
+    opacity: 0.36;
+    filter: saturate(1.18) contrast(1.08) brightness(1.12) drop-shadow(0 0 24px rgba(77, 162, 255, 0.14));
   }
   .planet-key-mark__stage { transform: perspective(900px) rotateX(62deg) rotateZ(calc(-10deg + var(--planet-scroll-rotate))); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-  }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
   .planet-key-mark { transform: translate3d(-50%, 0, 0); }
 }
