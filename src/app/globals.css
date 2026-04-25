@@ -71,14 +71,30 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 }
 
 .premium-panel {
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.028)),
-    rgba(6, 12, 24, 0.62);
+    linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.075) 38%, rgba(255,255,255,0.035) 100%),
+    rgba(9, 16, 30, 0.38);
   box-shadow:
-    0 30px 100px rgba(0, 0, 0, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(22px);
+    0 28px 90px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(30px) saturate(1.45);
+  -webkit-backdrop-filter: blur(30px) saturate(1.45);
+}
+
+.premium-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,0.22), transparent 23%, transparent 70%, rgba(255,255,255,0.065)),
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,0.16), transparent 28rem);
+  opacity: 0.62;
+  mix-blend-mode: screen;
 }
 
 .premium-hairline { position: relative; }
@@ -90,9 +106,10 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   border-radius: inherit;
   padding: 1px;
   pointer-events: none;
-  background: linear-gradient(135deg, rgba(77, 162, 255, 0.55), rgba(255, 255, 255, 0.06), rgba(214, 168, 95, 0.34));
+  background: linear-gradient(135deg, rgba(255,255,255,0.72), rgba(77, 162, 255, 0.42), rgba(214, 168, 95, 0.38), rgba(255,255,255,0.16));
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
+  z-index: 1;
 }
 
 .planet-key-mark {
@@ -127,13 +144,7 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   opacity: 0.98;
 }
 
-.planet-key-mark__svg {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
+.planet-key-mark__svg { position: relative; width: 100%; height: 100%; overflow: visible; }
 .planet-key-mark__outer { transform-origin: 310px 310px; animation: pkm-spin 34s linear infinite; opacity: 1; }
 .planet-key-mark__latitudes { transform-origin: 310px 310px; animation: pkm-spin 26s linear infinite reverse; opacity: 1; }
 .planet-key-mark__longitudes { transform-origin: 310px 310px; animation: pkm-spin 42s linear infinite; opacity: 1; }
@@ -154,6 +165,13 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 
 @media (max-width: 767px) {
   .cinematic-shell::after { opacity: 0.12; background-size: 100% 4px, 64px 64px; }
+  .premium-panel {
+    backdrop-filter: blur(22px) saturate(1.28);
+    -webkit-backdrop-filter: blur(22px) saturate(1.28);
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.03) 100%),
+      rgba(8, 14, 26, 0.52);
+  }
   .planet-key-mark {
     top: 5.5rem;
     width: 145vw;
