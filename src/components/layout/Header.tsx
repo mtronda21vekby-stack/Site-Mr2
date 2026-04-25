@@ -61,7 +61,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
             <span className="absolute inset-1 rounded-2xl border border-white/12" />
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-base font-black tracking-[-0.03em] text-text sm:text-lg">Planetlocksmiths</span>
+            <span className="notranslate block truncate text-base font-black tracking-[-0.03em] text-text sm:text-lg" translate="no">Planetlocksmiths</span>
             <span className="hidden text-[0.62rem] font-bold uppercase tracking-[0.22em] text-muted sm:block">Mobile auto key response</span>
           </span>
         </Link>
@@ -79,7 +79,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
           <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">
             {labels.request}
           </Link>
-          <a href={`tel:${phonePrimary}`} className="rounded-full bg-accent-blue px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-black shadow-[0_0_30px_rgba(77,162,255,0.28)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110">
+          <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-black shadow-[0_0_30px_rgba(77,162,255,0.28)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no">
             {labels.call} {phoneDisplay}
           </a>
         </div>
@@ -101,7 +101,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
             ))}
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-text" onClick={() => setOpen(false)}>{labels.request}</Link>
-              <a href={`tel:${phonePrimary}`} className="rounded-full bg-accent-blue px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-black">{labels.call}</a>
+              <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-black" translate="no">{labels.call}</a>
             </div>
           </nav>
         </div>
@@ -112,7 +112,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
 
 function LanguageSwitcher({ currentLocale, pathname, isMobile = false }: { currentLocale: ActiveLocale; pathname: string | null; isMobile?: boolean }) {
   return (
-    <div className={`inline-flex items-center rounded-full border border-white/16 bg-white/[0.07] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl ${isMobile ? 'w-full justify-between' : ''}`} aria-label="Language switcher">
+    <div className={`notranslate inline-flex items-center rounded-full border border-white/16 bg-white/[0.07] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl ${isMobile ? 'w-full justify-between' : ''}`} aria-label="Language switcher" translate="no">
       {activeLocales.map((targetLocale) => {
         const isActive = targetLocale === currentLocale
         return (
