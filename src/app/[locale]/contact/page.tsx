@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import ContactSection from '@/components/sections/ContactSection'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -15,6 +17,13 @@ type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+  return buildPageMetadata({ locale: activeLocale, path: '/contact', title: copy.title, description: copy.intro })
+}
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro: string; phone: string; serviceType: string; serviceValue: string; area: string; areaValue: string; sideTitle: string; sideText: string; call: string; request: string }> = {
   en: { eyebrow: 'Contact Planetlocksmiths', title: 'Request mobile automotive locksmith service', intro: 'Use the form below to send vehicle details, location, urgency, and the service needed. For urgent lockouts or active roadside situations, calling may be faster.', phone: 'Phone', serviceType: 'Service type', serviceValue: 'Mobile automotive locksmith', area: 'Common area', areaValue: 'Philadelphia, Pennsylvania and nearby coverage areas', sideTitle: 'What makes the request faster', sideText: 'Vehicle make, model, year, exact location, phone number, and key situation help create a cleaner callback and service path.', call: 'Call', request: 'Request service' },
