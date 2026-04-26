@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getAreasListFromSource,
   getContentBlocksFromSource,
@@ -15,6 +17,13 @@ type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+  return buildPageMetadata({ locale: activeLocale, path: '/areas', title: copy.title, description: copy.intro })
+}
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro: string; call: string; request: string; cardPrefix: string; open: string; empty: string; sideTitle: string; sideText: string; countLabel: string }> = {
   en: { eyebrow: 'Planetlocksmiths / coverage', title: 'Service Areas', intro: 'Mobile automotive locksmith coverage pages help customers understand where service may be available, what support is offered, and what vehicle details are needed before requesting help.', call: 'Call', request: 'Request service', cardPrefix: 'Area', open: 'Open area', empty: 'No published areas yet.', sideTitle: 'Coverage ready', sideText: 'Coverage depends on technician availability, location, distance, vehicle type, parts, timing, and job complexity.', countLabel: 'Published areas' },
