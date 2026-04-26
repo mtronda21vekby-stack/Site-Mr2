@@ -103,7 +103,7 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             ))}
           </div>
 
-          <a href={`tel:${phoneNumber}`} className="notranslate mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-6 py-3 text-sm font-black uppercase tracking-[0.15em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-blue/45 hover:bg-accent-blue/10 sm:w-auto" translate="no">Call instead: {phoneDisplay}</a>
+          <a href={`tel:${phoneNumber}`} className="notranslate mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-6 py-3 text-sm font-black uppercase tracking-[0.15em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-blue/45 hover:bg-accent-blue/10 sm:w-auto" translate="no" aria-label={`Call ${phoneDisplay}`}>Call instead</a>
         </div>
 
         <form onSubmit={handleSubmit} className="premium-panel rounded-[1.75rem] p-5 sm:p-7">
@@ -129,7 +129,7 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
 
             <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
               <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_28px_rgba(77,162,255,0.26)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>
-              <a href={`tel:${phoneNumber}`} className="notranslate inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12" translate="no">Call {phoneDisplay}</a>
+              <a href={`tel:${phoneNumber}`} className="notranslate inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12" translate="no" aria-label={`Call ${phoneDisplay}`}>Call</a>
             </div>
 
             {status === 'success' ? <p className="sm:col-span-2 rounded-2xl border border-accent-gold/25 bg-accent-gold/10 px-4 py-3 text-sm text-accent-gold">Thank you. Your request has been received.</p> : null}
