@@ -8,6 +8,7 @@ import CinematicBackground from '@/components/layout/CinematicBackground'
 import JsonLd from '@/components/seo/JsonLd'
 import ContactSection from '@/components/sections/ContactSection'
 import FaqSection from '@/components/sections/FaqSection'
+import { buildPageMetadata, getSiteUrl } from '@/lib/seo'
 import {
   getAreaPageFromSource,
   getContentBlocksFromSource,
@@ -35,16 +36,11 @@ function toActiveLocale(locale: Locale): ActiveLocale {
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
   const activeLocale = toActiveLocale(locale)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
   const area = await getAreaPageFromSource(activeLocale, slug)
 
   if (!area) return { title: 'Service Area Not Found | Planetlocksmiths', robots: { index: false, follow: false } }
 
-  const url = `${siteUrl}/${activeLocale}/areas/${area.slug}`
-  const title = area.seoTitle || area.title
-  const description = area.seoDescription || area.intro
-
-  return { title, description, alternates: { canonical: url }, openGraph: { type: 'website', url, title, description, siteName: 'Planetlocksmiths' } }
+  return buildPageMetadata({ locale: activeLocale, path: `/areas/${area.slug}`, title: area.seoTitle || area.title, description: area.seoDescription || area.intro })
 }
 
 export default async function AreaDetailPage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
@@ -52,7 +48,7 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
 
   const { locale, slug } = await params
   const activeLocale = toActiveLocale(locale)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
+  const siteUrl = getSiteUrl()
   const [global, home, area, faq, commonBlocks, areaBlocks] = await Promise.all([
     getGlobalSettingsFromSource(),
     getHomeContentFromSource(activeLocale),
