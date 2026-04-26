@@ -8,7 +8,8 @@ import CinematicBackground from '@/components/layout/CinematicBackground'
 import JsonLd from '@/components/seo/JsonLd'
 import ContactSection from '@/components/sections/ContactSection'
 import FaqSection from '@/components/sections/FaqSection'
-import { buildPageMetadata, getSiteUrl } from '@/lib/seo'
+import { buildPageMetadata } from '@/lib/seo'
+import { buildAreaDetailBusinessSchema, buildBreadcrumbSchema, compactSchema } from '@/lib/schema'
 import {
   getAreaPageFromSource,
   getContentBlocksFromSource,
@@ -48,7 +49,6 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
 
   const { locale, slug } = await params
   const activeLocale = toActiveLocale(locale)
-  const siteUrl = getSiteUrl()
   const [global, home, area, faq, commonBlocks, areaBlocks] = await Promise.all([
     getGlobalSettingsFromSource(),
     getHomeContentFromSource(activeLocale),
@@ -63,7 +63,6 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
   const copy = labels[activeLocale]
   const paragraphs = area.intro?.split('\n').filter(Boolean) ?? []
   const location = [area.city, area.state].filter(Boolean).join(', ') || area.title
-  const pageUrl = `${siteUrl}/${activeLocale}/areas/${area.slug}`
   const primaryCta = home.heroPrimaryCta || copy.eyebrow
   const secondaryCta = home.heroSecondaryCta || home.contactTitle || 'Request service'
   const supportedServices = area.supportedServices.length ? area.supportedServices : copy.defaultServices
@@ -76,10 +75,14 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
   const localInfoBlock = blockBySlot.get('local-info')
   const coverageBlock = blockBySlot.get('coverage-notes')
 
-  const jsonLd = [
-    { '@context': 'https://schema.org', '@type': 'AutomotiveBusiness', '@id': `${pageUrl}#business`, name: global.brandName, url: pageUrl, telephone: global.phoneDisplay, description: area.seoDescription || area.intro, areaServed: { '@type': 'City', name: location }, openingHours: global.serviceHours, makesOffer: supportedServices.map((service) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: service, areaServed: location } })) },
-    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/${activeLocale}` }, { '@type': 'ListItem', position: 2, name: 'Service Areas', item: `${siteUrl}/${activeLocale}/areas` }, { '@type': 'ListItem', position: 3, name: area.title, item: pageUrl }] },
-  ]
+  const jsonLd = compactSchema([
+    buildAreaDetailBusinessSchema({ locale: activeLocale, global, area, supportedServices, location }),
+    buildBreadcrumbSchema({ locale: activeLocale, items: [
+      { name: 'Home', path: '' },
+      { name: 'Service Areas', path: '/areas' },
+      { name: area.title, path: `/areas/${area.slug}` },
+    ] }),
+  ])
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
