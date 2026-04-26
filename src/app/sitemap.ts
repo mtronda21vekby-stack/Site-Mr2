@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { ACTIVE_LOCALES } from '@/lib/locales'
 import type { Locale } from '@/lib/content'
+import { getSiteUrl } from '@/lib/seo'
 import {
   getAreasListFromSource,
   getServicesListFromSource,
@@ -10,15 +11,18 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
+  const baseUrl = getSiteUrl()
   const now = new Date()
   const pages: MetadataRoute.Sitemap = []
 
   const staticRoutes = [
     { path: '', priority: 1, changeFrequency: 'daily' as const },
-    { path: '/services', priority: 0.85, changeFrequency: 'weekly' as const },
-    { path: '/areas', priority: 0.85, changeFrequency: 'weekly' as const },
-    { path: '/contact', priority: 0.8, changeFrequency: 'weekly' as const },
+    { path: '/services', priority: 0.9, changeFrequency: 'weekly' as const },
+    { path: '/areas', priority: 0.9, changeFrequency: 'weekly' as const },
+    { path: '/contact', priority: 0.85, changeFrequency: 'weekly' as const },
+    { path: '/about', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/faq', priority: 0.7, changeFrequency: 'weekly' as const },
+    { path: '/reviews', priority: 0.68, changeFrequency: 'weekly' as const },
     { path: '/privacy', priority: 0.45, changeFrequency: 'monthly' as const },
     { path: '/terms', priority: 0.45, changeFrequency: 'monthly' as const },
   ]
@@ -48,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           url: `${baseUrl}/${locale}/services/${service.slug}`,
           lastModified: now,
           changeFrequency: 'weekly',
-          priority: 0.78,
+          priority: 0.82,
         })
       }
 
@@ -59,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           url: `${baseUrl}/${locale}/areas/${area.slug}`,
           lastModified: now,
           changeFrequency: 'weekly',
-          priority: 0.76,
+          priority: 0.8,
         })
       }
     } catch (error) {
