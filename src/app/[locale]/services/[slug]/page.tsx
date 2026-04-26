@@ -8,7 +8,8 @@ import CinematicBackground from '@/components/layout/CinematicBackground'
 import JsonLd from '@/components/seo/JsonLd'
 import ContactSection from '@/components/sections/ContactSection'
 import FaqSection from '@/components/sections/FaqSection'
-import { buildPageMetadata, getSiteUrl } from '@/lib/seo'
+import { buildPageMetadata } from '@/lib/seo'
+import { buildBreadcrumbSchema, buildServiceDetailSchema, compactSchema } from '@/lib/schema'
 import {
   getContentBlocksFromSource,
   getFaqFromSource,
@@ -48,7 +49,6 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
   const { locale, slug } = await params
   const activeLocale = toActiveLocale(locale)
-  const siteUrl = getSiteUrl()
 
   const [global, home, service, faq, commonBlocks, serviceBlocks] = await Promise.all([
     getGlobalSettingsFromSource(),
@@ -63,7 +63,6 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
   const copy = labels[activeLocale]
   const paragraphs = service.intro?.split('\n').filter(Boolean) ?? []
-  const pageUrl = `${siteUrl}/${activeLocale}/services/${service.slug}`
   const primaryCta = home.heroPrimaryCta || copy.serviceEyebrow
   const secondaryCta = home.heroSecondaryCta || home.contactTitle || 'Request service'
   const blockBySlot = new Map([...commonBlocks, ...serviceBlocks].map((block) => [block.slot, block]))
@@ -75,10 +74,14 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const processBlock = blockBySlot.get('process')
   const processItems = processBlock?.items.length ? processBlock.items : copy.processItems
 
-  const jsonLd = [
-    { '@context': 'https://schema.org', '@type': 'Service', '@id': `${pageUrl}#service`, name: service.title, description: service.seoDescription || service.excerpt, url: pageUrl, provider: { '@type': 'AutomotiveBusiness', name: global.brandName, telephone: global.phoneDisplay, url: `${siteUrl}/${activeLocale}` }, areaServed: 'Philadelphia, Pennsylvania and nearby coverage areas', serviceType: service.title },
-    { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/${activeLocale}` }, { '@type': 'ListItem', position: 2, name: 'Services', item: `${siteUrl}/${activeLocale}/services` }, { '@type': 'ListItem', position: 3, name: service.title, item: pageUrl }] },
-  ]
+  const jsonLd = compactSchema([
+    buildServiceDetailSchema({ locale: activeLocale, global, service }),
+    buildBreadcrumbSchema({ locale: activeLocale, items: [
+      { name: 'Home', path: '' },
+      { name: 'Services', path: '/services' },
+      { name: service.title, path: `/services/${service.slug}` },
+    ] }),
+  ])
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
