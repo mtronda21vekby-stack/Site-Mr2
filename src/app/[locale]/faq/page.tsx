@@ -3,6 +3,7 @@ import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import FaqSection from '@/components/sections/FaqSection'
+import ContentBlockModule from '@/components/site/ContentBlockModule'
 import {
   getContentBlocksFromSource,
   getFaqFromSource,
@@ -17,33 +18,18 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; empty: string }> = {
-  en: {
-    eyebrow: 'Customer questions',
-    title: 'Frequently Asked Questions',
-    body: 'Answers to common questions about mobile automotive locksmith requests, service timing, vehicle information, key programming, and availability.',
-    empty: 'No published FAQ items yet.',
-  },
-  es: {
-    eyebrow: 'Preguntas de clientes',
-    title: 'Preguntas frecuentes',
-    body: 'Respuestas a preguntas comunes sobre solicitudes móviles de cerrajería automotriz, tiempos, datos del vehículo, programación de llaves y disponibilidad.',
-    empty: 'No hay preguntas frecuentes publicadas todavía.',
-  },
+  en: { eyebrow: 'Customer questions', title: 'Frequently Asked Questions', body: 'Answers to common questions about mobile automotive locksmith requests, service timing, vehicle information, key programming, and availability.', empty: 'No published FAQ items yet.' },
+  es: { eyebrow: 'Preguntas de clientes', title: 'Preguntas frecuentes', body: 'Respuestas a preguntas comunes sobre solicitudes móviles de cerrajería automotriz, tiempos, datos del vehículo, programación de llaves y disponibilidad.', empty: 'No hay preguntas frecuentes publicadas todavía.' },
 }
 
 export default async function FAQPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
-  const [global, home, faq, blocks] = await Promise.all([
-    getGlobalSettingsFromSource(),
-    getHomeContentFromSource(activeLocale),
-    getFaqFromSource(activeLocale),
-    getContentBlocksFromSource(activeLocale, 'faq'),
-  ])
-
+  const [global, home, faq, blocks] = await Promise.all([getGlobalSettingsFromSource(), getHomeContentFromSource(activeLocale), getFaqFromSource(activeLocale), getContentBlocksFromSource(activeLocale, 'faq')])
   const fallback = fallbackCopy[activeLocale]
   const hero = blocks.find((block) => block.slot === 'hero')
   const empty = blocks.find((block) => block.slot === 'empty')
+  const extraBlocks = blocks.filter((block) => !['hero', 'empty'].includes(block.slot))
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
@@ -51,22 +37,10 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: Lo
       <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
       <main>
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
-          <div className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10">
-            <div className="relative z-10">
-              <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">{hero?.eyebrow || fallback.eyebrow}</p>
-              <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{hero?.title || home.faqTitle || fallback.title}</h1>
-              <p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{hero?.body || fallback.body}</p>
-            </div>
-          </div>
+          <div className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10"><div className="relative z-10"><p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">{hero?.eyebrow || fallback.eyebrow}</p><h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{hero?.title || home.faqTitle || fallback.title}</h1><p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{hero?.body || fallback.body}</p></div></div>
+          {extraBlocks.length ? <div className="mt-8 grid gap-5 lg:grid-cols-2">{extraBlocks.map((block) => <ContentBlockModule key={block.id} block={block} variant={block.items.length > 1 ? 'checklist' : 'section'} />)}</div> : null}
         </section>
-
-        {faq.length ? (
-          <FaqSection title={home.faqTitle || fallback.title} items={faq} />
-        ) : (
-          <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
-            <div className="premium-panel rounded-[1.5rem] p-6 text-muted"><div className="relative z-10">{empty?.body || fallback.empty}</div></div>
-          </section>
-        )}
+        {faq.length ? <FaqSection title={home.faqTitle || fallback.title} items={faq} /> : <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8"><div className="premium-panel rounded-[1.5rem] p-6 text-muted"><div className="relative z-10">{empty?.body || fallback.empty}</div></div></section>}
       </main>
       <Footer locale={activeLocale} />
       <MobileStickyCta locale={activeLocale} phoneNumber={global.phonePrimary} />
