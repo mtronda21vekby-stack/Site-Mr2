@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import ReviewsSection from '@/components/sections/ReviewsSection'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -16,6 +18,13 @@ type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+  return buildPageMetadata({ locale: activeLocale, path: '/reviews', title: copy.title, description: copy.body })
+}
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; empty: string }> = {
   en: { eyebrow: 'Customer feedback', title: 'Customer Reviews', body: 'Read customer feedback for mobile automotive locksmith requests including lockouts, replacement keys, fobs, transponder support, and related vehicle key situations.', empty: 'No published reviews yet.' },
