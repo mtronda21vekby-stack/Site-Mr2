@@ -1,3 +1,5 @@
+import PremiumReveal from '@/components/motion/PremiumReveal'
+import CallButton from '@/components/ui/CallButton'
 import type { Locale } from '@/components/layout/Header'
 import type { GlobalSettings, HomeContent } from '@/lib/content'
 
@@ -10,19 +12,19 @@ type ConversionRailProps = {
 const labels: Record<Locale, { eyebrow: string; call: string; request: string; fallbackText: string }> = {
   en: {
     eyebrow: 'Fast service path',
-    call: 'Call now',
+    call: 'Call',
     request: 'Start request',
     fallbackText: 'For urgent vehicle lockouts, calling is usually fastest. For keys, fobs, or scheduled help, submit the request form with vehicle details.',
   },
   es: {
     eyebrow: 'Ruta rápida de servicio',
-    call: 'Llamar ahora',
+    call: 'Llamar',
     request: 'Iniciar solicitud',
     fallbackText: 'Para autos cerrados urgentes, llamar suele ser más rápido. Para llaves, controles o citas, envíe el formulario con datos del vehículo.',
   },
   ru: {
     eyebrow: 'Fast service path',
-    call: 'Call now',
+    call: 'Call',
     request: 'Start request',
     fallbackText: 'For urgent vehicle lockouts, calling is usually fastest. For keys, fobs, or scheduled help, submit the request form with vehicle details.',
   },
@@ -34,10 +36,11 @@ export default function ConversionRail({ locale, global, home }: ConversionRailP
   return (
     <section className="relative bg-transparent py-8 sm:py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="premium-panel relative overflow-hidden rounded-[1.75rem] p-5 sm:p-6">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-blue/30 to-transparent" />
+        <PremiumReveal className="premium-panel group relative overflow-hidden rounded-[1.75rem] p-5 transition duration-500 hover:-translate-y-1 hover:border-accent-blue/35 hover:shadow-[0_0_80px_rgba(77,162,255,0.10)] sm:p-6">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-blue/30 to-transparent" />
+          <div className="pointer-events-none absolute -right-20 -top-20 h-44 w-44 rounded-full bg-accent-blue/0 blur-3xl transition duration-500 group-hover:bg-accent-blue/12" />
 
-          <div className="relative grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="relative z-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <p className="mb-2 text-xs font-black uppercase tracking-[0.24em] text-accent-cyan">
                 {copy.eyebrow}
@@ -51,15 +54,13 @@ export default function ConversionRail({ locale, global, home }: ConversionRailP
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[23rem]">
-              <a href={`tel:${global.phonePrimary}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-6 py-3 text-sm font-black uppercase tracking-[0.15em] text-black shadow-[0_0_28px_rgba(77,162,255,0.22)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110">
-                {home.heroPrimaryCta || copy.call}
-              </a>
-              <a href="#request-service" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.035] px-6 py-3 text-sm font-black uppercase tracking-[0.15em] text-text transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/40 hover:bg-accent-gold/10 hover:text-accent-gold">
+              <CallButton phoneNumber={global.phonePrimary} phoneDisplay={global.phoneDisplay} label={home.heroPrimaryCta || copy.call} className="shadow-[0_0_34px_rgba(77,162,255,0.26)] active:scale-[0.985]" />
+              <a href="#request-service" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.035] px-6 py-3 text-sm font-black uppercase tracking-[0.15em] text-text transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/40 hover:bg-accent-gold/10 hover:text-accent-gold active:scale-[0.985]">
                 {home.heroSecondaryCta || copy.request}
               </a>
             </div>
           </div>
-        </div>
+        </PremiumReveal>
       </div>
     </section>
   )
