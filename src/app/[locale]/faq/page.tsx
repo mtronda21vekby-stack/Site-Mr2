@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import FaqSection from '@/components/sections/FaqSection'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getFaqFromSource,
@@ -16,6 +18,13 @@ type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+  return buildPageMetadata({ locale: activeLocale, path: '/faq', title: copy.title, description: copy.body })
+}
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; empty: string }> = {
   en: { eyebrow: 'Customer questions', title: 'Frequently Asked Questions', body: 'Answers to common questions about mobile automotive locksmith requests, service timing, vehicle information, key programming, and availability.', empty: 'No published FAQ items yet.' },
