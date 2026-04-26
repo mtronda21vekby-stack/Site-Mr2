@@ -79,7 +79,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
           <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">
             {labels.request}
           </Link>
-          <a href={`tel:${phonePrimary}`} className="notranslate inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent-blue text-[0.65rem] font-black uppercase tracking-[0.10em] text-black shadow-[0_0_24px_rgba(77,162,255,0.24)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no" aria-label={`${labels.call} ${phoneDisplay}`} title={`${labels.call} ${phoneDisplay}`}>
+          <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-black shadow-[0_0_24px_rgba(77,162,255,0.24)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no" aria-label={`${labels.call} ${phoneDisplay}`} title={`${labels.call} ${phoneDisplay}`}>
             {labels.call}
           </a>
         </div>
