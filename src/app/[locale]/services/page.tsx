@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -15,6 +17,13 @@ type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+  return buildPageMetadata({ locale: activeLocale, path: '/services', title: copy.title, description: copy.intro })
+}
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro: string; call: string; request: string; cardPrefix: string; open: string; empty: string; sideTitle: string; sideText: string; countLabel: string }> = {
   en: {
