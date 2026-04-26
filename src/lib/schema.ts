@@ -1,9 +1,9 @@
 import { getCanonicalUrl, getSiteUrl, type SeoLocale } from '@/lib/seo'
-import type { AreaListItem, FaqItem, GlobalSettings, ServiceListItem } from '@/lib/content.server'
+import type { AreaContent, FaqItem, GlobalSettings, ServiceContent } from '@/lib/content.server'
 
 type SchemaNode = Record<string, unknown>
 
-export function buildAutomotiveBusinessSchema({ locale, global, services, areas, description }: { locale: SeoLocale; global: GlobalSettings; services?: ServiceListItem[]; areas?: AreaListItem[]; description?: string }): SchemaNode {
+export function buildAutomotiveBusinessSchema({ locale, global, services, areas, description }: { locale: SeoLocale; global: GlobalSettings; services?: ServiceContent[]; areas?: AreaContent[]; description?: string }): SchemaNode {
   const siteUrl = getSiteUrl()
   const pageUrl = getCanonicalUrl(locale, '/')
 
@@ -29,7 +29,7 @@ export function buildAutomotiveBusinessSchema({ locale, global, services, areas,
   }
 }
 
-export function buildServiceCollectionSchema({ locale, services }: { locale: SeoLocale; services: ServiceListItem[] }): SchemaNode {
+export function buildServiceCollectionSchema({ locale, services }: { locale: SeoLocale; services: ServiceContent[] }): SchemaNode {
   const siteUrl = getSiteUrl()
   return {
     '@context': 'https://schema.org',
@@ -46,7 +46,7 @@ export function buildServiceCollectionSchema({ locale, services }: { locale: Seo
   }
 }
 
-export function buildAreaCollectionSchema({ locale, areas }: { locale: SeoLocale; areas: AreaListItem[] }): SchemaNode {
+export function buildAreaCollectionSchema({ locale, areas }: { locale: SeoLocale; areas: AreaContent[] }): SchemaNode {
   const siteUrl = getSiteUrl()
   return {
     '@context': 'https://schema.org',
