@@ -37,9 +37,9 @@ const navConfig: Record<Locale, Array<{ label: string; href: (locale: Locale) =>
 }
 
 const ctaLabels: Record<Locale, { request: string; call: string; menu: string }> = {
-  en: { request: 'Request Service', call: 'Call', menu: 'Menu' },
-  es: { request: 'Solicitar servicio', call: 'Llamar', menu: 'Menú' },
-  ru: { request: 'Request Service', call: 'Call', menu: 'Menu' },
+  en: { request: 'Request', call: 'Call', menu: 'Menu' },
+  es: { request: 'Solicitud', call: 'Llamar', menu: 'Menú' },
+  ru: { request: 'Request', call: 'Call', menu: 'Menu' },
 }
 
 export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderProps) {
@@ -74,13 +74,13 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
           <LanguageSwitcher currentLocale={activeLocale} pathname={pathname} />
           <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">
             {labels.request}
           </Link>
-          <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-black shadow-[0_0_30px_rgba(77,162,255,0.28)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no">
-            {labels.call} {phoneDisplay}
+          <a href={`tel:${phonePrimary}`} className="notranslate inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent-blue text-[0.65rem] font-black uppercase tracking-[0.10em] text-black shadow-[0_0_24px_rgba(77,162,255,0.24)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no" aria-label={`${labels.call} ${phoneDisplay}`} title={`${labels.call} ${phoneDisplay}`}>
+            {labels.call}
           </a>
         </div>
 
@@ -101,7 +101,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
             ))}
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-text" onClick={() => setOpen(false)}>{labels.request}</Link>
-              <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-black" translate="no">{labels.call}</a>
+              <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-black" translate="no" aria-label={`${labels.call} ${phoneDisplay}`}>{labels.call}</a>
             </div>
           </nav>
         </div>
