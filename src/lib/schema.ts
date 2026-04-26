@@ -64,6 +64,64 @@ export function buildAreaCollectionSchema({ locale, areas }: { locale: SeoLocale
   }
 }
 
+export function buildServiceDetailSchema({ locale, global, service }: { locale: SeoLocale; global: GlobalSettings; service: ServiceContent }): SchemaNode {
+  const siteUrl = getSiteUrl()
+  const url = `${siteUrl}/${locale}/services/${service.slug}`
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${url}#service`,
+    name: service.title,
+    description: service.seoDescription || service.excerpt,
+    url,
+    provider: {
+      '@type': 'AutomotiveBusiness',
+      name: global.brandName,
+      telephone: global.phoneDisplay,
+      url: `${siteUrl}/${locale}`,
+    },
+    areaServed: 'Philadelphia, Pennsylvania and nearby coverage areas',
+    serviceType: service.title,
+  }
+}
+
+export function buildAreaDetailBusinessSchema({ locale, global, area, supportedServices, location }: { locale: SeoLocale; global: GlobalSettings; area: AreaContent; supportedServices: string[]; location: string }): SchemaNode {
+  const siteUrl = getSiteUrl()
+  const url = `${siteUrl}/${locale}/areas/${area.slug}`
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AutomotiveBusiness',
+    '@id': `${url}#business`,
+    name: global.brandName,
+    url,
+    telephone: global.phoneDisplay,
+    description: area.seoDescription || area.intro,
+    areaServed: { '@type': 'City', name: location },
+    openingHours: global.serviceHours,
+    makesOffer: supportedServices.map((service) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: service, areaServed: location },
+    })),
+  }
+}
+
+export function buildBreadcrumbSchema({ locale, items }: { locale: SeoLocale; items: Array<{ name: string; path: string }> }): SchemaNode {
+  const siteUrl = getSiteUrl()
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${siteUrl}/${locale}${item.path}`,
+    })),
+  }
+}
+
 export function buildContactPageSchema({ locale, global, description }: { locale: SeoLocale; global: GlobalSettings; description: string }): SchemaNode {
   return {
     '@context': 'https://schema.org',
