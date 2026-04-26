@@ -1,31 +1,75 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { getGlobalSettings } from '@/lib/content';
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import MobileStickyCta from '@/components/layout/MobileStickyCta'
+import CinematicBackground from '@/components/layout/CinematicBackground'
+import ReviewsSection from '@/components/sections/ReviewsSection'
+import {
+  getContentBlocksFromSource,
+  getGlobalSettingsFromSource,
+  getHomeContentFromSource,
+  getReviewsFromSource,
+} from '@/lib/content.server'
 
-export async function generateStaticParams() {
-  return [
-    { locale: 'en' },
-    { locale: 'es' },
-    { locale: 'ru' },
-  ];
+type Locale = 'en' | 'es' | 'ru'
+type ActiveLocale = 'en' | 'es'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; empty: string }> = {
+  en: {
+    eyebrow: 'Customer feedback',
+    title: 'Customer Reviews',
+    body: 'Read customer feedback for mobile automotive locksmith requests including lockouts, replacement keys, fobs, transponder support, and related vehicle key situations.',
+    empty: 'No published reviews yet.',
+  },
+  es: {
+    eyebrow: 'Opiniones de clientes',
+    title: 'Reseñas de clientes',
+    body: 'Lea opiniones de clientes sobre solicitudes móviles de cerrajería automotriz: autos cerrados, llaves, controles, transponder y situaciones relacionadas.',
+    empty: 'No hay reseñas publicadas todavía.',
+  },
 }
 
-export default async function ReviewsPage({
-  params,
-}: {
-  params: Promise<{ locale: 'en' | 'es' | 'ru' }>;
-}) {
-  const { locale } = await params;
-  const global = getGlobalSettings();
+export default async function ReviewsPage({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const [global, home, reviews, blocks] = await Promise.all([
+    getGlobalSettingsFromSource(),
+    getHomeContentFromSource(activeLocale),
+    getReviewsFromSource(activeLocale),
+    getContentBlocksFromSource(activeLocale, 'reviews'),
+  ])
+
+  const fallback = fallbackCopy[activeLocale]
+  const hero = blocks.find((block) => block.slot === 'hero')
+  const empty = blocks.find((block) => block.slot === 'empty')
 
   return (
-    <>
-      <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
-      <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 text-text">
-        <h1 className="text-3xl font-heading font-semibold mb-6">Reviews</h1>
-        <p>This page will eventually show customer reviews. For now it is a placeholder.</p>
+    <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
+      <CinematicBackground />
+      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <main>
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10">
+            <div className="relative z-10">
+              <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">{hero?.eyebrow || fallback.eyebrow}</p>
+              <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{hero?.title || home.reviewsTitle || fallback.title}</h1>
+              <p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{hero?.body || fallback.body}</p>
+            </div>
+          </div>
+        </section>
+
+        {reviews.length ? (
+          <ReviewsSection title={home.reviewsTitle || fallback.title} items={reviews} />
+        ) : (
+          <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+            <div className="premium-panel rounded-[1.5rem] p-6 text-muted"><div className="relative z-10">{empty?.body || fallback.empty}</div></div>
+          </section>
+        )}
       </main>
-      <Footer locale={locale} />
-    </>
-  );
+      <Footer locale={activeLocale} />
+      <MobileStickyCta locale={activeLocale} phoneNumber={global.phonePrimary} />
+    </div>
+  )
 }
