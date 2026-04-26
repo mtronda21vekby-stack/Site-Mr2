@@ -1,14 +1,18 @@
 import type { MetadataRoute } from 'next'
+import { getSiteUrl } from '@/lib/seo'
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
+  const siteUrl = getSiteUrl()
 
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/admin'],
-    },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/admin', '/admin/', '/api', '/api/'],
+      },
+    ],
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   }
 }
