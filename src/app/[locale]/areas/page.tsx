@@ -4,8 +4,10 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
+import JsonLd from '@/components/seo/JsonLd'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
 import { buildPageMetadata } from '@/lib/seo'
+import { buildAreaCollectionSchema, buildAutomotiveBusinessSchema, compactSchema } from '@/lib/schema'
 import {
   getAreasListFromSource,
   getContentBlocksFromSource,
@@ -35,6 +37,7 @@ export default async function AreasIndexPage({ params }: { params: Promise<{ loc
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const fallback = fallbackCopy[activeLocale]
   const [global, areas, blocks] = await Promise.all([getGlobalSettingsFromSource(), getAreasListFromSource(activeLocale), getContentBlocksFromSource(activeLocale, 'areas')])
+  const schema = compactSchema([buildAutomotiveBusinessSchema({ locale: activeLocale, global, areas, description: fallback.intro }), buildAreaCollectionSchema({ locale: activeLocale, areas })])
   const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
   const heroBlock = blockBySlot.get('hero')
   const sideBlock = blockBySlot.get('side')
@@ -53,6 +56,7 @@ export default async function AreasIndexPage({ params }: { params: Promise<{ loc
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
+      <JsonLd data={schema} />
       <CinematicBackground />
       <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
       <main className="relative text-text">
