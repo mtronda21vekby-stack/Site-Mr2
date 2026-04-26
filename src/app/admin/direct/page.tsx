@@ -86,7 +86,7 @@ export default function AdminDashboardPage() {
   return (
     <div style={pageStyle}>
       <div style={ambientBlueStyle} /><div style={ambientGoldStyle} />
-      <section style={heroPanelStyle}><div><p style={eyebrowStyle}>Planetlocksmiths / Workers control room</p><h1 style={heroTitleStyle}>Operations + Quality Dashboard</h1><p style={heroTextStyle}>Manage Supabase content, emergency leads, local landing pages, Ads-readiness, reviews, FAQ, content blocks, and service coverage from one command center.</p></div><div style={heroActionsStyle}><a href="/admin/audit" style={ghostButtonStyle}>Audit center</a><a href="/admin/content-blocks" style={ghostButtonStyle}>Content blocks</a><a href="/en" style={ghostButtonStyle}>View site</a><button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Refreshing...' : 'Refresh signal'}</button></div></section>
+      <section style={heroPanelStyle}><div><p style={eyebrowStyle}>Planetlocksmiths / Workers control room</p><h1 style={heroTitleStyle}>Operations + Quality Dashboard</h1><p style={heroTextStyle}>Manage Supabase content, emergency leads, local landing pages, Ads-readiness, reviews, FAQ, content blocks, and service coverage from one command center.</p></div><div style={heroActionsStyle}><a href="/admin/audit" style={ghostButtonStyle}>Audit center</a><a href="/admin/content-blocks-v3" style={ghostButtonStyle}>Content blocks V3</a><a href="/en" style={ghostButtonStyle}>View site</a><button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Refreshing...' : 'Refresh signal'}</button></div></section>
       {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
       <div style={statsGridStyle}><AdminStatCard title="New Orders" value={String(metrics.newOrders)} note="Fresh requests waiting for action." /><AdminStatCard title="Active Orders" value={String(metrics.activeOrders)} note="Contacted, scheduled, or in progress." /><AdminStatCard title="Completed" value={String(metrics.completedOrders)} note="Closed requests marked completed." /><AdminStatCard title="Services" value={String(metrics.services)} note="Published service landing pages." /><AdminStatCard title="Areas" value={String(metrics.areas)} note="Published local coverage pages." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Published customer answers." /><AdminStatCard title="Reviews" value={String(metrics.reviews)} note="Published proof cards." /></div>
       <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Quality control</p><h2 style={panelTitleStyle}>Ads / SEO / UX Readiness</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} ready</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
@@ -97,7 +97,8 @@ export default function AdminDashboardPage() {
 
 const links = [
   { title: 'Audit', href: '/admin/audit', description: 'Detailed quality audit for editable content and landing pages.', accent: '#FF9A9A' },
-  { title: 'Content Blocks', href: '/admin/content-blocks', description: 'Reusable editable page sections, custom blocks, CTA copy, and section items.', accent: '#2DE2E6' },
+  { title: 'Content Blocks V3', href: '/admin/content-blocks-v3', description: 'Modular editor with shared presets, previews, reusable blocks, CTA copy, and section items.', accent: '#2DE2E6' },
+  { title: 'Content Blocks Legacy', href: '/admin/content-blocks', description: 'Backup legacy editor kept temporarily while V3 is validated.', accent: '#68738E' },
   { title: 'Orders', href: '/admin/orders', description: 'Incoming leads, statuses, notes, field workflow.', accent: '#4DA2FF' },
   { title: 'Settings', href: '/admin/settings', description: 'Brand, phone, email, service hours, emergency routing.', accent: '#D6A85F' },
   { title: 'Home', href: '/admin/home', description: 'Hero, CTA copy, conversion rails, contact block.', accent: '#2DE2E6' },
@@ -109,7 +110,7 @@ const links = [
 
 function getQualityItems(metrics: Metrics): QualityItem[] {
   return [
-    { title: 'Content blocks', href: '/admin/content-blocks', status: 'warn', note: 'Use content blocks for any page copy that should not be hardcoded.' },
+    { title: 'Content blocks V3', href: '/admin/content-blocks-v3', status: 'warn', note: 'Use V3 for shared presets, previews, and reusable page modules.' },
     { title: 'Content audit', href: '/admin/audit', status: 'warn', note: 'Open detailed audit for SEO, intro length, slugs, highlights, and supported services.' },
     { title: 'Service pages', href: '/admin/services', status: metrics.services >= 6 ? 'good' : metrics.services >= 3 ? 'warn' : 'danger', note: metrics.services >= 6 ? 'Strong service coverage.' : 'Add more published service landing pages.' },
     { title: 'Area pages', href: '/admin/areas', status: metrics.areas >= 6 ? 'good' : metrics.areas >= 3 ? 'warn' : 'danger', note: metrics.areas >= 6 ? 'Good local coverage depth.' : 'Add more local service-area pages.' },
