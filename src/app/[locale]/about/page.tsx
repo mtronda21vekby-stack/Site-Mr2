@@ -20,17 +20,20 @@ const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body:
   es: { eyebrow: 'Sobre Planetlocksmiths', title: 'Soporte móvil de cerrajería automotriz para solicitudes claras y rápidas.', body: 'Planetlocksmiths está organizado para solicitudes móviles automotrices: autos cerrados, reemplazo de llaves, programación de controles, transponder, ignición y llaves rotas.' },
 }
 
-const fallbackBlocks: Record<ActiveLocale, SiteContentBlock[]> = {
-  en: [
+function getFallbackBlocks(locale: ActiveLocale): SiteContentBlock[] {
+  if (locale === 'es') {
+    return [
+      { id: 'about-fallback-1-es', locale: 'es', pageKey: 'about', slot: 'section-1', eyebrow: 'Sobre 01', title: 'Enfoque automotriz', body: 'El sitio está diseñado para solicitudes específicas del vehículo: servicio, datos del auto, ubicación, urgencia y contacto.', items: [], ctaLabel: '', ctaHref: '', sortOrder: 1 },
+      { id: 'about-fallback-2-es', locale: 'es', pageKey: 'about', slot: 'section-2', eyebrow: 'Sobre 02', title: 'Ruta móvil de servicio', body: 'Los clientes pueden llamar o enviar una solicitud desde cualquier página. La disponibilidad depende de ubicación, vehículo, piezas, horario y complejidad.', items: [], ctaLabel: '', ctaHref: '', sortOrder: 2 },
+      { id: 'about-fallback-3-es', locale: 'es', pageKey: 'about', slot: 'section-3', eyebrow: 'Sobre 03', title: 'Información importante', body: 'Datos claros ayudan a confirmar el siguiente paso antes del servicio.', items: ['Marca, modelo y año', 'Ubicación actual o ZIP', 'Auto cerrado, llave perdida, control, transponder, ignición o llave rota', 'Teléfono y urgencia'], ctaLabel: '', ctaHref: '', sortOrder: 3 },
+    ]
+  }
+
+  return [
     { id: 'about-fallback-1', locale: 'en', pageKey: 'about', slot: 'section-1', eyebrow: 'About 01', title: 'Automotive focus', body: 'The site is designed around vehicle-specific requests so customers can provide service type, vehicle details, location, urgency, and contact information clearly.', items: [], ctaLabel: '', ctaHref: '', sortOrder: 1 },
     { id: 'about-fallback-2', locale: 'en', pageKey: 'about', slot: 'section-2', eyebrow: 'About 02', title: 'Mobile-first service path', body: 'Customers can call or submit a request from any page. Service availability depends on location, vehicle details, parts, timing, and job complexity.', items: [], ctaLabel: '', ctaHref: '', sortOrder: 2 },
     { id: 'about-fallback-3', locale: 'en', pageKey: 'about', slot: 'section-3', eyebrow: 'About 03', title: 'Information that matters', body: 'Cleaner request details help confirm the right next step before service begins.', items: ['Vehicle make, model, and year', 'Current location or ZIP code', 'Lockout, lost key, fob, transponder, ignition, or broken key situation', 'Phone number and urgency'], ctaLabel: '', ctaHref: '', sortOrder: 3 },
-  ],
-  es: [
-    { id: 'about-fallback-1-es', locale: 'es', pageKey: 'about', slot: 'section-1', eyebrow: 'Sobre 01', title: 'Enfoque automotriz', body: 'El sitio está diseñado para solicitudes específicas del vehículo: servicio, datos del auto, ubicación, urgencia y contacto.', items: [], ctaLabel: '', ctaHref: '', sortOrder: 1 },
-    { id: 'about-fallback-2-es', locale: 'es', pageKey: 'about', slot: 'section-2', eyebrow: 'Sobre 02', title: 'Ruta móvil de servicio', body: 'Los clientes pueden llamar o enviar una solicitud desde cualquier página. La disponibilidad depende de ubicación, vehículo, piezas, horario y complejidad.', items: [], ctaLabel: '', ctaHref: '', sortOrder: 2 },
-    { id: 'about-fallback-3-es', locale: 'es', pageKey: 'about', slot: 'section-3', eyebrow: 'Sobre 03', title: 'Información importante', body: 'Datos claros ayudan a confirmar el siguiente paso antes del servicio.', items: ['Marca, modelo y año', 'Ubicación actual o ZIP', 'Auto cerrado, llave perdida, control, transponder, ignición o llave rota', 'Teléfono y urgencia'], ctaLabel: '', ctaHref: '', sortOrder: 3 },
-  ],
+  ]
 }
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: Locale }> }) {
@@ -40,7 +43,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const fallback = fallbackCopy[activeLocale]
   const hero = blocks.find((block) => block.slot === 'hero')
   const customSections = blocks.filter((block) => block.slot !== 'hero')
-  const sections: SiteContentBlock[] = customSections.length ? customSections : fallbackBlocks[activeLocale]
+  const sections: SiteContentBlock[] = customSections.length ? customSections : getFallbackBlocks(activeLocale)
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
