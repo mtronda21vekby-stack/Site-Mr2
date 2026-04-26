@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
+import ContentBlockModule from '@/components/site/ContentBlockModule'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -60,6 +61,7 @@ export default async function ServicesIndexPage({ params }: { params: Promise<{ 
   const sideBlock = blockBySlot.get('side')
   const cardsBlock = blockBySlot.get('cards')
   const emptyBlock = blockBySlot.get('empty')
+  const extraBlocks = blocks.filter((block) => !['hero', 'side', 'cards', 'empty'].includes(block.slot))
 
   const heroEyebrow = heroBlock?.eyebrow || fallback.eyebrow
   const heroTitle = heroBlock?.title || fallback.title
@@ -99,6 +101,8 @@ export default async function ServicesIndexPage({ params }: { params: Promise<{ 
               </div>
             </aside>
           </div>
+
+          {extraBlocks.length ? <div className="mt-8 grid gap-5 lg:grid-cols-2">{extraBlocks.map((block) => <ContentBlockModule key={block.id} block={block} variant={block.items.length > 1 ? 'checklist' : 'section'} />)}</div> : null}
 
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {services.map((service, index) => (
