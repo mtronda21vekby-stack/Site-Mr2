@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import CallButton from '@/components/ui/CallButton'
 
 export type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
@@ -79,9 +80,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
           <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">
             {labels.request}
           </Link>
-          <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-2.5 text-xs font-black uppercase tracking-[0.15em] text-black shadow-[0_0_24px_rgba(77,162,255,0.24)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no" aria-label={`${labels.call} ${phoneDisplay}`} title={`${labels.call} ${phoneDisplay}`}>
-            {labels.call}
-          </a>
+          <CallButton phoneNumber={phonePrimary} phoneDisplay={phoneDisplay} label={labels.call} className="min-h-0 px-4 py-2.5 text-xs tracking-[0.15em] shadow-[0_0_24px_rgba(77,162,255,0.24)]" title={`${labels.call} ${phoneDisplay}`} />
         </div>
 
         <button type="button" className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/18 bg-white/[0.075] px-4 text-xs font-black uppercase tracking-[0.16em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
@@ -101,7 +100,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
             ))}
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Link href={requestHref} className="rounded-full border border-white/18 bg-white/[0.075] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-text" onClick={() => setOpen(false)}>{labels.request}</Link>
-              <a href={`tel:${phonePrimary}`} className="notranslate rounded-full bg-accent-blue px-4 py-3 text-center text-xs font-black uppercase tracking-[0.14em] text-black" translate="no" aria-label={`${labels.call} ${phoneDisplay}`}>{labels.call}</a>
+              <CallButton phoneNumber={phonePrimary} phoneDisplay={phoneDisplay} label={labels.call} className="px-4 py-3 text-xs tracking-[0.14em]" />
             </div>
           </nav>
         </div>
