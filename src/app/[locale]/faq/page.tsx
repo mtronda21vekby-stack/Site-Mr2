@@ -4,8 +4,10 @@ import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import FaqSection from '@/components/sections/FaqSection'
+import JsonLd from '@/components/seo/JsonLd'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
 import { buildPageMetadata } from '@/lib/seo'
+import { buildFAQPageSchema, compactSchema } from '@/lib/schema'
 import {
   getContentBlocksFromSource,
   getFaqFromSource,
@@ -35,6 +37,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: Lo
   const { locale } = await params
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const [global, home, faq, blocks] = await Promise.all([getGlobalSettingsFromSource(), getHomeContentFromSource(activeLocale), getFaqFromSource(activeLocale), getContentBlocksFromSource(activeLocale, 'faq')])
+  const schema = compactSchema([buildFAQPageSchema({ locale: activeLocale, faq })])
   const fallback = fallbackCopy[activeLocale]
   const hero = blocks.find((block) => block.slot === 'hero')
   const empty = blocks.find((block) => block.slot === 'empty')
@@ -42,6 +45,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: Lo
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
+      <JsonLd data={schema} />
       <CinematicBackground />
       <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
       <main>
