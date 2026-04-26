@@ -68,7 +68,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const copy = labels[activeLocale]
   const paragraphs = service.intro?.split('\n').filter(Boolean) ?? []
   const pageUrl = `${siteUrl}/${activeLocale}/services/${service.slug}`
-  const primaryCta = home.heroPrimaryCta || global.phoneDisplay
+  const primaryCta = home.heroPrimaryCta || copy.serviceEyebrow
   const secondaryCta = home.heroSecondaryCta || home.contactTitle || 'Request service'
   const blockBySlot = new Map([...commonBlocks, ...serviceBlocks].map((block) => [block.slot, block]))
   const heroBlock = blockBySlot.get('hero')
@@ -98,7 +98,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               <h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{heroBlock?.title || service.title}</h1>
               {heroBlock?.body || service.excerpt ? <p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{heroBlock?.body || service.excerpt}</p> : null}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={`tel:${global.phonePrimary}`} className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no">{heroBlock?.ctaLabel || primaryCta}</a>
+                <a href={`tel:${global.phonePrimary}`} className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_44px_rgba(77,162,255,0.32)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110" translate="no" aria-label={`${heroBlock?.ctaLabel || primaryCta} ${global.phoneDisplay}`}>{heroBlock?.ctaLabel || primaryCta}</a>
                 <a href={heroBlock?.ctaHref || '#request-service'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-accent-gold/45 hover:bg-accent-gold/12 hover:text-accent-gold">{secondaryCta}</a>
               </div>
             </div>
@@ -106,7 +106,6 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <aside className="premium-panel relative z-10 rounded-[1.5rem] p-5">
               <div className="relative z-10">
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-accent-cyan">{home.emergencyTitle || global.serviceHours}</p>
-                <p className="notranslate mt-3 text-2xl font-semibold text-text" translate="no">{global.phoneDisplay}</p>
                 <p className="mt-3 text-sm leading-7 text-muted">{home.emergencyText || home.contactText || service.excerpt}</p>
               </div>
             </aside>
