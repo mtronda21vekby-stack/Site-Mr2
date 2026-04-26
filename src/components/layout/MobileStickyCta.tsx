@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import type { Locale } from './Header'
 
-const labels: Record<Locale, { call: string; request: string }> = {
-  en: { call: 'Call now', request: 'Request' },
-  es: { call: 'Llamar', request: 'Solicitud' },
-  ru: { call: 'Call now', request: 'Request' },
+const labels: Record<Locale, { call: string; request: string; callAria: string }> = {
+  en: { call: 'Call', request: 'Request', callAria: 'Call Planetlocksmiths now' },
+  es: { call: 'Llamar', request: 'Solicitud', callAria: 'Llamar a Planetlocksmiths ahora' },
+  ru: { call: 'Call', request: 'Request', callAria: 'Call Planetlocksmiths now' },
 }
 
 export default function MobileStickyCta({
@@ -24,14 +24,15 @@ export default function MobileStickyCta({
       <div className="relative mx-auto grid max-w-md grid-cols-2 gap-3">
         <a
           href={`tel:${phoneNumber}`}
-          className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-4 text-sm font-black text-black shadow-[0_0_28px_rgba(77,162,255,0.28)] transition active:scale-[0.98]"
+          className="notranslate inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-4 text-xs font-black uppercase tracking-[0.14em] text-black shadow-[0_0_28px_rgba(77,162,255,0.28)] transition active:scale-[0.98]"
           translate="no"
+          aria-label={copy.callAria}
         >
           {copy.call}
         </a>
         <Link
           href={requestHref}
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-4 text-sm font-black text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition active:scale-[0.98]"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] px-4 text-xs font-black uppercase tracking-[0.14em] text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-2xl transition active:scale-[0.98]"
         >
           {copy.request}
         </Link>
