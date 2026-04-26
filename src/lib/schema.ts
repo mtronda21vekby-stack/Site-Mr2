@@ -1,5 +1,6 @@
 import { getCanonicalUrl, getSiteUrl, type SeoLocale } from '@/lib/seo'
-import type { AreaContent, FaqItem, GlobalSettings, ServiceContent } from '@/lib/content.server'
+import type { AreaContent, GlobalSettings, ServiceContent } from '@/lib/content.server'
+import type { FaqItem } from '@/lib/content'
 
 type SchemaNode = Record<string, unknown>
 
