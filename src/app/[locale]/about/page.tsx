@@ -1,8 +1,10 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -14,6 +16,13 @@ type ActiveLocale = 'en' | 'es'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+  return buildPageMetadata({ locale: activeLocale, path: '/about', title: copy.title, description: copy.body })
+}
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string }> = {
   en: { eyebrow: 'About Planetlocksmiths', title: 'Mobile automotive locksmith support built for clear, fast service requests.', body: 'Planetlocksmiths is structured around mobile automotive locksmith requests for car lockouts, replacement keys, key fob programming, transponder support, ignition-related help, and broken key situations.' },
