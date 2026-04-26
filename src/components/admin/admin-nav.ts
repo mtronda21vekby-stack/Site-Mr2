@@ -22,7 +22,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     title: 'Content',
     items: [
       { href: '/admin/home', label: 'Home' },
-      { href: '/admin/content-blocks-v3', label: 'Content Blocks' },
+      { href: '/admin/content-blocks', label: 'Content Blocks' },
       { href: '/admin/services', label: 'Services' },
       { href: '/admin/areas', label: 'Areas' },
       { href: '/admin/reviews', label: 'Reviews' },
