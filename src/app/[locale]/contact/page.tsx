@@ -4,8 +4,10 @@ import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
 import ContactSection from '@/components/sections/ContactSection'
+import JsonLd from '@/components/seo/JsonLd'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
 import { buildPageMetadata } from '@/lib/seo'
+import { buildAutomotiveBusinessSchema, buildContactPageSchema, compactSchema } from '@/lib/schema'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -35,6 +37,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const fallback = fallbackCopy[activeLocale]
   const [global, home, blocks] = await Promise.all([getGlobalSettingsFromSource(), getHomeContentFromSource(activeLocale), getContentBlocksFromSource(activeLocale, 'contact')])
+  const schema = compactSchema([buildAutomotiveBusinessSchema({ locale: activeLocale, global, description: fallback.intro }), buildContactPageSchema({ locale: activeLocale, global, description: fallback.intro })])
   const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
   const heroBlock = blockBySlot.get('hero')
   const sideBlock = blockBySlot.get('side')
@@ -52,6 +55,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
+      <JsonLd data={schema} />
       <CinematicBackground />
       <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
       <main className="flex flex-col">
