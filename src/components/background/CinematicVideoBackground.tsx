@@ -39,6 +39,7 @@ export default function CinematicVideoBackground() {
   const [canScrub, setCanScrub] = useState(false)
   const [duration, setDuration] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
   const [sceneState, setSceneState] = useState(SCENE_STATES[0])
   const { scrollYProgress } = useScroll()
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 95, damping: 28, mass: 0.28 })
@@ -56,31 +57,44 @@ export default function CinematicVideoBackground() {
     if (!video) return
 
     video.muted = true
+    video.defaultMuted = true
     video.playsInline = true
 
     const onLoadedMetadata = () => {
       setDuration(Number.isFinite(video.duration) ? video.duration : 0)
       setCanScrub(true)
+      setVideoReady(true)
       if (isMobile) {
         video.loop = true
+        video.autoplay = true
         video.play().catch(() => undefined)
       } else {
+        video.loop = false
         video.pause()
         video.currentTime = 0.001
       }
     }
 
+    const onCanPlay = () => {
+      setVideoReady(true)
+      if (isMobile) video.play().catch(() => undefined)
+    }
+
     const onError = () => {
       setCanScrub(false)
       setDuration(0)
+      setVideoReady(false)
     }
 
     video.addEventListener('loadedmetadata', onLoadedMetadata)
+    video.addEventListener('canplay', onCanPlay)
     video.addEventListener('error', onError)
+    video.load()
     if (video.readyState >= 1) onLoadedMetadata()
 
     return () => {
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
+      video.removeEventListener('canplay', onCanPlay)
       video.removeEventListener('error', onError)
     }
   }, [isMobile])
@@ -90,12 +104,14 @@ export default function CinematicVideoBackground() {
     if (!video) return
     if (isMobile) {
       video.loop = true
+      video.autoplay = true
       video.play().catch(() => undefined)
     } else {
       video.loop = false
+      video.autoplay = false
       video.pause()
     }
-  }, [isMobile])
+  }, [isMobile, videoReady])
 
   useEffect(() => {
     if (!canScrub || !duration || isMobile) return
@@ -135,20 +151,22 @@ export default function CinematicVideoBackground() {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-[#02040A]">
       <video
         ref={videoRef}
-        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] [object-position:62%_50%] scale-[1.06] md:[object-position:center] md:scale-[1.06] max-md:scale-[1.28] max-md:opacity-88 max-md:saturate-[1.18] max-md:contrast-[1.16] max-md:brightness-[0.78]"
+        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] [object-position:62%_50%] scale-[1.06] md:[object-position:center] md:scale-[1.06] max-md:scale-[1.28] max-md:opacity-95 max-md:saturate-[1.2] max-md:contrast-[1.18] max-md:brightness-[0.88]"
+        autoPlay={isMobile}
         muted
         playsInline
+        loop={isMobile}
         preload="auto"
         src={VIDEO_SRC}
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_32%,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.90)_100%)] max-md:bg-[radial-gradient(circle_at_56%_24%,rgba(0,0,0,0.02)_0%,rgba(0,0,0,0.22)_44%,rgba(0,0,0,0.84)_100%)]" />
-      <div className="absolute inset-y-0 left-0 w-[68%] bg-gradient-to-r from-[#02040A] via-[#02040A]/86 to-transparent max-md:w-full max-md:bg-gradient-to-b max-md:from-[#02040A]/52 max-md:via-[#02040A]/28 max-md:to-[#02040A]/72" />
-      <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-[#02040A]/82 via-[#02040A]/28 to-transparent max-md:h-52" />
-      <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-gradient-to-t from-[#02040A] via-[#02040A]/76 to-transparent max-md:h-[28rem]" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,4,10,0.72)_0%,rgba(2,4,10,0.45)_34%,rgba(2,4,10,0.16)_62%,rgba(2,4,10,0.54)_100%)] max-md:bg-[linear-gradient(180deg,rgba(2,4,10,0.42)_0%,rgba(2,4,10,0.16)_42%,rgba(2,4,10,0.70)_100%)]" />
-      <div className="absolute inset-0 opacity-[0.035] mix-blend-screen [background-image:radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0.55px,transparent_0.9px)] [background-size:4px_4px] max-md:opacity-[0.025]" />
-      <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:120px_120px] [mask-image:radial-gradient(circle_at_65%_34%,black_0%,transparent_62%)] max-md:opacity-[0.045] max-md:[background-size:82px_82px] max-md:[mask-image:radial-gradient(circle_at_52%_28%,black_0%,transparent_72%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_32%,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.90)_100%)] max-md:bg-[radial-gradient(circle_at_56%_24%,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.12)_44%,rgba(0,0,0,0.72)_100%)]" />
+      <div className="absolute inset-y-0 left-0 w-[68%] bg-gradient-to-r from-[#02040A] via-[#02040A]/86 to-transparent max-md:w-full max-md:bg-gradient-to-b max-md:from-[#02040A]/28 max-md:via-[#02040A]/10 max-md:to-[#02040A]/62" />
+      <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-[#02040A]/82 via-[#02040A]/28 to-transparent max-md:h-52 max-md:from-[#02040A]/46" />
+      <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-gradient-to-t from-[#02040A] via-[#02040A]/76 to-transparent max-md:h-[28rem] max-md:via-[#02040A]/54" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,4,10,0.72)_0%,rgba(2,4,10,0.45)_34%,rgba(2,4,10,0.16)_62%,rgba(2,4,10,0.54)_100%)] max-md:bg-[linear-gradient(180deg,rgba(2,4,10,0.24)_0%,rgba(2,4,10,0.08)_42%,rgba(2,4,10,0.58)_100%)]" />
+      <div className="absolute inset-0 opacity-[0.035] mix-blend-screen [background-image:radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0.55px,transparent_0.9px)] [background-size:4px_4px] max-md:opacity-[0.018]" />
+      <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:120px_120px] [mask-image:radial-gradient(circle_at_65%_34%,black_0%,transparent_62%)] max-md:opacity-[0.028] max-md:[background-size:82px_82px] max-md:[mask-image:radial-gradient(circle_at_52%_28%,black_0%,transparent_72%)]" />
 
       <div className="absolute bottom-[18%] right-[12%] hidden rounded-full border border-accent-blue/24 bg-accent-blue/10 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.22em] text-accent-cyan shadow-[0_0_40px_rgba(77,162,255,0.18)] backdrop-blur-xl md:block">
         <span className="mr-3 inline-block h-1.5 w-1.5 rounded-full bg-accent-cyan shadow-[0_0_14px_rgba(45,226,230,0.95)]" />
