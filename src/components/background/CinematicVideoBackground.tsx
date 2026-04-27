@@ -6,6 +6,13 @@ import { useEffect, useRef, useState } from 'react'
 const VIDEO_SRC = '/media/Premium_Automotive_Locksmith_Website_Background.mp4'
 const SNAP_POINTS = [0, 0.28, 0.52, 0.74, 1]
 
+const SCENE_STATES = [
+  { threshold: 0, label: 'System locked', detail: 'City core standing by' },
+  { threshold: 0.26, label: 'Key aligned', detail: 'Vehicle access request detected' },
+  { threshold: 0.5, label: 'Unlock sequence', detail: 'Emergency dispatch opening' },
+  { threshold: 0.72, label: 'Network online', detail: 'Mobile locksmith route active' },
+]
+
 function clamp01(value: number) {
   return Math.max(0, Math.min(1, value))
 }
@@ -21,6 +28,10 @@ function snapProgress(value: number) {
   return snapped
 }
 
+function getSceneState(progress: number) {
+  return SCENE_STATES.reduce((active, item) => (progress >= item.threshold ? item : active), SCENE_STATES[0])
+}
+
 export default function CinematicVideoBackground() {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const frameRef = useRef<number | null>(null)
@@ -29,6 +40,7 @@ export default function CinematicVideoBackground() {
   const [duration, setDuration] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [unlockActive, setUnlockActive] = useState(false)
+  const [sceneState, setSceneState] = useState(SCENE_STATES[0])
   const { scrollYProgress } = useScroll()
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 95, damping: 28, mass: 0.28 })
 
@@ -87,6 +99,7 @@ export default function CinematicVideoBackground() {
       const threshold = isMobile ? 0.055 : 0.03
 
       setUnlockActive(snappedProgress > 0.49 && snappedProgress < 0.78)
+      setSceneState(getSceneState(snappedProgress))
 
       if (Math.abs(video.currentTime - nextTime) > threshold) {
         video.currentTime = nextTime
@@ -129,7 +142,12 @@ export default function CinematicVideoBackground() {
       <div className={`absolute inset-0 transition-opacity duration-500 ${unlockActive ? 'opacity-100' : 'opacity-0'}`}>
         <div className="absolute left-[58%] top-[32%] h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent-blue/28 shadow-[0_0_120px_rgba(77,162,255,0.32)] motion-safe:animate-[unlockPulse_1.35s_ease-out_infinite] max-md:left-[52%] max-md:top-[28%] max-md:h-[17rem] max-md:w-[17rem]" />
         <div className="absolute left-[58%] top-[32%] h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-blue/12 blur-3xl max-md:left-[52%] max-md:top-[28%] max-md:h-[24rem] max-md:w-[24rem]" />
-        <div className="absolute bottom-[18%] right-[12%] rounded-full border border-accent-blue/24 bg-accent-blue/10 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.22em] text-accent-cyan shadow-[0_0_40px_rgba(77,162,255,0.18)] backdrop-blur-xl max-md:bottom-[12%] max-md:right-5 max-md:text-[0.55rem]">unlock sequence</div>
+      </div>
+
+      <div className="absolute bottom-[18%] right-[12%] hidden rounded-full border border-accent-blue/24 bg-accent-blue/10 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.22em] text-accent-cyan shadow-[0_0_40px_rgba(77,162,255,0.18)] backdrop-blur-xl md:block">
+        <span className="mr-3 inline-block h-1.5 w-1.5 rounded-full bg-accent-cyan shadow-[0_0_14px_rgba(45,226,230,0.95)]" />
+        {sceneState.label}
+        <span className="ml-3 text-white/45">{sceneState.detail}</span>
       </div>
     </div>
   )
