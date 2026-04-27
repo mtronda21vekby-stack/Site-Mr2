@@ -1,9 +1,10 @@
 'use client'
 
 import { useScroll, useSpring } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-const VIDEO_SRC = '/media/Premium_Automotive_Locksmith_Website_Background.mp4'
+const DESKTOP_VIDEO_SRC = '/media/Premium_Automotive_Locksmith_Website_Background.mp4'
+const MOBILE_VIDEO_SRC = '/media/clideo_editor_de7f5321887f4e22af79a787f031062c.mp4'
 const SNAP_POINTS = [0, 0.28, 0.52, 0.74, 1]
 
 const SCENE_STATES = [
@@ -43,6 +44,7 @@ export default function CinematicVideoBackground() {
   const [sceneState, setSceneState] = useState(SCENE_STATES[0])
   const { scrollYProgress } = useScroll()
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 72, damping: 24, mass: 0.36 })
+  const activeVideoSrc = useMemo(() => (isMobile ? MOBILE_VIDEO_SRC : DESKTOP_VIDEO_SRC), [isMobile])
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px), (pointer: coarse)')
@@ -56,6 +58,11 @@ export default function CinematicVideoBackground() {
     const video = videoRef.current
     if (!video) return
 
+    setCanScrub(false)
+    setDuration(0)
+    lastUpdateRef.current = 0
+    latestProgressRef.current = 0
+
     video.muted = true
     video.defaultMuted = true
     video.playsInline = true
@@ -63,12 +70,13 @@ export default function CinematicVideoBackground() {
     video.disablePictureInPicture = true
     video.loop = false
     video.autoplay = false
+    video.pause()
 
     const onLoadedMetadata = () => {
       setDuration(Number.isFinite(video.duration) ? video.duration : 0)
       setCanScrub(true)
       video.pause()
-      video.currentTime = isMobile ? 0.1 : 0.001
+      video.currentTime = isMobile ? 0.001 : 0.001
     }
 
     const onError = () => {
@@ -85,7 +93,7 @@ export default function CinematicVideoBackground() {
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
       video.removeEventListener('error', onError)
     }
-  }, [isMobile])
+  }, [activeVideoSrc, isMobile])
 
   useEffect(() => {
     if (!canScrub || !duration) return
@@ -95,18 +103,16 @@ export default function CinematicVideoBackground() {
       const video = videoRef.current
       if (!video) return
 
-      const minFrameGap = isMobile ? 66 : 32
+      const minFrameGap = isMobile ? 58 : 32
       if (timestamp - lastUpdateRef.current < minFrameGap) return
       lastUpdateRef.current = timestamp
 
       const safeDuration = Math.max(0.1, duration - 0.08)
       const rawProgress = clamp01(latestProgressRef.current)
       const desktopProgress = snapProgress(rawProgress)
-      const mobileStart = 0.1
-      const mobileRange = 0.82
-      const mappedProgress = isMobile ? mobileStart + rawProgress * mobileRange : desktopProgress
+      const mappedProgress = isMobile ? rawProgress : desktopProgress
       const nextTime = Math.min(safeDuration, Math.max(0.001, mappedProgress * safeDuration))
-      const threshold = isMobile ? 0.12 : 0.035
+      const threshold = isMobile ? 0.095 : 0.035
 
       setSceneState(getSceneState(isMobile ? rawProgress : desktopProgress))
 
@@ -133,18 +139,18 @@ export default function CinematicVideoBackground() {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-[#02040A]">
       <video
         ref={videoRef}
-        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] [object-position:62%_50%] scale-[1.06] md:[object-position:center] md:scale-[1.06] max-md:scale-[1.18] max-md:opacity-92 max-md:saturate-[1.14] max-md:contrast-[1.12] max-md:brightness-[0.84]"
+        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] [object-position:62%_50%] scale-[1.06] md:[object-position:center] md:scale-[1.06] max-md:scale-[1.04] max-md:opacity-94 max-md:saturate-[1.12] max-md:contrast-[1.1] max-md:brightness-[0.88]"
         muted
         playsInline
         preload="metadata"
-        src={VIDEO_SRC}
+        src={activeVideoSrc}
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_32%,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.90)_100%)] max-md:bg-[radial-gradient(circle_at_56%_24%,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.12)_44%,rgba(0,0,0,0.72)_100%)]" />
-      <div className="absolute inset-y-0 left-0 w-[68%] bg-gradient-to-r from-[#02040A] via-[#02040A]/86 to-transparent max-md:w-full max-md:bg-gradient-to-b max-md:from-[#02040A]/28 max-md:via-[#02040A]/10 max-md:to-[#02040A]/62" />
-      <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-[#02040A]/82 via-[#02040A]/28 to-transparent max-md:h-52 max-md:from-[#02040A]/46" />
-      <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-gradient-to-t from-[#02040A] via-[#02040A]/76 to-transparent max-md:h-[28rem] max-md:via-[#02040A]/54" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,4,10,0.72)_0%,rgba(2,4,10,0.45)_34%,rgba(2,4,10,0.16)_62%,rgba(2,4,10,0.54)_100%)] max-md:bg-[linear-gradient(180deg,rgba(2,4,10,0.24)_0%,rgba(2,4,10,0.08)_42%,rgba(2,4,10,0.58)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_32%,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.90)_100%)] max-md:bg-[radial-gradient(circle_at_50%_26%,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.10)_45%,rgba(0,0,0,0.70)_100%)]" />
+      <div className="absolute inset-y-0 left-0 w-[68%] bg-gradient-to-r from-[#02040A] via-[#02040A]/86 to-transparent max-md:w-full max-md:bg-gradient-to-b max-md:from-[#02040A]/20 max-md:via-[#02040A]/8 max-md:to-[#02040A]/60" />
+      <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-[#02040A]/82 via-[#02040A]/28 to-transparent max-md:h-52 max-md:from-[#02040A]/40" />
+      <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-gradient-to-t from-[#02040A] via-[#02040A]/76 to-transparent max-md:h-[28rem] max-md:via-[#02040A]/50" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,4,10,0.72)_0%,rgba(2,4,10,0.45)_34%,rgba(2,4,10,0.16)_62%,rgba(2,4,10,0.54)_100%)] max-md:bg-[linear-gradient(180deg,rgba(2,4,10,0.20)_0%,rgba(2,4,10,0.06)_42%,rgba(2,4,10,0.54)_100%)]" />
       <div className="absolute inset-0 opacity-[0.035] mix-blend-screen [background-image:radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0.55px,transparent_0.9px)] [background-size:4px_4px] max-md:hidden" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:120px_120px] [mask-image:radial-gradient(circle_at_65%_34%,black_0%,transparent_62%)] max-md:hidden" />
 
