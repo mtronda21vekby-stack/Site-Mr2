@@ -39,7 +39,6 @@ export default function CinematicVideoBackground() {
   const [canScrub, setCanScrub] = useState(false)
   const [duration, setDuration] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
-  const [videoReady, setVideoReady] = useState(false)
   const [sceneState, setSceneState] = useState(SCENE_STATES[0])
   const { scrollYProgress } = useScroll()
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 95, damping: 28, mass: 0.28 })
@@ -59,62 +58,36 @@ export default function CinematicVideoBackground() {
     video.muted = true
     video.defaultMuted = true
     video.playsInline = true
+    video.controls = false
+    video.disablePictureInPicture = true
+    video.loop = false
+    video.autoplay = false
 
     const onLoadedMetadata = () => {
       setDuration(Number.isFinite(video.duration) ? video.duration : 0)
       setCanScrub(true)
-      setVideoReady(true)
-      if (isMobile) {
-        video.loop = true
-        video.autoplay = true
-        video.play().catch(() => undefined)
-      } else {
-        video.loop = false
-        video.pause()
-        video.currentTime = 0.001
-      }
-    }
-
-    const onCanPlay = () => {
-      setVideoReady(true)
-      if (isMobile) video.play().catch(() => undefined)
+      video.pause()
+      video.currentTime = isMobile ? 0.12 : 0.001
     }
 
     const onError = () => {
       setCanScrub(false)
       setDuration(0)
-      setVideoReady(false)
     }
 
     video.addEventListener('loadedmetadata', onLoadedMetadata)
-    video.addEventListener('canplay', onCanPlay)
     video.addEventListener('error', onError)
     video.load()
     if (video.readyState >= 1) onLoadedMetadata()
 
     return () => {
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
-      video.removeEventListener('canplay', onCanPlay)
       video.removeEventListener('error', onError)
     }
   }, [isMobile])
 
   useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    if (isMobile) {
-      video.loop = true
-      video.autoplay = true
-      video.play().catch(() => undefined)
-    } else {
-      video.loop = false
-      video.autoplay = false
-      video.pause()
-    }
-  }, [isMobile, videoReady])
-
-  useEffect(() => {
-    if (!canScrub || !duration || isMobile) return
+    if (!canScrub || !duration) return
 
     const applyFrame = () => {
       frameRef.current = null
@@ -123,12 +96,16 @@ export default function CinematicVideoBackground() {
 
       const safeDuration = Math.max(0.1, duration - 0.08)
       const rawProgress = clamp01(latestProgressRef.current)
-      const snappedProgress = snapProgress(rawProgress)
-      const nextTime = Math.min(safeDuration, Math.max(0.001, snappedProgress * safeDuration))
+      const desktopProgress = snapProgress(rawProgress)
+      const mobileStart = 0.08
+      const mobileRange = 0.86
+      const mappedProgress = isMobile ? mobileStart + rawProgress * mobileRange : desktopProgress
+      const nextTime = Math.min(safeDuration, Math.max(0.001, mappedProgress * safeDuration))
+      const threshold = isMobile ? 0.075 : 0.03
 
-      setSceneState(getSceneState(snappedProgress))
+      setSceneState(getSceneState(isMobile ? rawProgress : desktopProgress))
 
-      if (Math.abs(video.currentTime - nextTime) > 0.03) {
+      if (Math.abs(video.currentTime - nextTime) > threshold) {
         video.currentTime = nextTime
       }
     }
@@ -152,10 +129,8 @@ export default function CinematicVideoBackground() {
       <video
         ref={videoRef}
         className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] [object-position:62%_50%] scale-[1.06] md:[object-position:center] md:scale-[1.06] max-md:scale-[1.28] max-md:opacity-95 max-md:saturate-[1.2] max-md:contrast-[1.18] max-md:brightness-[0.88]"
-        autoPlay={isMobile}
         muted
         playsInline
-        loop={isMobile}
         preload="auto"
         src={VIDEO_SRC}
       />
