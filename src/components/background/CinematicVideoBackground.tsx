@@ -139,14 +139,14 @@ export default function CinematicVideoBackground() {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-[#02040A]">
       <video
         ref={videoRef}
-        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] object-center scale-[1.06] md:scale-[1.06] max-md:scale-100 max-md:opacity-96 max-md:saturate-[1.12] max-md:contrast-[1.08] max-md:brightness-[0.9]"
+        className="absolute left-1/2 top-1/2 h-full w-full min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-78 saturate-[1.12] contrast-[1.12] brightness-[0.70] object-center scale-[1.06] md:scale-[1.06] max-md:object-[54%_50%] max-md:scale-100 max-md:opacity-96 max-md:saturate-[1.12] max-md:contrast-[1.08] max-md:brightness-[0.9]"
         muted
         playsInline
         preload="metadata"
         src={activeVideoSrc}
       />
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_32%,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.90)_100%)] max-md:bg-[radial-gradient(circle_at_50%_28%,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.66)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_64%_32%,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.30)_42%,rgba(0,0,0,0.90)_100%)] max-md:bg-[radial-gradient(circle_at_54%_28%,rgba(0,0,0,0.00)_0%,rgba(0,0,0,0.08)_48%,rgba(0,0,0,0.66)_100%)]" />
       <div className="absolute inset-y-0 left-0 w-[68%] bg-gradient-to-r from-[#02040A] via-[#02040A]/86 to-transparent max-md:w-full max-md:bg-gradient-to-b max-md:from-[#02040A]/16 max-md:via-[#02040A]/6 max-md:to-[#02040A]/58" />
       <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-[#02040A]/82 via-[#02040A]/28 to-transparent max-md:h-52 max-md:from-[#02040A]/34" />
       <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-gradient-to-t from-[#02040A] via-[#02040A]/76 to-transparent max-md:h-[28rem] max-md:via-[#02040A]/46" />
