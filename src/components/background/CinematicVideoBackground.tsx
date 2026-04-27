@@ -39,7 +39,6 @@ export default function CinematicVideoBackground() {
   const [canScrub, setCanScrub] = useState(false)
   const [duration, setDuration] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
-  const [unlockActive, setUnlockActive] = useState(false)
   const [sceneState, setSceneState] = useState(SCENE_STATES[0])
   const { scrollYProgress } = useScroll()
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 95, damping: 28, mass: 0.28 })
@@ -58,12 +57,17 @@ export default function CinematicVideoBackground() {
 
     video.muted = true
     video.playsInline = true
-    video.pause()
-    video.currentTime = 0.001
 
     const onLoadedMetadata = () => {
       setDuration(Number.isFinite(video.duration) ? video.duration : 0)
       setCanScrub(true)
+      if (isMobile) {
+        video.loop = true
+        video.play().catch(() => undefined)
+      } else {
+        video.pause()
+        video.currentTime = 0.001
+      }
     }
 
     const onError = () => {
@@ -79,10 +83,22 @@ export default function CinematicVideoBackground() {
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
       video.removeEventListener('error', onError)
     }
-  }, [])
+  }, [isMobile])
 
   useEffect(() => {
-    if (!canScrub || !duration) return
+    const video = videoRef.current
+    if (!video) return
+    if (isMobile) {
+      video.loop = true
+      video.play().catch(() => undefined)
+    } else {
+      video.loop = false
+      video.pause()
+    }
+  }, [isMobile])
+
+  useEffect(() => {
+    if (!canScrub || !duration || isMobile) return
 
     const applyFrame = () => {
       frameRef.current = null
@@ -90,18 +106,13 @@ export default function CinematicVideoBackground() {
       if (!video) return
 
       const safeDuration = Math.max(0.1, duration - 0.08)
-      const mobileStart = isMobile ? 0.08 : 0.001
-      const mobileRange = isMobile ? 0.84 : 1
       const rawProgress = clamp01(latestProgressRef.current)
-      const snappedProgress = isMobile ? rawProgress : snapProgress(rawProgress)
-      const mappedProgress = isMobile ? mobileStart + snappedProgress * mobileRange : snappedProgress
-      const nextTime = Math.min(safeDuration, Math.max(0.001, mappedProgress * safeDuration))
-      const threshold = isMobile ? 0.055 : 0.03
+      const snappedProgress = snapProgress(rawProgress)
+      const nextTime = Math.min(safeDuration, Math.max(0.001, snappedProgress * safeDuration))
 
-      setUnlockActive(snappedProgress > 0.49 && snappedProgress < 0.78)
       setSceneState(getSceneState(snappedProgress))
 
-      if (Math.abs(video.currentTime - nextTime) > threshold) {
+      if (Math.abs(video.currentTime - nextTime) > 0.03) {
         video.currentTime = nextTime
       }
     }
@@ -138,11 +149,6 @@ export default function CinematicVideoBackground() {
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,4,10,0.72)_0%,rgba(2,4,10,0.45)_34%,rgba(2,4,10,0.16)_62%,rgba(2,4,10,0.54)_100%)] max-md:bg-[linear-gradient(180deg,rgba(2,4,10,0.42)_0%,rgba(2,4,10,0.16)_42%,rgba(2,4,10,0.70)_100%)]" />
       <div className="absolute inset-0 opacity-[0.035] mix-blend-screen [background-image:radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0.55px,transparent_0.9px)] [background-size:4px_4px] max-md:opacity-[0.025]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:120px_120px] [mask-image:radial-gradient(circle_at_65%_34%,black_0%,transparent_62%)] max-md:opacity-[0.045] max-md:[background-size:82px_82px] max-md:[mask-image:radial-gradient(circle_at_52%_28%,black_0%,transparent_72%)]" />
-
-      <div className={`absolute inset-0 transition-opacity duration-500 ${unlockActive ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="absolute left-[58%] top-[32%] h-[22rem] w-[22rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent-blue/28 shadow-[0_0_120px_rgba(77,162,255,0.32)] motion-safe:animate-[unlockPulse_1.35s_ease-out_infinite] max-md:left-[52%] max-md:top-[28%] max-md:h-[17rem] max-md:w-[17rem]" />
-        <div className="absolute left-[58%] top-[32%] h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-blue/12 blur-3xl max-md:left-[52%] max-md:top-[28%] max-md:h-[24rem] max-md:w-[24rem]" />
-      </div>
 
       <div className="absolute bottom-[18%] right-[12%] hidden rounded-full border border-accent-blue/24 bg-accent-blue/10 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.22em] text-accent-cyan shadow-[0_0_40px_rgba(77,162,255,0.18)] backdrop-blur-xl md:block">
         <span className="mr-3 inline-block h-1.5 w-1.5 rounded-full bg-accent-cyan shadow-[0_0_14px_rgba(45,226,230,0.95)]" />
