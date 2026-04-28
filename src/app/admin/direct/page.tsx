@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
         setRecentOrders(Array.isArray(recent.data) ? recent.data.map((row: any) => ({ id: row.id ?? '', name: row.name ?? '', phone: row.phone ?? '', service_needed: row.service_needed ?? '', status: row.status ?? 'new', created_at: row.created_at ?? '' })) : [])
       } catch (error) {
         if (!mounted) return
-        setErrorMessage(error instanceof Error ? error.message : 'Failed to load dashboard')
+        setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить панель')
       } finally {
         if (mounted) setIsRefreshing(false)
       }
@@ -82,51 +82,75 @@ export default function AdminDashboardPage() {
   }, [router, supabase])
 
   const qualityItems = getQualityItems(metrics)
-  if (isChecking) return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Planetlocksmiths cockpit</p><h1 style={titleStyle}>Loading admin...</h1></div></div>
+  if (isChecking) return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Админ-панель</p><h1 style={titleStyle}>Загрузка...</h1></div></div>
 
   return (
     <div style={pageStyle}>
       <div style={ambientBlueStyle} /><div style={ambientGoldStyle} />
-      <section style={heroPanelStyle}><div><p style={eyebrowStyle}>Planetlocksmiths / Workers control room</p><h1 style={heroTitleStyle}>Operations + Quality Dashboard</h1><p style={heroTextStyle}>Manage Supabase content, emergency leads, local landing pages, Ads-readiness, reviews, FAQ, content blocks, and service coverage from one command center.</p></div><div style={heroActionsStyle}><a href="/admin/audit" style={ghostButtonStyle}>Audit center</a><a href={CONTENT_BLOCKS_HREF} style={ghostButtonStyle}>Content blocks</a><a href="/en" style={ghostButtonStyle}>View site</a><button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Refreshing...' : 'Refresh signal'}</button></div></section>
+      <section style={heroPanelStyle}>
+        <div>
+          <p style={eyebrowStyle}>Planet Locksmiths / панель управления</p>
+          <h1 style={heroTitleStyle}>Админка сайта</h1>
+          <p style={heroTextStyle}>Быстрый доступ к заказам, настройкам, контенту и загрузке фотографий. Версия: RU-PHOTOS-CMS-v2.</p>
+        </div>
+        <div style={heroActionsStyle}>
+          <a href="/admin/photos" style={photoButtonStyle}>📸 Загрузка фото</a>
+          <a href="/admin" style={ghostButtonStyle}>Главная админка</a>
+          <a href="/en" style={ghostButtonStyle}>Открыть сайт</a>
+          <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Обновление...' : 'Обновить'}</button>
+        </div>
+      </section>
+
+      <section style={photoAccessPanelStyle}>
+        <div>
+          <p style={eyebrowStyle}>Фото CMS</p>
+          <h2 style={panelTitleStyle}>Фотографии, галерея и кейсы до/после</h2>
+          <p style={heroTextStyle}>Нажми сюда, чтобы загрузить фото, создать before/after кейс, редактировать название, описание и категорию.</p>
+        </div>
+        <a href="/admin/photos" style={largePhotoLinkStyle}>Перейти к загрузке фото →</a>
+      </section>
+
       {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
-      <div style={statsGridStyle}><AdminStatCard title="New Orders" value={String(metrics.newOrders)} note="Fresh requests waiting for action." /><AdminStatCard title="Active Orders" value={String(metrics.activeOrders)} note="Contacted, scheduled, or in progress." /><AdminStatCard title="Completed" value={String(metrics.completedOrders)} note="Closed requests marked completed." /><AdminStatCard title="Services" value={String(metrics.services)} note="Published service landing pages." /><AdminStatCard title="Areas" value={String(metrics.areas)} note="Published local coverage pages." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Published customer answers." /><AdminStatCard title="Reviews" value={String(metrics.reviews)} note="Published proof cards." /></div>
-      <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Quality control</p><h2 style={panelTitleStyle}>Ads / SEO / UX Readiness</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} ready</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
-      <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Admin modules</p><h2 style={panelTitleStyle}>Quick Access</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Open module →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Dispatch feed</p><h2 style={panelTitleStyle}>Latest Orders</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>All orders →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Order'}</strong><p style={mutedLineStyle}>{order.name || 'No name'} · {order.phone || 'No phone'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>No recent orders yet. New requests will appear here after the contact form starts receiving leads.</div> : null}</div></section></div>
+      <div style={statsGridStyle}><AdminStatCard title="Новые заявки" value={String(metrics.newOrders)} note="Свежие запросы." /><AdminStatCard title="Активные" value={String(metrics.activeOrders)} note="В работе." /><AdminStatCard title="Завершено" value={String(metrics.completedOrders)} note="Закрытые заявки." /><AdminStatCard title="Услуги" value={String(metrics.services)} note="Страницы услуг." /><AdminStatCard title="Локации" value={String(metrics.areas)} note="Городские страницы." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Ответы клиентам." /><AdminStatCard title="Отзывы" value={String(metrics.reviews)} note="Доказательства доверия." /></div>
+      <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Контроль качества</p><h2 style={panelTitleStyle}>SEO / UX / Ads готовность</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} готово</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
+      <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Модули</p><h2 style={panelTitleStyle}>Быстрый доступ</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Открыть →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Заявки</p><h2 style={panelTitleStyle}>Последние заявки</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>Все заявки →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Заявка'}</strong><p style={mutedLineStyle}>{order.name || 'Без имени'} · {order.phone || 'Без телефона'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>Пока нет заявок.</div> : null}</div></section></div>
     </div>
   )
 }
 
 const links = [
-  { title: 'Audit', href: '/admin/audit', description: 'Detailed quality audit for editable content and landing pages.', accent: '#FF9A9A' },
-  { title: 'Content Blocks', href: CONTENT_BLOCKS_HREF, description: 'Modular editor with shared presets, previews, reusable blocks, CTA copy, and section items.', accent: '#2DE2E6' },
-  { title: 'Orders', href: '/admin/orders', description: 'Incoming leads, statuses, notes, field workflow.', accent: '#4DA2FF' },
-  { title: 'Settings', href: '/admin/settings', description: 'Brand, phone, email, service hours, emergency routing.', accent: '#D6A85F' },
-  { title: 'Home', href: '/admin/home', description: 'Hero, CTA copy, conversion rails, contact block.', accent: '#2DE2E6' },
-  { title: 'Services', href: '/admin/services', description: 'Service landing pages, SEO fields, live publishing.', accent: '#2DE2E6' },
-  { title: 'Areas', href: '/admin/areas', description: 'Local pages, coverage notes, supported services.', accent: '#D6A85F' },
-  { title: 'FAQ', href: '/admin/faq', description: 'Customer answers for emergency and service questions.', accent: '#4DA2FF' },
-  { title: 'Reviews', href: '/admin/reviews', description: 'Localized proof cards and rating signals.', accent: '#D6A85F' },
+  { title: 'Фотографии', href: '/admin/photos', description: 'Загрузка фото, галерея, before/after кейсы, inline редактирование.', accent: '#2DE2E6' },
+  { title: 'Аудит', href: '/admin/audit', description: 'Проверка качества контента и страниц.', accent: '#FF9A9A' },
+  { title: 'Контент-блоки', href: CONTENT_BLOCKS_HREF, description: 'Редактор секций, CTA и блоков.', accent: '#2DE2E6' },
+  { title: 'Заказы', href: '/admin/orders', description: 'Заявки, статусы, заметки.', accent: '#4DA2FF' },
+  { title: 'Настройки', href: '/admin/settings', description: 'Бренд, телефон, email, часы работы.', accent: '#D6A85F' },
+  { title: 'Главная', href: '/admin/home', description: 'Hero, CTA, конверсионные блоки.', accent: '#2DE2E6' },
+  { title: 'Услуги', href: '/admin/services', description: 'Страницы услуг и SEO.', accent: '#2DE2E6' },
+  { title: 'Города', href: '/admin/areas', description: 'Локальные страницы.', accent: '#D6A85F' },
+  { title: 'FAQ', href: '/admin/faq', description: 'Ответы клиентам.', accent: '#4DA2FF' },
+  { title: 'Отзывы', href: '/admin/reviews', description: 'Отзывы и proof-карточки.', accent: '#D6A85F' },
 ]
 
 function getQualityItems(metrics: Metrics): QualityItem[] {
   return [
-    { title: 'Content blocks', href: CONTENT_BLOCKS_HREF, status: 'warn', note: 'Use the modular editor for shared presets, previews, and reusable page modules.' },
-    { title: 'Content audit', href: '/admin/audit', status: 'warn', note: 'Open detailed audit for SEO, intro length, slugs, highlights, and supported services.' },
-    { title: 'Service pages', href: '/admin/services', status: metrics.services >= 6 ? 'good' : metrics.services >= 3 ? 'warn' : 'danger', note: metrics.services >= 6 ? 'Strong service coverage.' : 'Add more published service landing pages.' },
-    { title: 'Area pages', href: '/admin/areas', status: metrics.areas >= 6 ? 'good' : metrics.areas >= 3 ? 'warn' : 'danger', note: metrics.areas >= 6 ? 'Good local coverage depth.' : 'Add more local service-area pages.' },
-    { title: 'FAQ depth', href: '/admin/faq', status: metrics.faq >= 8 ? 'good' : metrics.faq >= 4 ? 'warn' : 'danger', note: metrics.faq >= 8 ? 'Good answer base for Ads trust.' : 'Add FAQ about pricing, authorization, keys, timing, and service limits.' },
-    { title: 'Reviews proof', href: '/admin/reviews', status: metrics.reviews >= 6 ? 'good' : metrics.reviews >= 3 ? 'warn' : 'danger', note: metrics.reviews >= 6 ? 'Strong public proof layer.' : 'Add more published customer reviews.' },
-    { title: 'Lead flow', href: '/admin/orders', status: metrics.newOrders + metrics.activeOrders > 0 ? 'good' : 'warn', note: metrics.newOrders + metrics.activeOrders > 0 ? 'Requests are entering the system.' : 'No active/new requests visible yet.' },
+    { title: 'Фото CMS', href: '/admin/photos', status: 'good', note: 'Загрузка фото и before/after кейсов подключена.' },
+    { title: 'Контент-блоки', href: CONTENT_BLOCKS_HREF, status: 'warn', note: 'Редактор модульных секций.' },
+    { title: 'Аудит контента', href: '/admin/audit', status: 'warn', note: 'Проверка SEO, текстов и страниц.' },
+    { title: 'Страницы услуг', href: '/admin/services', status: metrics.services >= 6 ? 'good' : metrics.services >= 3 ? 'warn' : 'danger', note: metrics.services >= 6 ? 'Покрытие услуг хорошее.' : 'Добавить больше страниц услуг.' },
+    { title: 'Города', href: '/admin/areas', status: metrics.areas >= 6 ? 'good' : metrics.areas >= 3 ? 'warn' : 'danger', note: metrics.areas >= 6 ? 'Локальное покрытие хорошее.' : 'Добавить больше городских страниц.' },
+    { title: 'FAQ', href: '/admin/faq', status: metrics.faq >= 8 ? 'good' : metrics.faq >= 4 ? 'warn' : 'danger', note: metrics.faq >= 8 ? 'FAQ база сильная.' : 'Добавить вопросы про цену, ключи, сроки.' },
+    { title: 'Отзывы', href: '/admin/reviews', status: metrics.reviews >= 6 ? 'good' : metrics.reviews >= 3 ? 'warn' : 'danger', note: metrics.reviews >= 6 ? 'Доверие сильное.' : 'Добавить больше отзывов.' },
   ]
 }
 
-function QualityCard({ item }: { item: QualityItem }) { const color = item.status === 'good' ? '#2DE2E6' : item.status === 'warn' ? '#D6A85F' : '#FF9A9A'; return <a href={item.href} style={{ ...infoWindowStyle, textDecoration: 'none', color: '#F5F7FB', borderColor: `${color}55` }}><span style={{ display: 'inline-flex', marginBottom: 10, color, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8 }}>{item.status}</span><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.note}</p><span style={{ ...quickCtaStyle, color }}>Fix / review →</span></a> }
+function QualityCard({ item }: { item: QualityItem }) { const color = item.status === 'good' ? '#2DE2E6' : item.status === 'warn' ? '#D6A85F' : '#FF9A9A'; return <a href={item.href} style={{ ...infoWindowStyle, textDecoration: 'none', color: '#F5F7FB', borderColor: `${color}55` }}><span style={{ display: 'inline-flex', marginBottom: 10, color, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8 }}>{item.status}</span><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.note}</p><span style={{ ...quickCtaStyle, color }}>Открыть →</span></a> }
 
 const pageStyle: CSSProperties = { position: 'relative', minWidth: 0, overflow: 'hidden', paddingBottom: 24 }
 const ambientBlueStyle: CSSProperties = { position: 'fixed', right: -180, top: -120, width: 460, height: 460, borderRadius: 999, background: 'rgba(77,162,255,0.12)', filter: 'blur(80px)', pointerEvents: 'none' }
 const ambientGoldStyle: CSSProperties = { position: 'fixed', left: -180, bottom: -160, width: 420, height: 420, borderRadius: 999, background: 'rgba(214,168,95,0.09)', filter: 'blur(80px)', pointerEvents: 'none' }
 const loadingShellStyle: CSSProperties = { minHeight: '60vh', display: 'grid', placeItems: 'center' }
 const heroPanelStyle: CSSProperties = { position: 'relative', overflow: 'hidden', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, alignItems: 'end', border: '1px solid rgba(77,162,255,0.22)', borderRadius: 30, padding: 24, marginBottom: 18, background: 'radial-gradient(circle at 12% 0%, rgba(77,162,255,0.20), transparent 320px), linear-gradient(145deg, rgba(17,25,46,0.78), rgba(3,5,11,0.86))', boxShadow: '0 32px 110px rgba(0,0,0,0.36)', backdropFilter: 'blur(20px)' }
+const photoAccessPanelStyle: CSSProperties = { ...heroPanelStyle, border: '1px solid rgba(45,226,230,0.34)', background: 'radial-gradient(circle at 10% 0%, rgba(45,226,230,0.20), transparent 340px), linear-gradient(145deg, rgba(7,25,32,0.82), rgba(3,5,11,0.88))' }
 const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 3 }
 const titleStyle: CSSProperties = { color: '#F5F7FB', margin: '10px 0 0', fontSize: 34 }
 const heroTitleStyle: CSSProperties = { margin: '12px 0 0', color: '#F5F7FB', fontSize: 'clamp(34px, 6vw, 64px)', lineHeight: 0.95, letterSpacing: -2.8 }
@@ -134,6 +158,8 @@ const heroTextStyle: CSSProperties = { maxWidth: 760, margin: '18px 0 0', color:
 const heroActionsStyle: CSSProperties = { display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
 function primaryButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 46, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(77,162,255,0.32)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8, cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.7 : 1, boxShadow: '0 0 34px rgba(77,162,255,0.26)' } }
 const ghostButtonStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.035)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.6 }
+const photoButtonStyle: CSSProperties = { ...ghostButtonStyle, border: '1px solid rgba(45,226,230,0.5)', background: 'rgba(45,226,230,0.15)', color: '#2DE2E6', boxShadow: '0 0 38px rgba(45,226,230,0.18)' }
+const largePhotoLinkStyle: CSSProperties = { minHeight: 58, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 22px', borderRadius: 999, border: '1px solid rgba(45,226,230,0.5)', background: '#2DE2E6', color: '#02040A', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.6, boxShadow: '0 0 44px rgba(45,226,230,0.25)' }
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 14, marginBottom: 18 }
 const twoColumnStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 14, minWidth: 0, marginTop: 14 }
 const panelStyle: CSSProperties = { position: 'relative', overflow: 'hidden', background: 'linear-gradient(145deg, rgba(11,16,32,0.78), rgba(5,7,11,0.82))', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 26, padding: 18, minWidth: 0, boxShadow: '0 28px 90px rgba(0,0,0,0.26)', backdropFilter: 'blur(18px)' }
