@@ -14,6 +14,34 @@ export async function GET() {
   return NextResponse.json({ photos: data ?? [] })
 }
 
+export async function PATCH(req: Request) {
+  const isAdmin = await isAdminAuthenticated()
+  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id, title, alt, category } = (await req.json().catch(() => ({}))) as {
+    id?: string
+    title?: string
+    alt?: string
+    category?: string
+  }
+
+  if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+
+  const supabase = getSupabaseAdmin()
+  const { error } = await supabase
+    .from('site_images')
+    .update({
+      title: title ?? null,
+      alt: alt ?? null,
+      category: category || 'gallery',
+    })
+    .eq('id', id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json({ ok: true })
+}
+
 export async function DELETE(req: Request) {
   const isAdmin = await isAdminAuthenticated()
   if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
