@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 import GalleryLightbox from './GalleryLightbox'
+import BeforeAfterSlider from './BeforeAfterSlider'
 
 type SiteImage = {
   id: string
@@ -16,7 +17,7 @@ async function getGalleryImages(): Promise<SiteImage[]> {
       .from('site_images')
       .select('id,image_url,title,alt,category')
       .order('created_at', { ascending: false })
-      .limit(9)
+      .limit(12)
 
     if (error) return []
     return data ?? []
@@ -28,6 +29,9 @@ async function getGalleryImages(): Promise<SiteImage[]> {
 export default async function SiteGallery() {
   const images = await getGalleryImages()
   if (!images.length) return null
+
+  const before = images.find((i) => i.category === 'before')
+  const after = images.find((i) => i.category === 'after')
 
   return (
     <section className="relative px-5 py-20 md:px-8 md:py-28">
@@ -41,6 +45,17 @@ export default async function SiteGallery() {
             Fresh photos from vehicle key programming, lockouts, emergency calls, and mobile service jobs.
           </p>
         </div>
+
+        {before && after && (
+          <div className="mb-12">
+            <BeforeAfterSlider
+              beforeImage={before.image_url}
+              afterImage={after.image_url}
+              title="Before / After vehicle unlock"
+              category="proof"
+            />
+          </div>
+        )}
 
         <GalleryLightbox images={images} />
       </div>
