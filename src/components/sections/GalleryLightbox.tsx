@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 type GalleryImage = {
   id: string
@@ -12,14 +12,22 @@ type GalleryImage = {
 
 export default function GalleryLightbox({ images }: { images: GalleryImage[] }) {
   const [active, setActive] = useState<number | null>(null)
+  const [filter, setFilter] = useState('all')
+  const touchStartX = useRef<number | null>(null)
+  const categories = useMemo(() => ['all', ...Array.from(new Set(images.map((image) => image.category || 'gallery')))], [images])
+  const filteredImages = useMemo(() => (filter === 'all' ? images : images.filter((image) => (image.category || 'gallery') === filter)), [filter, images])
+
+  useEffect(() => {
+    setActive(null)
+  }, [filter])
 
   useEffect(() => {
     if (active === null) return
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setActive(null)
-      if (event.key === 'ArrowRight') setActive((value) => (value === null ? value : (value + 1) % images.length))
-      if (event.key === 'ArrowLeft') setActive((value) => (value === null ? value : (value - 1 + images.length) % images.length))
+      if (event.key === 'ArrowRight') setActive((value) => (value === null ? value : (value + 1) % filteredImages.length))
+      if (event.key === 'ArrowLeft') setActive((value) => (value === null ? value : (value - 1 + filteredImages.length) % filteredImages.length))
     }
 
     window.addEventListener('keydown', onKeyDown)
@@ -29,19 +37,35 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
       window.removeEventListener('keydown', onKeyDown)
       document.body.style.overflow = ''
     }
-  }, [active, images.length])
+  }, [active, filteredImages.length])
 
-  const current = active === null ? null : images[active]
+  const current = active === null ? null : filteredImages[active]
+
+  const next = () => setActive((value) => (value === null ? value : (value + 1) % filteredImages.length))
+  const prev = () => setActive((value) => (value === null ? value : (value - 1 + filteredImages.length) % filteredImages.length))
 
   return (
     <>
+      <div className="mb-8 flex gap-2 overflow-x-auto pb-2">
+        {categories.map((category) => (
+          <button
+            key={category}
+            type="button"
+            onClick={() => setFilter(category)}
+            className={`shrink-0 rounded-full border px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${filter === category ? 'border-accent-cyan/60 bg-accent-cyan/15 text-white' : 'border-white/10 bg-white/[0.035] text-white/55 hover:border-white/25 hover:text-white'}`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {images.map((image, index) => (
+        {filteredImages.map((image, index) => (
           <button
             key={image.id}
             type="button"
             onClick={() => setActive(index)}
-            className={`group overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] text-left shadow-2xl outline-none backdrop-blur-xl transition duration-500 hover:border-accent-cyan/35 hover:bg-white/[0.055] ${index === 0 ? 'sm:col-span-2 lg:col-span-2' : ''}`}
+            className={`group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] text-left shadow-2xl outline-none backdrop-blur-xl transition duration-500 hover:-translate-y-1 hover:border-accent-cyan/35 hover:bg-white/[0.055] ${index === 0 ? 'sm:col-span-2 lg:col-span-2' : ''}`}
           >
             <div className={`${index === 0 ? 'h-[24rem]' : 'h-72'} overflow-hidden bg-black/50`}>
               <img
@@ -51,6 +75,7 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
             </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
             <div className="flex items-center justify-between gap-4 p-5">
               <div className="min-w-0">
                 <p className="truncate text-xs font-black uppercase tracking-[0.22em] text-accent-cyan/80">
@@ -67,7 +92,22 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
       </div>
 
       {current && active !== null && (
-        <div className="fixed inset-0 z-[100] bg-black/90 p-4 backdrop-blur-2xl md:p-8">
+        <div
+          className="fixed inset-0 z-[100] bg-black/92 p-4 backdrop-blur-2xl md:p-8"
+          onTouchStart={(event) => {
+            touchStartX.current = event.touches[0]?.clientX ?? null
+          }}
+          onTouchEnd={(event) => {
+            if (touchStartX.current === null) return
+            const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
+            const delta = endX - touchStartX.current
+            if (Math.abs(delta) > 48) {
+              if (delta < 0) next()
+              else prev()
+            }
+            touchStartX.current = null
+          }}
+        >
           <button
             type="button"
             onClick={() => setActive(null)}
@@ -76,10 +116,14 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
             Close
           </button>
 
+          <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white/70 backdrop-blur-xl">
+            {active + 1} / {filteredImages.length}
+          </div>
+
           <div className="flex h-full items-center justify-center">
             <button
               type="button"
-              onClick={() => setActive((active - 1 + images.length) % images.length)}
+              onClick={prev}
               className="hidden rounded-full border border-white/15 bg-white/10 px-5 py-4 text-white backdrop-blur-xl md:block"
             >
               ←
@@ -94,12 +138,13 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
               <div className="p-5">
                 <p className="text-xs font-black uppercase tracking-[0.22em] text-accent-cyan/80">{current.category || 'gallery'}</p>
                 <h3 className="mt-2 text-xl font-black text-white">{current.title || 'Mobile locksmith service'}</h3>
+                <p className="mt-2 text-sm text-white/45 md:hidden">Swipe left or right to browse.</p>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => setActive((active + 1) % images.length)}
+              onClick={next}
               className="hidden rounded-full border border-white/15 bg-white/10 px-5 py-4 text-white backdrop-blur-xl md:block"
             >
               →
