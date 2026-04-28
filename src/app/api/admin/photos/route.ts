@@ -3,9 +3,6 @@ import { isAdminAuthenticated } from '@/lib/adminAuth'
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function GET() {
-  const isAdmin = await isAdminAuthenticated()
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const supabase = getSupabaseAdmin()
   const { data, error } = await supabase
     .from('site_images')
