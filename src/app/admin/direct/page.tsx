@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
         setRecentOrders(Array.isArray(recent.data) ? recent.data.map((row: any) => ({ id: row.id ?? '', name: row.name ?? '', phone: row.phone ?? '', service_needed: row.service_needed ?? '', status: row.status ?? 'new', created_at: row.created_at ?? '' })) : [])
       } catch (error) {
         if (!mounted) return
-        setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить панель')
+        setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить рабочую панель')
       } finally {
         if (mounted) setIsRefreshing(false)
       }
@@ -82,20 +82,20 @@ export default function AdminDashboardPage() {
   }, [router, supabase])
 
   const qualityItems = getQualityItems(metrics)
-  if (isChecking) return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Админ-панель</p><h1 style={titleStyle}>Загрузка...</h1></div></div>
+  if (isChecking) return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Панель управления</p><h1 style={titleStyle}>Загрузка...</h1></div></div>
 
   return (
     <div style={pageStyle}>
       <div style={ambientBlueStyle} /><div style={ambientGoldStyle} />
       <section style={heroPanelStyle}>
         <div>
-          <p style={eyebrowStyle}>Planet Locksmiths / панель управления</p>
-          <h1 style={heroTitleStyle}>Админка сайта</h1>
-          <p style={heroTextStyle}>Быстрый доступ к заказам, настройкам, контенту и загрузке фотографий. Версия: RU-PHOTOS-CMS-v2.</p>
+          <p style={eyebrowStyle}>Planet Locksmiths / рабочая панель сайта</p>
+          <h1 style={heroTitleStyle}>Панель управления сайтом</h1>
+          <p style={heroTextStyle}>Быстрый доступ к заявкам, настройкам, контенту и загрузке фотографий. Версия: RU-PHOTOS-CMS-v3.</p>
         </div>
         <div style={heroActionsStyle}>
-          <a href="/admin/photos" style={photoButtonStyle}>📸 Загрузка фото</a>
-          <a href="/admin" style={ghostButtonStyle}>Главная админка</a>
+          <a href="/admin/photos" style={photoButtonStyle}>📸 Фото</a>
+          <a href="/admin" style={ghostButtonStyle}>Главная панель</a>
           <a href="/en" style={ghostButtonStyle}>Открыть сайт</a>
           <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Обновление...' : 'Обновить'}</button>
         </div>
@@ -105,21 +105,21 @@ export default function AdminDashboardPage() {
         <div>
           <p style={eyebrowStyle}>Фото CMS</p>
           <h2 style={panelTitleStyle}>Фотографии, галерея и кейсы до/после</h2>
-          <p style={heroTextStyle}>Нажми сюда, чтобы загрузить фото, создать before/after кейс, редактировать название, описание и категорию.</p>
+          <p style={heroTextStyle}>Здесь можно загрузить фото работ, создать кейс до/после, изменить название, описание и категорию изображения.</p>
         </div>
-        <a href="/admin/photos" style={largePhotoLinkStyle}>Перейти к загрузке фото →</a>
+        <a href="/admin/photos" style={largePhotoLinkStyle}>Перейти к фото →</a>
       </section>
 
       {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
       <div style={statsGridStyle}><AdminStatCard title="Новые заявки" value={String(metrics.newOrders)} note="Свежие запросы." /><AdminStatCard title="Активные" value={String(metrics.activeOrders)} note="В работе." /><AdminStatCard title="Завершено" value={String(metrics.completedOrders)} note="Закрытые заявки." /><AdminStatCard title="Услуги" value={String(metrics.services)} note="Страницы услуг." /><AdminStatCard title="Локации" value={String(metrics.areas)} note="Городские страницы." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Ответы клиентам." /><AdminStatCard title="Отзывы" value={String(metrics.reviews)} note="Доказательства доверия." /></div>
-      <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Контроль качества</p><h2 style={panelTitleStyle}>SEO / UX / Ads готовность</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} готово</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
-      <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Модули</p><h2 style={panelTitleStyle}>Быстрый доступ</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Открыть →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Заявки</p><h2 style={panelTitleStyle}>Последние заявки</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>Все заявки →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Заявка'}</strong><p style={mutedLineStyle}>{order.name || 'Без имени'} · {order.phone || 'Без телефона'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>Пока нет заявок.</div> : null}</div></section></div>
+      <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Контроль качества</p><h2 style={panelTitleStyle}>SEO / UX / рекламная готовность</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} готово</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
+      <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Левое меню / разделы</p><h2 style={panelTitleStyle}>Быстрый доступ</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Открыть →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Заявки</p><h2 style={panelTitleStyle}>Последние заявки</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>Все заявки →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Заявка'}</strong><p style={mutedLineStyle}>{order.name || 'Без имени'} · {order.phone || 'Без телефона'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>Пока нет заявок.</div> : null}</div></section></div>
     </div>
   )
 }
 
 const links = [
-  { title: 'Фотографии', href: '/admin/photos', description: 'Загрузка фото, галерея, before/after кейсы, inline редактирование.', accent: '#2DE2E6' },
+  { title: 'Фото', href: '/admin/photos', description: 'Загрузка фото, галерея, кейсы до/после, редактирование данных.', accent: '#2DE2E6' },
   { title: 'Аудит', href: '/admin/audit', description: 'Проверка качества контента и страниц.', accent: '#FF9A9A' },
   { title: 'Контент-блоки', href: CONTENT_BLOCKS_HREF, description: 'Редактор секций, CTA и блоков.', accent: '#2DE2E6' },
   { title: 'Заказы', href: '/admin/orders', description: 'Заявки, статусы, заметки.', accent: '#4DA2FF' },
@@ -133,7 +133,7 @@ const links = [
 
 function getQualityItems(metrics: Metrics): QualityItem[] {
   return [
-    { title: 'Фото CMS', href: '/admin/photos', status: 'good', note: 'Загрузка фото и before/after кейсов подключена.' },
+    { title: 'Фото CMS', href: '/admin/photos', status: 'good', note: 'Загрузка фото и кейсов до/после подключена.' },
     { title: 'Контент-блоки', href: CONTENT_BLOCKS_HREF, status: 'warn', note: 'Редактор модульных секций.' },
     { title: 'Аудит контента', href: '/admin/audit', status: 'warn', note: 'Проверка SEO, текстов и страниц.' },
     { title: 'Страницы услуг', href: '/admin/services', status: metrics.services >= 6 ? 'good' : metrics.services >= 3 ? 'warn' : 'danger', note: metrics.services >= 6 ? 'Покрытие услуг хорошее.' : 'Добавить больше страниц услуг.' },
