@@ -9,7 +9,6 @@ type AdminPhoto = {
   title?: string | null
   alt?: string | null
   category?: string | null
-  created_at?: string | null
 }
 
 export default function AdminPhotosPage() {
@@ -18,6 +17,10 @@ export default function AdminPhotosPage() {
   const [status, setStatus] = useState('')
   const [photos, setPhotos] = useState<AdminPhoto[]>([])
   const [loading, setLoading] = useState(false)
+
+  const [title, setTitle] = useState('')
+  const [alt, setAlt] = useState('')
+  const [category, setCategory] = useState('gallery')
 
   const loadPhotos = async () => {
     const res = await fetch('/api/admin/photos')
@@ -41,6 +44,9 @@ export default function AdminPhotosPage() {
 
     const form = new FormData()
     form.append('file', file)
+    form.append('title', title)
+    form.append('alt', alt)
+    form.append('category', category)
 
     setLoading(true)
     setStatus('Uploading...')
@@ -61,6 +67,9 @@ export default function AdminPhotosPage() {
     setStatus('Uploaded')
     setFile(null)
     setPreview(null)
+    setTitle('')
+    setAlt('')
+    setCategory('gallery')
     setLoading(false)
     await loadPhotos()
   }
@@ -68,69 +77,66 @@ export default function AdminPhotosPage() {
   const remove = async (id: string) => {
     if (!confirm('Delete this photo?')) return
 
-    const res = await fetch('/api/admin/photos', {
+    await fetch('/api/admin/photos', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     })
 
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
-      setStatus(data.error || 'Delete failed')
-      return
-    }
-
-    setStatus('Deleted')
-    await loadPhotos()
+    loadPhotos()
   }
 
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8">
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">Admin</p>
-          <h1 className="mt-2 text-3xl font-black">Photo Upload</h1>
-          <p className="mt-2 max-w-2xl text-sm text-white/55">
-            Upload customer, service, vehicle key, and locksmith work photos. Images are stored in Supabase and stay available after refresh.
-          </p>
-        </div>
+        <h1 className="text-3xl font-black mb-6">Photo Upload</h1>
 
-        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl">
-          <input type="file" accept="image/*" onChange={onSelect} className="block w-full text-sm text-white/70" />
+        <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+          <input type="file" accept="image/*" onChange={onSelect} />
 
-          {preview && (
-            <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-              <img src={preview} alt="Selected upload preview" className="max-h-80 w-full object-contain" />
-            </div>
-          )}
+          <input
+            placeholder="Title (example: case 1)"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="mt-3 w-full bg-black border px-3 py-2"
+          />
 
-          <button
-            onClick={upload}
-            disabled={!file || loading}
-            className="mt-5 rounded-full border border-accent-blue/40 bg-accent-blue/15 px-6 py-3 text-sm font-black uppercase tracking-[0.18em] text-white disabled:cursor-not-allowed disabled:opacity-45"
+          <input
+            placeholder="Alt text"
+            value={alt}
+            onChange={(e) => setAlt(e.target.value)}
+            className="mt-3 w-full bg-black border px-3 py-2"
+          />
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="mt-3 w-full bg-black border px-3 py-2"
           >
-            {loading ? 'Uploading...' : 'Upload photo'}
+            <option value="gallery">gallery</option>
+            <option value="before">before</option>
+            <option value="after">after</option>
+            <option value="services">services</option>
+          </select>
+
+          {preview && <img src={preview} className="mt-4 w-64" />}
+
+          <button onClick={upload} className="mt-4 border px-4 py-2">
+            Upload
           </button>
 
-          <div className="mt-3 text-sm text-white/60">{status}</div>
+          <div>{status}</div>
         </section>
 
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {photos.map((photo) => (
-            <article key={photo.id} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
-              <img src={photo.image_url} alt={photo.alt || 'Uploaded site photo'} className="h-64 w-full object-cover" />
-              <div className="flex items-center justify-between gap-3 p-4">
-                <div className="min-w-0">
-                  <p className="truncate text-xs uppercase tracking-[0.18em] text-white/45">{photo.category || 'gallery'}</p>
-                  <p className="truncate text-sm text-white/75">{photo.title || 'Untitled photo'}</p>
-                </div>
-                <button onClick={() => remove(photo.id)} className="rounded-full border border-red-400/30 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-red-300">
-                  Delete
-                </button>
-              </div>
-            </article>
+        <div className="mt-6 grid grid-cols-2 gap-4">
+          {photos.map((p) => (
+            <div key={p.id}>
+              <img src={p.image_url} className="w-full" />
+              <div>{p.category}</div>
+              <button onClick={() => remove(p.id)}>Delete</button>
+            </div>
           ))}
-        </section>
+        </div>
       </div>
     </main>
   )
