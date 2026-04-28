@@ -1,4 +1,3 @@
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 import GalleryLightbox from './GalleryLightbox'
 import BeforeAfterSlider from './BeforeAfterSlider'
 
@@ -18,15 +17,11 @@ function getCaseKey(image: SiteImage) {
 
 async function getGalleryImages(): Promise<SiteImage[]> {
   try {
-    const supabase = getSupabaseAdmin()
-    const { data, error } = await supabase
-      .from('site_images')
-      .select('id,image_url,title,alt,category')
-      .order('created_at', { ascending: false })
-      .limit(24)
-
-    if (error) return []
-    return data ?? []
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const res = await fetch(`${siteUrl}/api/admin/photos`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data.photos ?? []).slice(0, 24)
   } catch {
     return []
   }
@@ -34,7 +29,19 @@ async function getGalleryImages(): Promise<SiteImage[]> {
 
 export default async function SiteGallery() {
   const images = await getGalleryImages()
-  if (!images.length) return null
+  if (!images.length) {
+    return (
+      <section className="relative px-5 py-20 md:px-8 md:py-28">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 text-white shadow-2xl backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Field gallery</p>
+          <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">Live work gallery</h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/55">
+            Upload photos in the admin panel to populate this section automatically.
+          </p>
+        </div>
+      </section>
+    )
+  }
 
   const beforeImages = images.filter((i) => i.category === 'before')
   const afterImages = images.filter((i) => i.category === 'after')
@@ -63,7 +70,7 @@ export default async function SiteGallery() {
                 <h3 className="mt-3 text-2xl font-black text-white md:text-4xl">Proof-based service cases</h3>
               </div>
               <p className="hidden max-w-sm text-right text-sm leading-6 text-white/45 md:block">
-                Pair photos with titles like “case 1”, “case 2” to create multiple comparison sliders.
+                Upload paired before and after photos from the admin panel to create proof cases.
               </p>
             </div>
 
