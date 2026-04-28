@@ -25,7 +25,7 @@ export default function AdminPhotosPage() {
   const [title, setTitle] = useState('')
   const [alt, setAlt] = useState('')
   const [category, setCategory] = useState('gallery')
-  const [caseTitle, setCaseTitle] = useState('case 1')
+  const [caseTitle, setCaseTitle] = useState('case')
   const [caseAlt, setCaseAlt] = useState('')
 
   const loadPhotos = async () => {
@@ -70,18 +70,18 @@ export default function AdminPhotosPage() {
     })
 
     const data = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(data.error || 'Upload failed')
+    if (!res.ok) throw new Error(data.error || 'Ошибка загрузки')
   }
 
   const upload = async () => {
     if (!file || loading) return
 
     setLoading(true)
-    setStatus('Uploading...')
+    setStatus('Загрузка...')
 
     try {
       await uploadOne(file, title, alt, category)
-      setStatus('Uploaded')
+      setStatus('Загружено')
       setFile(null)
       setPreview(null)
       setTitle('')
@@ -89,7 +89,7 @@ export default function AdminPhotosPage() {
       setCategory('gallery')
       await loadPhotos()
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Upload failed')
+      setStatus(error instanceof Error ? error.message : 'Ошибка')
     } finally {
       setLoading(false)
     }
@@ -99,28 +99,28 @@ export default function AdminPhotosPage() {
     if (!beforeFile || !afterFile || loading) return
 
     setLoading(true)
-    setStatus('Uploading before/after case...')
+    setStatus('Загрузка кейса...')
 
     try {
-      await uploadOne(beforeFile, caseTitle, caseAlt || `${caseTitle} before`, 'before')
-      await uploadOne(afterFile, caseTitle, caseAlt || `${caseTitle} after`, 'after')
-      setStatus('Before/after case uploaded')
+      await uploadOne(beforeFile, caseTitle, caseAlt || `${caseTitle} до`, 'before')
+      await uploadOne(afterFile, caseTitle, caseAlt || `${caseTitle} после`, 'after')
+      setStatus('Кейс загружен')
       setBeforeFile(null)
       setAfterFile(null)
       setBeforePreview(null)
       setAfterPreview(null)
-      setCaseTitle('case 1')
+      setCaseTitle('case')
       setCaseAlt('')
       await loadPhotos()
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Pair upload failed')
+      setStatus(error instanceof Error ? error.message : 'Ошибка')
     } finally {
       setLoading(false)
     }
   }
 
   const remove = async (id: string) => {
-    if (!confirm('Delete this photo?')) return
+    if (!confirm('Удалить фото?')) return
 
     await fetch('/api/admin/photos', {
       method: 'DELETE',
@@ -135,78 +135,49 @@ export default function AdminPhotosPage() {
     <main className="min-h-screen bg-black px-5 py-8 text-white">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">Admin photos</p>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">Photo Upload</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-white/55">
-            Upload regular gallery photos or create a before/after proof case with two files in one workflow.
-          </p>
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">Админ фото</p>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">Загрузка фотографий</h1>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl">
-            <h2 className="text-xl font-black">Single photo</h2>
-            <input type="file" accept="image/*" onChange={onSelect} className="mt-5 block w-full text-sm text-white/70" />
+          <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
+            <h2 className="text-xl font-black">Одиночное фото</h2>
+            <input type="file" accept="image/*" onChange={onSelect} />
 
-            <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3" />
-            <input placeholder="Alt text" value={alt} onChange={(e) => setAlt(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3" />
+            <input placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-3 w-full" />
+            <input placeholder="Alt текст" value={alt} onChange={(e) => setAlt(e.target.value)} className="mt-3 w-full" />
 
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3">
-              <option value="gallery">gallery</option>
-              <option value="services">services</option>
-              <option value="before">before</option>
-              <option value="after">after</option>
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-3 w-full">
+              <option value="gallery">галерея</option>
+              <option value="services">сервисы</option>
+              <option value="before">до</option>
+              <option value="after">после</option>
             </select>
 
-            {preview && <img src={preview} alt="Preview" className="mt-4 max-h-64 w-full rounded-2xl object-contain bg-black/50" />}
+            {preview && <img src={preview} className="mt-4 w-64" />}
 
-            <button onClick={upload} disabled={!file || loading} className="mt-5 rounded-full border border-accent-cyan/35 bg-accent-cyan/10 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] disabled:opacity-40">
-              Upload photo
-            </button>
+            <button onClick={upload} className="mt-4 border px-4 py-2">Загрузить</button>
           </section>
 
-          <section className="rounded-3xl border border-accent-cyan/20 bg-accent-cyan/[0.055] p-5 shadow-2xl backdrop-blur-xl">
-            <h2 className="text-xl font-black">Before / After pair</h2>
-            <p className="mt-2 text-sm leading-6 text-white/55">Upload two images as one proof case. The title must be case 1, case 2, etc.</p>
+          <section className="rounded-3xl border border-accent-cyan/20 bg-accent-cyan/[0.055] p-5">
+            <h2 className="text-xl font-black">Кейс до / после</h2>
 
-            <input placeholder="Case title: case 1" value={caseTitle} onChange={(e) => setCaseTitle(e.target.value)} className="mt-4 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3" />
-            <input placeholder="Alt text / description" value={caseAlt} onChange={(e) => setCaseAlt(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3" />
+            <input placeholder="Название кейса" value={caseTitle} onChange={(e) => setCaseTitle(e.target.value)} className="mt-3 w-full" />
+            <input placeholder="Описание" value={caseAlt} onChange={(e) => setCaseAlt(e.target.value)} className="mt-3 w-full" />
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label className="rounded-2xl border border-white/10 bg-black/35 p-4">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">Before</span>
-                <input type="file" accept="image/*" onChange={(e) => onPairSelect('before', e)} className="mt-3 block w-full text-xs" />
-                {beforePreview && <img src={beforePreview} alt="Before preview" className="mt-3 h-44 w-full rounded-xl object-cover" />}
-              </label>
+            <input type="file" onChange={(e) => onPairSelect('before', e)} />
+            <input type="file" onChange={(e) => onPairSelect('after', e)} />
 
-              <label className="rounded-2xl border border-white/10 bg-black/35 p-4">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">After</span>
-                <input type="file" accept="image/*" onChange={(e) => onPairSelect('after', e)} className="mt-3 block w-full text-xs" />
-                {afterPreview && <img src={afterPreview} alt="After preview" className="mt-3 h-44 w-full rounded-xl object-cover" />}
-              </label>
-            </div>
-
-            <button onClick={uploadPair} disabled={!beforeFile || !afterFile || loading} className="mt-5 rounded-full border border-accent-cyan/45 bg-accent-cyan/15 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] disabled:opacity-40">
-              Upload case
-            </button>
+            <button onClick={uploadPair} className="mt-4 border px-4 py-2">Загрузить кейс</button>
           </section>
         </div>
 
-        <div className="mt-4 text-sm text-white/60">{status}</div>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-4">
           {photos.map((p) => (
-            <article key={p.id} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
-              <img src={p.image_url} alt={p.alt || 'Uploaded site photo'} className="h-64 w-full object-cover" />
-              <div className="flex items-center justify-between gap-3 p-4">
-                <div className="min-w-0">
-                  <p className="truncate text-xs uppercase tracking-[0.18em] text-accent-cyan/70">{p.category || 'gallery'}</p>
-                  <p className="truncate text-sm text-white/75">{p.title || 'Untitled photo'}</p>
-                </div>
-                <button onClick={() => remove(p.id)} className="rounded-full border border-red-400/30 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-red-300">
-                  Delete
-                </button>
-              </div>
-            </article>
+            <div key={p.id}>
+              <img src={p.image_url} className="w-full" />
+              <button onClick={() => remove(p.id)}>Удалить</button>
+            </div>
           ))}
         </div>
       </div>
