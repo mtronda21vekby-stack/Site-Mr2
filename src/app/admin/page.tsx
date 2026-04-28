@@ -2,16 +2,16 @@ import Link from 'next/link'
 
 const adminCards = [
   {
-    title: 'Photos',
-    description: 'Upload gallery, service, before/after, and proof photos.',
+    title: 'Фотографии',
+    description: 'Загрузка галереи, сервисных фото, кейсов до/после и доказательств выполненных работ.',
     href: '/admin/photos',
-    status: 'Ready',
+    status: 'Готово',
   },
   {
-    title: 'Direct Editor',
-    description: 'Open the existing direct content editor.',
+    title: 'Редактор контента',
+    description: 'Открыть существующий прямой редактор текстов и настроек сайта.',
     href: '/admin/direct',
-    status: 'Existing',
+    status: 'Подключено',
   },
 ]
 
@@ -20,10 +20,10 @@ export default function AdminPage() {
     <main className="min-h-screen bg-black px-5 py-8 text-white md:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl md:p-8">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Planet Locksmiths Admin</p>
-          <h1 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">Control center</h1>
+          <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Админ-панель Planet Locksmiths</p>
+          <h1 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">Панель управления</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-white/55">
-            Manage website content, upload field photos, create before/after proof cases, and keep the live site fresh without touching GitHub.
+            Управляйте сайтом, загружайте фотографии работ, создавайте кейсы до/после и обновляйте контент без GitHub и без деплоя после каждой правки.
           </p>
         </div>
 
@@ -47,9 +47,9 @@ export default function AdminPage() {
         </div>
 
         <section className="mt-8 rounded-[2rem] border border-white/10 bg-white/[0.025] p-6">
-          <h2 className="text-lg font-black">Before / After naming rule</h2>
+          <h2 className="text-lg font-black">Правило для кейсов до/после</h2>
           <p className="mt-3 text-sm leading-7 text-white/55">
-            For proof sliders, upload paired images with category <strong>before</strong> and <strong>after</strong>, then use title or alt text like <strong>case 1</strong>, <strong>case 2</strong>, etc.
+            Для слайдеров загружайте пары изображений с категориями <strong>before</strong> и <strong>after</strong>. Название кейса можно писать свободно, например <strong>case 1</strong>, <strong>case 2</strong> или подробное описание работы.
           </p>
         </section>
       </div>
