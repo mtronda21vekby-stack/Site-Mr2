@@ -26,5 +26,12 @@ export async function POST(req: Request) {
 
   const { data } = supabase.storage.from('site-images').getPublicUrl(fileName)
 
+  const { error: dbError } = await supabase.from('site_images').insert({
+    image_url: data.publicUrl,
+    storage_path: fileName,
+  })
+
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+
   return NextResponse.json({ url: data.publicUrl })
 }
