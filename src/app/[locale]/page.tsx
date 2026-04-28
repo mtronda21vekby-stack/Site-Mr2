@@ -15,6 +15,7 @@ import CustomerInfoSection from '@/components/sections/CustomerInfoSection'
 import ServiceDepthSection from '@/components/sections/ServiceDepthSection'
 import ConversionRail from '@/components/sections/ConversionRail'
 import AreasShowcase from '@/components/sections/AreasShowcase'
+import SiteGallery from '@/components/sections/SiteGallery'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -113,6 +114,9 @@ export default async function LocaleHome({
 
         <ConversionRail locale={locale} global={global} home={home} />
         <ServicesGrid services={services} locale={locale} />
+
+        <SiteGallery />
+
         <ServiceDepthSection
           locale={locale}
           services={services}
