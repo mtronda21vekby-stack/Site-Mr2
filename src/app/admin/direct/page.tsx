@@ -85,35 +85,56 @@ export default function AdminDashboardPage() {
   if (isChecking) return <div style={loadingShellStyle}><div style={panelStyle}><p style={eyebrowStyle}>Панель управления</p><h1 style={titleStyle}>Загрузка...</h1></div></div>
 
   return (
-    <div style={pageStyle}>
-      <div style={ambientBlueStyle} /><div style={ambientGoldStyle} />
-      <section style={heroPanelStyle}>
-        <div>
-          <p style={eyebrowStyle}>Planet Locksmiths / рабочая панель сайта</p>
-          <h1 style={heroTitleStyle}>Панель управления сайтом</h1>
-          <p style={heroTextStyle}>Быстрый доступ к заявкам, настройкам, контенту и загрузке фотографий. Версия: RU-PHOTOS-CMS-v3.</p>
+    <div style={appShellStyle}>
+      <aside style={sidebarStyle}>
+        <div style={brandBlockStyle}>
+          <p style={brandEyebrowStyle}>Planet Locksmiths</p>
+          <strong style={brandTitleStyle}>Control Panel</strong>
         </div>
-        <div style={heroActionsStyle}>
-          <a href="/admin/photos" style={photoButtonStyle}>📸 Фото</a>
-          <a href="/admin" style={ghostButtonStyle}>Главная панель</a>
-          <a href="/en" style={ghostButtonStyle}>Открыть сайт</a>
-          <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Обновление...' : 'Обновить'}</button>
+        <nav style={sidebarNavStyle}>
+          {links.map((item) => (
+            <a key={item.href} href={item.href} style={sidebarLinkStyle(item.accent, item.href === '/admin/photos')}>
+              <span style={sidebarDotStyle(item.accent)} />
+              <span>{item.title}</span>
+            </a>
+          ))}
+        </nav>
+        <div style={sidebarFooterStyle}>
+          <a href="/en" style={sidebarGhostStyle}>Открыть сайт</a>
+          <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={sidebarButtonStyle}>{isRefreshing ? 'Обновление...' : 'Обновить'}</button>
         </div>
-      </section>
+      </aside>
 
-      <section style={photoAccessPanelStyle}>
-        <div>
-          <p style={eyebrowStyle}>Фото CMS</p>
-          <h2 style={panelTitleStyle}>Фотографии, галерея и кейсы до/после</h2>
-          <p style={heroTextStyle}>Здесь можно загрузить фото работ, создать кейс до/после, изменить название, описание и категорию изображения.</p>
-        </div>
-        <a href="/admin/photos" style={largePhotoLinkStyle}>Перейти к фото →</a>
-      </section>
+      <main style={mainContentStyle}>
+        <div style={ambientBlueStyle} /><div style={ambientGoldStyle} />
+        <section style={heroPanelStyle}>
+          <div>
+            <p style={eyebrowStyle}>Planet Locksmiths / рабочая панель сайта</p>
+            <h1 style={heroTitleStyle}>Панель управления сайтом</h1>
+            <p style={heroTextStyle}>Быстрый доступ к заявкам, настройкам, контенту и загрузке фотографий. Версия: RU-PHOTOS-CMS-v4.</p>
+          </div>
+          <div style={heroActionsStyle}>
+            <a href="/admin/photos" style={photoButtonStyle}>📸 Фото</a>
+            <a href="/admin" style={ghostButtonStyle}>Главная панель</a>
+            <a href="/en" style={ghostButtonStyle}>Открыть сайт</a>
+            <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={primaryButtonStyle(isRefreshing)}>{isRefreshing ? 'Обновление...' : 'Обновить'}</button>
+          </div>
+        </section>
 
-      {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
-      <div style={statsGridStyle}><AdminStatCard title="Новые заявки" value={String(metrics.newOrders)} note="Свежие запросы." /><AdminStatCard title="Активные" value={String(metrics.activeOrders)} note="В работе." /><AdminStatCard title="Завершено" value={String(metrics.completedOrders)} note="Закрытые заявки." /><AdminStatCard title="Услуги" value={String(metrics.services)} note="Страницы услуг." /><AdminStatCard title="Локации" value={String(metrics.areas)} note="Городские страницы." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Ответы клиентам." /><AdminStatCard title="Отзывы" value={String(metrics.reviews)} note="Доказательства доверия." /></div>
-      <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Контроль качества</p><h2 style={panelTitleStyle}>SEO / UX / рекламная готовность</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} готово</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
-      <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Левое меню / разделы</p><h2 style={panelTitleStyle}>Быстрый доступ</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Открыть →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Заявки</p><h2 style={panelTitleStyle}>Последние заявки</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>Все заявки →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Заявка'}</strong><p style={mutedLineStyle}>{order.name || 'Без имени'} · {order.phone || 'Без телефона'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>Пока нет заявок.</div> : null}</div></section></div>
+        <section style={photoAccessPanelStyle}>
+          <div>
+            <p style={eyebrowStyle}>Фото CMS</p>
+            <h2 style={panelTitleStyle}>Фотографии, галерея и кейсы до/после</h2>
+            <p style={heroTextStyle}>Здесь можно загрузить фото работ, создать кейс до/после, изменить название, описание и категорию изображения.</p>
+          </div>
+          <a href="/admin/photos" style={largePhotoLinkStyle}>Перейти к фото →</a>
+        </section>
+
+        {errorMessage ? <div style={messageErrorStyle}>{errorMessage}</div> : null}
+        <div style={statsGridStyle}><AdminStatCard title="Новые заявки" value={String(metrics.newOrders)} note="Свежие запросы." /><AdminStatCard title="Активные" value={String(metrics.activeOrders)} note="В работе." /><AdminStatCard title="Завершено" value={String(metrics.completedOrders)} note="Закрытые заявки." /><AdminStatCard title="Услуги" value={String(metrics.services)} note="Страницы услуг." /><AdminStatCard title="Локации" value={String(metrics.areas)} note="Городские страницы." /><AdminStatCard title="FAQ" value={String(metrics.faq)} note="Ответы клиентам." /><AdminStatCard title="Отзывы" value={String(metrics.reviews)} note="Доказательства доверия." /></div>
+        <section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Контроль качества</p><h2 style={panelTitleStyle}>SEO / UX / рекламная готовность</h2></div><span style={statusPillStyle}>{qualityItems.filter((item) => item.status === 'good').length}/{qualityItems.length} готово</span></div><div style={qualityGridStyle}>{qualityItems.map((item) => <QualityCard key={item.title} item={item} />)}</div></section>
+        <div style={twoColumnStyle}><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Разделы сайта</p><h2 style={panelTitleStyle}>Быстрый доступ</h2></div><span style={statusPillStyle}>Online</span></div><div style={quickGridStyle}>{links.map((item) => <a key={item.href} href={item.href} style={quickLinkStyle(item.accent)}><span style={quickOrbStyle(item.accent)} /><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.description}</p><span style={quickCtaStyle}>Открыть →</span></a>)}</div></section><section style={panelStyle}><div style={panelHeadingRowStyle}><div><p style={panelEyebrowStyle}>Заявки</p><h2 style={panelTitleStyle}>Последние заявки</h2></div><a href="/admin/orders" style={smallTextLinkStyle}>Все заявки →</a></div><div style={{ display: 'grid', gap: 10, marginTop: 16 }}>{recentOrders.map((order) => <a key={order.id} href="/admin/orders" style={orderCardStyle}><strong style={{ display: 'block', fontSize: 16, wordBreak: 'break-word' }}>{order.service_needed || 'Заявка'}</strong><p style={mutedLineStyle}>{order.name || 'Без имени'} · {order.phone || 'Без телефона'}</p><p style={statusTextStyle}>{order.status}</p></a>)}{!recentOrders.length ? <div style={emptyStateStyle}>Пока нет заявок.</div> : null}</div></section></div>
+      </main>
     </div>
   )
 }
@@ -121,7 +142,7 @@ export default function AdminDashboardPage() {
 const links = [
   { title: 'Фото', href: '/admin/photos', description: 'Загрузка фото, галерея, кейсы до/после, редактирование данных.', accent: '#2DE2E6' },
   { title: 'Аудит', href: '/admin/audit', description: 'Проверка качества контента и страниц.', accent: '#FF9A9A' },
-  { title: 'Контент-блоки', href: CONTENT_BLOCKS_HREF, description: 'Редактор секций, CTA и блоков.', accent: '#2DE2E6' },
+  { title: 'Контент', href: CONTENT_BLOCKS_HREF, description: 'Редактор секций, CTA и блоков.', accent: '#2DE2E6' },
   { title: 'Заказы', href: '/admin/orders', description: 'Заявки, статусы, заметки.', accent: '#4DA2FF' },
   { title: 'Настройки', href: '/admin/settings', description: 'Бренд, телефон, email, часы работы.', accent: '#D6A85F' },
   { title: 'Главная', href: '/admin/home', description: 'Hero, CTA, конверсионные блоки.', accent: '#2DE2E6' },
@@ -145,6 +166,18 @@ function getQualityItems(metrics: Metrics): QualityItem[] {
 
 function QualityCard({ item }: { item: QualityItem }) { const color = item.status === 'good' ? '#2DE2E6' : item.status === 'warn' ? '#D6A85F' : '#FF9A9A'; return <a href={item.href} style={{ ...infoWindowStyle, textDecoration: 'none', color: '#F5F7FB', borderColor: `${color}55` }}><span style={{ display: 'inline-flex', marginBottom: 10, color, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8 }}>{item.status}</span><strong style={{ display: 'block', fontSize: 18 }}>{item.title}</strong><p style={quickDescriptionStyle}>{item.note}</p><span style={{ ...quickCtaStyle, color }}>Открыть →</span></a> }
 
+const appShellStyle: CSSProperties = { minHeight: '100vh', display: 'grid', gridTemplateColumns: '280px minmax(0, 1fr)', background: '#02040A', color: '#F5F7FB' }
+const sidebarStyle: CSSProperties = { position: 'sticky', top: 0, alignSelf: 'start', height: '100vh', overflowY: 'auto', borderRight: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(180deg, rgba(8,13,26,0.98), rgba(2,4,10,0.98))', padding: 18, boxShadow: '18px 0 80px rgba(0,0,0,0.28)', zIndex: 5 }
+const brandBlockStyle: CSSProperties = { border: '1px solid rgba(45,226,230,0.22)', borderRadius: 22, background: 'rgba(45,226,230,0.07)', padding: 16, marginBottom: 18 }
+const brandEyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
+const brandTitleStyle: CSSProperties = { display: 'block', marginTop: 8, color: '#F5F7FB', fontSize: 22, lineHeight: 1.05 }
+const sidebarNavStyle: CSSProperties = { display: 'grid', gap: 8 }
+function sidebarLinkStyle(accent: string, active: boolean): CSSProperties { return { display: 'flex', alignItems: 'center', gap: 10, minHeight: 44, padding: '0 12px', borderRadius: 14, border: `1px solid ${active ? accent : 'rgba(255,255,255,0.08)'}`, background: active ? `${accent}18` : 'rgba(255,255,255,0.025)', color: active ? accent : '#DDE6F7', textDecoration: 'none', fontSize: 14, fontWeight: 900, boxShadow: active ? `0 0 28px ${accent}18` : 'none' } }
+function sidebarDotStyle(accent: string): CSSProperties { return { width: 8, height: 8, borderRadius: 99, background: accent, boxShadow: `0 0 16px ${accent}` } }
+const sidebarFooterStyle: CSSProperties = { display: 'grid', gap: 8, marginTop: 18, borderTop: '1px solid rgba(255,255,255,0.10)', paddingTop: 14 }
+const sidebarGhostStyle: CSSProperties = { minHeight: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 999, border: '1px solid rgba(255,255,255,0.12)', color: '#F5F7FB', textDecoration: 'none', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5 }
+const sidebarButtonStyle: CSSProperties = { minHeight: 40, borderRadius: 999, border: '1px solid rgba(77,162,255,0.32)', background: '#4DA2FF', color: '#02040A', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5 }
+const mainContentStyle: CSSProperties = { position: 'relative', minWidth: 0, overflow: 'hidden', padding: 24 }
 const pageStyle: CSSProperties = { position: 'relative', minWidth: 0, overflow: 'hidden', paddingBottom: 24 }
 const ambientBlueStyle: CSSProperties = { position: 'fixed', right: -180, top: -120, width: 460, height: 460, borderRadius: 999, background: 'rgba(77,162,255,0.12)', filter: 'blur(80px)', pointerEvents: 'none' }
 const ambientGoldStyle: CSSProperties = { position: 'fixed', left: -180, bottom: -160, width: 420, height: 420, borderRadius: 999, background: 'rgba(214,168,95,0.09)', filter: 'blur(80px)', pointerEvents: 'none' }
