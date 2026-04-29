@@ -48,37 +48,123 @@ export default function AdminTopbar() {
   const currentPage = pathname === '/admin/direct' ? 'Обзор' : matchedPage ?? 'Панель'
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-      <div style={{ display: 'grid', gap: 6 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#A9D0FF', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: 999, background: '#2DE2E6', display: 'inline-block', boxShadow: '0 0 12px rgba(45,226,230,0.8)' }} />
-          Сессия активна
-        </div>
-
-        <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.1, color: '#F5F7FB' }}>{currentPage}</h1>
-
-        <p style={{ margin: 0, color: '#95A0B8', fontSize: 14, lineHeight: 1.5 }}>
-          Пользователь: <span style={{ color: '#F5F7FB' }}>{userEmail}</span>
-        </p>
+    <header className="topbar">
+      <div className="topbar__titleBlock">
+        <span className="topbar__status"><span /> Сессия активна</span>
+        <h1>{currentPage}</h1>
+        <p>Пользователь: <strong>{userEmail}</strong></p>
       </div>
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <a href="/en" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 42, padding: '0 14px', borderRadius: 12, textDecoration: 'none', background: '#4DA2FF', color: '#05070B', fontWeight: 700 }}>
-          Открыть сайт
-        </a>
-
-        <a href="/admin/photos" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 42, padding: '0 14px', borderRadius: 12, textDecoration: 'none', background: '#11192E', color: '#F5F7FB', fontWeight: 700, border: '1px solid rgba(45,226,230,0.35)' }}>
-          Фото
-        </a>
-
-        <a href="/admin/orders" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 42, padding: '0 14px', borderRadius: 12, textDecoration: 'none', background: '#11192E', color: '#F5F7FB', fontWeight: 700, border: '1px solid rgba(255,255,255,0.10)' }}>
-          Заявки
-        </a>
-
-        <button type="button" onClick={handleLogout} disabled={isLoggingOut} style={{ minHeight: 42, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', fontWeight: 700, cursor: isLoggingOut ? 'default' : 'pointer', opacity: isLoggingOut ? 0.7 : 1 }}>
+      <div className="topbar__actions">
+        <a href="/admin/photos" className="topbar__button topbar__button--accent">Фото</a>
+        <a href="/admin/orders" className="topbar__button">Заявки</a>
+        <a href="/en" className="topbar__button topbar__button--primary">Открыть сайт</a>
+        <button type="button" onClick={handleLogout} disabled={isLoggingOut} className="topbar__button topbar__button--ghost">
           {isLoggingOut ? 'Выход...' : 'Выйти'}
         </button>
       </div>
-    </div>
+
+      <style jsx>{`
+        .topbar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+
+        .topbar__titleBlock {
+          display: grid;
+          gap: 6px;
+          min-width: 0;
+        }
+
+        .topbar__status {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: #a9d0ff;
+          font-size: 11px;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 1.6px;
+        }
+
+        .topbar__status span {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: #2de2e6;
+          box-shadow: 0 0 14px rgba(45, 226, 230, 0.85);
+        }
+
+        h1 {
+          margin: 0;
+          color: #f5f7fb;
+          font-size: clamp(22px, 3vw, 32px);
+          line-height: 1.05;
+          letter-spacing: -1.1px;
+        }
+
+        p {
+          margin: 0;
+          color: #95a0b8;
+          font-size: 13px;
+          line-height: 1.5;
+        }
+
+        strong {
+          color: #f5f7fb;
+          font-weight: 800;
+        }
+
+        .topbar__actions {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .topbar__button {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 15px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          background: rgba(255, 255, 255, 0.04);
+          color: #f5f7fb;
+          text-decoration: none;
+          font-size: 12px;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 1.35px;
+          cursor: pointer;
+        }
+
+        .topbar__button--accent {
+          border-color: rgba(45, 226, 230, 0.36);
+          background: rgba(45, 226, 230, 0.12);
+          color: #2de2e6;
+        }
+
+        .topbar__button--primary {
+          border-color: rgba(77, 162, 255, 0.45);
+          background: #4da2ff;
+          color: #02040a;
+        }
+
+        .topbar__button--ghost {
+          font-family: inherit;
+        }
+
+        .topbar__button:disabled {
+          opacity: 0.62;
+          cursor: default;
+        }
+      `}</style>
+    </header>
   )
 }
