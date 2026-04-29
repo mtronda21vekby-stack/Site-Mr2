@@ -1,6 +1,4 @@
-import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
-import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
+import { isAdminAuthenticated } from '@/lib/adminAuth'
 
 export type UserRole = 'owner' | 'manager' | 'viewer'
 
@@ -22,40 +20,14 @@ export function canRole(role: UserRole, required: UserRole) {
 }
 
 export async function getCurrentUserProfile(): Promise<CurrentUserProfile | null> {
-  const cookieStore = await cookies()
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) return null
-
-  const authClient = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll()
-      },
-      setAll() {},
-    },
-  })
-
-  const { data: authData } = await authClient.auth.getUser()
-  const user = authData.user
-  if (!user?.id) return null
-
-  const admin = getSupabaseAdmin()
-  const { data } = await admin
-    .from('user_profiles')
-    .select('id,email,full_name,role')
-    .eq('id', user.id)
-    .maybeSingle()
-
-  const email = user.email || data?.email || ''
-  const role = (data?.role || 'viewer') as UserRole
+  const isAdmin = await isAdminAuthenticated()
+  if (!isAdmin) return null
 
   return {
-    id: user.id,
-    email,
-    full_name: data?.full_name || null,
-    role,
+    id: 'primary-control-user',
+    email: process.env.ADMIN_EMAIL || 'admin@planetlocksmiths.com',
+    full_name: process.env.ADMIN_NAME || 'Planet Locksmiths Owner',
+    role: (process.env.ADMIN_ROLE as UserRole) || 'owner',
   }
 }
 
