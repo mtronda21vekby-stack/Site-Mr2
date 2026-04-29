@@ -10,27 +10,26 @@ export type AdminNavGroup = {
 
 export const adminNavGroups: AdminNavGroup[] = [
   {
-    title: 'Core',
+    title: 'Основное',
     items: [
-      { href: '/admin/direct', label: 'Dashboard' },
-      { href: '/admin/orders', label: 'Orders' },
-      { href: '/admin/settings', label: 'Settings' },
-      { href: '/admin/audit', label: 'Audit' },
+      { href: '/admin/direct', label: 'Панель' },
+      { href: '/admin/photos', label: 'Фото' },
+      { href: '/admin/orders', label: 'Заявки' },
+      { href: '/admin/settings', label: 'Настройки' },
+      { href: '/admin/audit', label: 'Аудит' },
     ],
   },
   {
-    title: 'Content',
+    title: 'Контент',
     items: [
-      { href: '/admin/home', label: 'Home' },
-      { href: '/admin/content-blocks', label: 'Content Blocks' },
-      { href: '/admin/services', label: 'Services' },
-      { href: '/admin/areas', label: 'Areas' },
-      { href: '/admin/reviews', label: 'Reviews' },
+      { href: '/admin/home', label: 'Главная' },
+      { href: '/admin/content-blocks', label: 'Блоки' },
+      { href: '/admin/services', label: 'Услуги' },
+      { href: '/admin/areas', label: 'Города' },
+      { href: '/admin/reviews', label: 'Отзывы' },
       { href: '/admin/faq', label: 'FAQ' },
     ],
   },
 ]
 
-export const adminFlatNavItems: AdminNavItem[] = adminNavGroups.flatMap(
-  (group) => group.items
-)
+export const adminFlatNavItems: AdminNavItem[] = adminNavGroups.flatMap((group) => group.items)
