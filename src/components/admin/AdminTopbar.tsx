@@ -44,7 +44,8 @@ export default function AdminTopbar() {
     window.location.href = '/admin/login'
   }
 
-  const currentPage = adminFlatNavItems.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))?.label ?? 'Панель'
+  const matchedPage = adminFlatNavItems.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))?.label
+  const currentPage = pathname === '/admin/direct' ? 'Обзор' : matchedPage ?? 'Панель'
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
