@@ -11,8 +11,8 @@ export default function AdminSidebar() {
       style={{
         width: 280,
         minWidth: 280,
-        background:
-          'linear-gradient(180deg, rgba(11,16,32,1) 0%, rgba(7,11,20,1) 100%)',
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, rgba(11,16,32,1) 0%, rgba(7,11,20,1) 100%)',
         borderRight: '1px solid rgba(255,255,255,0.08)',
         padding: 18,
         boxSizing: 'border-box',
@@ -34,7 +34,7 @@ export default function AdminSidebar() {
             letterSpacing: 0.8,
           }}
         >
-          Planetlocksmiths
+          Planet Locksmiths
         </p>
 
         <h2
@@ -45,7 +45,7 @@ export default function AdminSidebar() {
             lineHeight: 1.1,
           }}
         >
-          Control Panel
+          Панель сайта
         </h2>
 
         <div
@@ -67,7 +67,7 @@ export default function AdminSidebar() {
               display: 'inline-block',
             }}
           />
-          LIVE ADMIN
+          Сессия активна
         </div>
       </div>
 
@@ -88,8 +88,7 @@ export default function AdminSidebar() {
 
             <div style={{ display: 'grid', gap: 8 }}>
               {group.items.map((item) => {
-                const active =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`)
+                const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
                 return (
                   <a
@@ -100,14 +99,12 @@ export default function AdminSidebar() {
                       textDecoration: 'none',
                       color: active ? '#05070B' : '#F5F7FB',
                       background: active ? '#4DA2FF' : '#11192E',
-                      border: active
-                        ? '1px solid rgba(77,162,255,0.60)'
-                        : '1px solid rgba(255,255,255,0.06)',
+                      border: active ? '1px solid rgba(77,162,255,0.60)' : '1px solid rgba(255,255,255,0.06)',
                       borderRadius: 12,
                       padding: '12px 14px',
                       fontSize: 15,
                       lineHeight: 1.3,
-                      fontWeight: active ? 700 : 500,
+                      fontWeight: active ? 800 : 600,
                     }}
                   >
                     {item.label}
