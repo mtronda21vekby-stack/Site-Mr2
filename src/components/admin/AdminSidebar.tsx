@@ -45,7 +45,7 @@ export default function AdminSidebar() {
             lineHeight: 1.1,
           }}
         >
-          Панель сайта
+          Управление сайтом
         </h2>
 
         <div
@@ -107,7 +107,7 @@ export default function AdminSidebar() {
                       fontWeight: active ? 800 : 600,
                     }}
                   >
-                    {item.label}
+                    {item.href === '/admin/direct' ? 'Обзор' : item.label}
                   </a>
                 )
               })}
