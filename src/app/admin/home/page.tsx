@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type 
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
-import AdminReadinessGuide from '@/components/admin/AdminReadinessGuide'
 
 type Locale = 'en' | 'es' | 'ru'
 
@@ -25,6 +24,12 @@ type HomePageForm = {
 
 const locales: Locale[] = ['en', 'es', 'ru']
 const FORM_ID = 'admin-home-form'
+
+const localeLabels: Record<Locale, string> = {
+  en: 'English',
+  es: 'Español',
+  ru: 'Русский',
+}
 
 const emptyForm = (locale: Locale): HomePageForm => ({
   id: '',
@@ -93,7 +98,7 @@ export default function AdminHomePage() {
         setForms(nextForms)
       } catch (error) {
         if (!mounted) return
-        setErrorMessage(error instanceof Error ? error.message : 'Failed to load home content')
+        setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить главную страницу')
       } finally {
         if (mounted) setIsBooting(false)
       }
@@ -111,45 +116,22 @@ export default function AdminHomePage() {
     event.preventDefault()
     setErrorMessage('')
     setSuccessMessage('')
-
-    const form = forms[activeLocale]
-    const heroTitle = form.heroTitle.trim()
-    const heroSubtitle = form.heroSubtitle.trim()
-    const heroPrimaryCta = form.heroPrimaryCta.trim()
-    const heroSecondaryCta = form.heroSecondaryCta.trim()
-    const emergencyTitle = form.emergencyTitle.trim()
-    const emergencyText = form.emergencyText.trim()
-    const reviewsTitle = form.reviewsTitle.trim()
-    const faqTitle = form.faqTitle.trim()
-    const contactTitle = form.contactTitle.trim()
-    const contactText = form.contactText.trim()
-
-    if (!heroTitle) { setErrorMessage('Hero Title is required.'); return }
-    if (heroSubtitle.length < 80) { setErrorMessage('Hero Subtitle should be at least 80 characters.'); return }
-    if (!heroPrimaryCta) { setErrorMessage('Primary CTA is required.'); return }
-    if (!heroSecondaryCta) { setErrorMessage('Secondary CTA is required.'); return }
-    if (!emergencyTitle) { setErrorMessage('Emergency Title is required.'); return }
-    if (emergencyText.length < 80) { setErrorMessage('Emergency Text should be at least 80 characters.'); return }
-    if (!reviewsTitle) { setErrorMessage('Reviews Title is required.'); return }
-    if (!faqTitle) { setErrorMessage('FAQ Title is required.'); return }
-    if (!contactTitle) { setErrorMessage('Contact Title is required.'); return }
-    if (contactText.length < 80) { setErrorMessage('Contact Text should be at least 80 characters.'); return }
-
     setIsSaving(true)
 
     try {
+      const form = forms[activeLocale]
       const payload = {
         locale: activeLocale,
-        hero_title: heroTitle,
-        hero_subtitle: heroSubtitle,
-        hero_primary_cta: heroPrimaryCta,
-        hero_secondary_cta: heroSecondaryCta,
-        emergency_title: emergencyTitle,
-        emergency_text: emergencyText,
-        reviews_title: reviewsTitle,
-        faq_title: faqTitle,
-        contact_title: contactTitle,
-        contact_text: contactText,
+        hero_title: form.heroTitle.trim(),
+        hero_subtitle: form.heroSubtitle.trim(),
+        hero_primary_cta: form.heroPrimaryCta.trim(),
+        hero_secondary_cta: form.heroSecondaryCta.trim(),
+        emergency_title: form.emergencyTitle.trim(),
+        emergency_text: form.emergencyText.trim(),
+        reviews_title: form.reviewsTitle.trim(),
+        faq_title: form.faqTitle.trim(),
+        contact_title: form.contactTitle.trim(),
+        contact_text: form.contactText.trim(),
       }
 
       if (form.id) {
@@ -161,64 +143,122 @@ export default function AdminHomePage() {
         setForms((prev) => ({ ...prev, [activeLocale]: { ...prev[activeLocale], id: result.data?.id ?? '' } }))
       }
 
-      setSuccessMessage(`Home content saved for ${activeLocale.toUpperCase()}`)
+      setSuccessMessage(`Главная сохранена: ${localeLabels[activeLocale]}`)
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to save home content')
+      setErrorMessage(error instanceof Error ? error.message : 'Не удалось сохранить главную страницу')
     } finally {
       setIsSaving(false)
     }
   }
 
   const form = forms[activeLocale]
+  const filledCount = [form.heroTitle, form.heroSubtitle, form.heroPrimaryCta, form.heroSecondaryCta, form.emergencyTitle, form.emergencyText, form.reviewsTitle, form.faqTitle, form.contactTitle, form.contactText].filter((value) => value.trim()).length
 
-  if (isBooting) return <div style={{ paddingTop: 20 }}><p style={{ color: '#95A0B8', margin: 0 }}>Loading home content...</p></div>
+  if (isBooting) return <div style={panelStyle}><p style={eyebrowStyle}>Главная</p><h1 style={titleStyle}>Загрузка...</h1></div>
 
   return (
-    <div>
-      <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+    <div style={pageStyle}>
+      <section style={heroStyle}>
         <div>
-          <p style={{ margin: 0, color: '#95A0B8', fontSize: 13 }}>Planetlocksmiths / Admin / Home</p>
-          <h2 style={{ margin: '8px 0 0', fontSize: 36, lineHeight: 1.1 }}>Home Content</h2>
+          <p style={eyebrowStyle}>Контент / главная страница</p>
+          <h1 style={titleStyle}>Главная</h1>
+          <p style={mutedStyle}>Редактирование hero, CTA, emergency-блока, заголовков отзывов, FAQ и контактного блока. Жёстких лимитов на длину текста нет.</p>
         </div>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          {locales.map((locale) => <button key={locale} type="button" onClick={() => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} style={{ minHeight: 42, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: activeLocale === locale ? '#4DA2FF' : '#11192E', color: activeLocale === locale ? '#05070B' : '#F5F7FB', fontWeight: 700, cursor: 'pointer' }}>{locale.toUpperCase()}</button>)}
-          <a href={`/${activeLocale}`} target="_blank" rel="noreferrer" style={ghostLinkStyle}>Preview {activeLocale.toUpperCase()}</a>
+        <div style={heroActionsStyle}>
+          {locales.map((locale) => <button key={locale} type="button" onClick={() => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} style={localeButtonStyle(activeLocale === locale)}>{locale.toUpperCase()}</button>)}
+          <a href={`/${activeLocale}`} target="_blank" rel="noreferrer" style={secondaryLinkStyle}>Открыть</a>
         </div>
-      </div>
+      </section>
 
-      <AdminReadinessGuide
-        title="These fields control the premium homepage, CTAs, conversion rails, emergency panels, FAQ title, and request form text."
-        items={[
-          { title: 'Hero + first impression', text: 'Hero Title, Hero Subtitle, and both CTA fields are visible above the fold and inside premium conversion panels.' },
-          { title: 'Emergency conversion', text: 'Emergency Title and Emergency Text power the dispatch panels and should explain urgency, service availability, and next steps.' },
-          { title: 'Ads readiness', text: 'Contact Title/Text, FAQ Title, and Reviews Title help Google Ads quality by making service purpose, trust, and request flow clear.' },
-        ]}
-      />
+      <section style={statsGridStyle}>
+        <InfoCard title="Язык" value={localeLabels[activeLocale]} note="Текущая версия главной." />
+        <InfoCard title="Заполнено" value={`${filledCount}/10`} note="Количество заполненных блоков." />
+        <InfoCard title="Hero" value={form.heroTitle ? 'Есть' : 'Пусто'} note="Первый экран сайта." />
+        <InfoCard title="CTA" value={form.heroPrimaryCta || 'Не указан'} note="Главная кнопка действия." />
+      </section>
+
+      <section style={guideStyle}>
+        <p style={eyebrowStyle}>Подсказка</p>
+        <p style={mutedStyle}>Главная должна быстро объяснять: кто вы, какие авто-услуги делаете, где работаете, как быстро можно связаться и что клиент получит после заявки.</p>
+      </section>
 
       {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
       {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
 
-      <form id={FORM_ID} onSubmit={handleSave} style={{ display: 'grid', gap: 16, background: '#0B1020', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: 18 }}>
-        <Field label="Hero Title" value={form.heroTitle} onChange={(value) => updateField('heroTitle', value)} />
-        <TextAreaField label="Hero Subtitle" value={form.heroSubtitle} onChange={(value) => updateField('heroSubtitle', value)} />
-        <Field label="Primary CTA" value={form.heroPrimaryCta} onChange={(value) => updateField('heroPrimaryCta', value)} />
-        <Field label="Secondary CTA" value={form.heroSecondaryCta} onChange={(value) => updateField('heroSecondaryCta', value)} />
-        <Field label="Emergency Title" value={form.emergencyTitle} onChange={(value) => updateField('emergencyTitle', value)} />
-        <TextAreaField label="Emergency Text" value={form.emergencyText} onChange={(value) => updateField('emergencyText', value)} />
-        <Field label="Reviews Title" value={form.reviewsTitle} onChange={(value) => updateField('reviewsTitle', value)} />
-        <Field label="FAQ Title" value={form.faqTitle} onChange={(value) => updateField('faqTitle', value)} />
-        <Field label="Contact Title" value={form.contactTitle} onChange={(value) => updateField('contactTitle', value)} />
-        <TextAreaField label="Contact Text" value={form.contactText} onChange={(value) => updateField('contactText', value)} />
+      <form id={FORM_ID} onSubmit={handleSave} style={formStyle}>
+        <Section title="Первый экран" text="Главный заголовок, подзаголовок и основные CTA-кнопки.">
+          <Field label="Hero title" value={form.heroTitle} onChange={(value) => updateField('heroTitle', value)} />
+          <TextAreaField label="Hero subtitle" value={form.heroSubtitle} onChange={(value) => updateField('heroSubtitle', value)} />
+          <div style={fieldGridStyle}>
+            <Field label="Primary CTA" value={form.heroPrimaryCta} onChange={(value) => updateField('heroPrimaryCta', value)} />
+            <Field label="Secondary CTA" value={form.heroSecondaryCta} onChange={(value) => updateField('heroSecondaryCta', value)} />
+          </div>
+        </Section>
+
+        <Section title="Emergency блок" text="Текст для срочного обращения, lockout и same-day сервиса.">
+          <Field label="Emergency title" value={form.emergencyTitle} onChange={(value) => updateField('emergencyTitle', value)} />
+          <TextAreaField label="Emergency text" value={form.emergencyText} onChange={(value) => updateField('emergencyText', value)} />
+        </Section>
+
+        <Section title="Доверие и FAQ" text="Заголовки секций, которые усиливают конверсию и доверие.">
+          <div style={fieldGridStyle}>
+            <Field label="Reviews title" value={form.reviewsTitle} onChange={(value) => updateField('reviewsTitle', value)} />
+            <Field label="FAQ title" value={form.faqTitle} onChange={(value) => updateField('faqTitle', value)} />
+          </div>
+        </Section>
+
+        <Section title="Контактный блок" text="Финальный блок перед заявкой или звонком.">
+          <Field label="Contact title" value={form.contactTitle} onChange={(value) => updateField('contactTitle', value)} />
+          <TextAreaField label="Contact text" value={form.contactText} onChange={(value) => updateField('contactText', value)} />
+        </Section>
       </form>
-      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label={`Save ${activeLocale.toUpperCase()} Home`} note={`Sticky save bar is active for ${activeLocale.toUpperCase()} homepage content.`} />
+
+      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label="Сохранить главную" note={`Сохраняется только текущий язык: ${localeLabels[activeLocale]}.`} />
     </div>
   )
 }
 
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label> }
-function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: 14, color: '#95A0B8' }}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label> }
-function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) { const isError = type === 'error'; return <div style={{ borderRadius: 12, border: isError ? '1px solid rgba(255,122,122,0.25)' : '1px solid rgba(77,162,255,0.25)', background: isError ? 'rgba(255,122,122,0.08)' : 'rgba(77,162,255,0.08)', color: isError ? '#FF9A9A' : '#A9D0FF', padding: '12px 14px', fontSize: 14, lineHeight: 1.5, marginBottom: 16 }}>{children}</div> }
+function InfoCard({ title, value, note }: { title: string; value: string; note: string }) {
+  return <article style={infoCardStyle}><p style={eyebrowStyle}>{title}</p><strong style={infoValueStyle}>{value}</strong><span style={infoNoteStyle}>{note}</span></article>
+}
 
-const ghostLinkStyle: CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minHeight: 42, padding: '0 14px', borderRadius: 12, textDecoration: 'none', border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', fontWeight: 700 }
-const inputStyle: CSSProperties = { width: '100%', minHeight: 48, borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
-const textAreaStyle: CSSProperties = { width: '100%', borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)', background: '#11192E', color: '#F5F7FB', padding: '12px 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', resize: 'vertical', WebkitAppearance: 'none' }
+function Section({ title, text, children }: { title: string; text: string; children: ReactNode }) {
+  return <section style={cardStyle}><div><p style={eyebrowStyle}>Редактирование</p><h2 style={cardTitleStyle}>{title}</h2><p style={mutedStyle}>{text}</p></div>{children}</section>
+}
+
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label>
+}
+
+function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label>
+}
+
+function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) {
+  return <div style={type === 'error' ? messageErrorStyle : messageSuccessStyle}>{children}</div>
+}
+
+const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
+const panelStyle: CSSProperties = { borderRadius: 26, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.035)', padding: 20 }
+const heroStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap', background: 'radial-gradient(circle at 0% 0%, rgba(45,226,230,0.14), transparent 320px), rgba(255,255,255,0.035)' }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
+const titleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 'clamp(34px, 6vw, 58px)', lineHeight: 0.96, letterSpacing: -2.2 }
+const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', fontSize: 14, lineHeight: 1.7, maxWidth: 760 }
+const heroActionsStyle: CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
+function localeButtonStyle(active: boolean): CSSProperties { return { minHeight: 44, padding: '0 15px', borderRadius: 999, border: active ? '1px solid rgba(45,226,230,0.5)' : '1px solid rgba(255,255,255,0.12)', background: active ? 'rgba(45,226,230,0.16)' : 'rgba(255,255,255,0.035)', color: active ? '#2DE2E6' : '#F5F7FB', fontWeight: 900 } }
+const secondaryLinkStyle: CSSProperties = { minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.035)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.1 }
+const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
+const infoCardStyle: CSSProperties = { borderRadius: 22, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(17,25,46,0.82), rgba(5,7,11,0.72))', padding: 16, display: 'grid', gap: 8, minWidth: 0 }
+const infoValueStyle: CSSProperties = { color: '#F5F7FB', fontSize: 20, lineHeight: 1.15, wordBreak: 'break-word' }
+const infoNoteStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, lineHeight: 1.5 }
+const guideStyle: CSSProperties = { ...panelStyle, padding: 16 }
+const formStyle: CSSProperties = { display: 'grid', gap: 16 }
+const cardStyle: CSSProperties = { borderRadius: 24, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(11,16,32,0.86), rgba(5,7,11,0.78))', padding: 18, display: 'grid', gap: 14 }
+const cardTitleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.12, wordBreak: 'break-word' }
+const fieldGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }
+const fieldStyle: CSSProperties = { display: 'grid', gap: 8 }
+const labelStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, fontWeight: 800 }
+const inputStyle: CSSProperties = { width: '100%', minHeight: 50, borderRadius: 15, border: '1px solid rgba(255,255,255,0.11)', background: 'rgba(7,11,20,0.82)', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
+const textAreaStyle: CSSProperties = { ...inputStyle, minHeight: 120, padding: '12px 14px', resize: 'vertical' }
+const messageErrorStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
+const messageSuccessStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(45,226,230,0.25)', background: 'rgba(45,226,230,0.08)', color: '#2DE2E6', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
