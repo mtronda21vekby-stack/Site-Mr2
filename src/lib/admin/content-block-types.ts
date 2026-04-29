@@ -1,4 +1,4 @@
-export type AdminContentBlockLocale = 'en' | 'es'
+export type AdminContentBlockLocale = 'en' | 'es' | 'ru'
 export type AdminContentBlockPublishFilter = 'all' | 'published' | 'draft'
 
 export type AdminContentBlockRow = {
