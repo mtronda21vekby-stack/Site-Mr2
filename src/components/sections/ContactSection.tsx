@@ -32,7 +32,7 @@ const initialForm: FormState = {
   name: '', phone: '', email: '', service_needed: '', vehicle_make: '', vehicle_model: '', vehicle_year: '', vehicle_make_model: '', location: '', urgency: 'asap', preferred_time: '', message: '',
 }
 
-const glassControlClass = 'min-h-12 rounded-2xl border border-white/16 bg-white/[0.07] px-4 py-3 text-sm text-text shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] outline-none backdrop-blur-2xl transition placeholder:text-muted focus:border-accent-blue/55 focus:bg-white/[0.105] disabled:cursor-not-allowed disabled:opacity-50'
+const glassControlClass = 'min-h-12 rounded-2xl border border-[#0B1F4D]/16 bg-white px-4 py-3 text-sm text-[#0B1F4D] shadow-[0_10px_28px_rgba(11,31,77,0.05)] outline-none transition placeholder:text-[#42526E]/65 focus:border-[#0B1F4D]/45 focus:bg-[#F7FAFF] disabled:cursor-not-allowed disabled:opacity-50'
 
 export default function ContactSection({ title, text, phoneNumber, phoneDisplay }: ContactSectionProps) {
   const [formData, setFormData] = useState<FormState>(initialForm)
@@ -71,22 +71,23 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
   }
 
   return (
-    <section id="request-service" className="relative bg-transparent pb-28 pt-16 sm:pb-20 sm:pt-20">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.76fr_1.24fr] lg:px-8">
+    <section id="request-service" className="relative bg-white pb-28 pt-16 sm:pb-20 sm:pt-20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(11,31,77,0.055),transparent_32rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_100%)]" />
+      <div className="relative mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.76fr_1.24fr] lg:px-8">
         <div>
-          <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-accent-cyan">Request mobile locksmith service</p>
-          <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-text sm:text-5xl lg:text-6xl">{title}</h2>
-          <p className="mt-5 max-w-xl text-base leading-8 text-muted">{text}</p>
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Request mobile locksmith service</p>
+          <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-[#0B1F4D] sm:text-5xl lg:text-6xl">{title}</h2>
+          <p className="mt-5 max-w-xl text-base leading-8 text-[#42526E]">{text}</p>
 
           <div className="premium-panel mt-7 rounded-[1.35rem] p-5">
             <div className="relative z-10 flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-accent-gold">Request readiness</p>
-                <p className="mt-2 text-sm leading-7 text-muted">Phone, service, vehicle, year, and location help speed up the callback.</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-[#123A73]">Request readiness</p>
+                <p className="mt-2 text-sm leading-7 text-[#42526E]">Phone, service, vehicle, year, and location help speed up the callback.</p>
               </div>
-              <span className="rounded-full border border-white/18 bg-white/[0.075] px-3 py-1 text-sm font-black text-accent-cyan shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl">{completionScore}/6</span>
+              <span className="rounded-full border border-[#0B1F4D]/18 bg-white px-3 py-1 text-sm font-black text-[#0B1F4D] shadow-[0_10px_26px_rgba(11,31,77,0.06)]">{completionScore}/6</span>
             </div>
-            <div className="relative z-10 mt-4 h-2 overflow-hidden rounded-full bg-white/12"><div className="h-full rounded-full bg-accent-blue transition-all" style={{ width: `${Math.round((completionScore / 6) * 100)}%` }} /></div>
+            <div className="relative z-10 mt-4 h-2 overflow-hidden rounded-full bg-[#0B1F4D]/10"><div className="h-full rounded-full bg-[#0B1F4D] transition-all" style={{ width: `${Math.round((completionScore / 6) * 100)}%` }} /></div>
           </div>
 
           <div className="mt-5 grid gap-3">
@@ -97,21 +98,21 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             ].map(([heading, copy], index) => (
               <div key={heading} className="premium-panel rounded-[1.15rem] p-4">
                 <div className="relative z-10 flex gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/18 bg-white/[0.075] text-xs font-black text-accent-blue shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-2xl">{index + 1}</span>
-                  <div><h3 className="font-semibold text-text">{heading}</h3><p className="mt-1 text-sm leading-6 text-muted">{copy}</p></div>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#0B1F4D]/18 bg-[#F3F7FF] text-xs font-black text-[#0B1F4D]">{index + 1}</span>
+                  <div><h3 className="font-semibold text-[#0B1F4D]">{heading}</h3><p className="mt-1 text-sm leading-6 text-[#42526E]">{copy}</p></div>
                 </div>
               </div>
             ))}
           </div>
 
-          <CallButton phoneNumber={phoneNumber} phoneDisplay={phoneDisplay} label="Call instead" variant="secondary" className="mt-7 w-full px-6 sm:w-auto hover:border-accent-blue/45 hover:bg-accent-blue/10" />
+          <CallButton phoneNumber={phoneNumber} phoneDisplay={phoneDisplay} label="Call instead" variant="secondary" className="mt-7 sm:w-auto" />
         </div>
 
         <form onSubmit={handleSubmit} className="premium-panel rounded-[1.75rem] p-5 sm:p-7">
-          <div className="relative z-10 mb-6 border-b border-white/10 pb-6">
-            <p className="text-xs font-black uppercase tracking-[0.26em] text-accent-gold">Service request form</p>
-            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-text">Vehicle + service details</h3>
-            <p className="mt-3 text-sm leading-7 text-muted">Required: phone and service. More vehicle details improve routing accuracy.</p>
+          <div className="relative z-10 mb-6 border-b border-[#0B1F4D]/10 pb-6">
+            <p className="text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Service request form</p>
+            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D]">Vehicle + service details</h3>
+            <p className="mt-3 text-sm leading-7 text-[#42526E]">Required: phone and service. More vehicle details improve routing accuracy.</p>
           </div>
 
           <div className="relative z-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -126,14 +127,14 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             <Field label="Service Location" name="location" value={formData.location} onChange={handleChange} placeholder="Philadelphia, PA / address / ZIP" />
             <Field label="Preferred Time" name="preferred_time" value={formData.preferred_time} onChange={handleChange} placeholder="ASAP / Today / 5 PM" />
 
-            <div className="flex flex-col sm:col-span-2"><label htmlFor="message" className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-muted">Extra Details</label><textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className={`${glassControlClass} min-h-28 resize-y`} placeholder="Example: keys lost, car is running, door locked, key fob not detected, parking lot name, etc." /></div>
+            <div className="flex flex-col sm:col-span-2"><label htmlFor="message" className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#42526E]">Extra Details</label><textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className={`${glassControlClass} min-h-28 resize-y`} placeholder="Example: keys lost, car is running, door locked, key fob not detected, parking lot name, etc." /></div>
 
             <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
-              <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full bg-accent-blue px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-black shadow-[0_0_28px_rgba(77,162,255,0.26)] transition duration-300 hover:-translate-y-0.5 hover:brightness-110 disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>
+              <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_42px_rgba(11,31,77,0.22)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.28)] disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>
               <CallButton phoneNumber={phoneNumber} phoneDisplay={phoneDisplay} label="Call" variant="secondary" />
             </div>
 
-            {status === 'success' ? <p className="sm:col-span-2 rounded-2xl border border-accent-gold/25 bg-accent-gold/10 px-4 py-3 text-sm text-accent-gold">Thank you. Your request has been received.</p> : null}
+            {status === 'success' ? <p className="sm:col-span-2 rounded-2xl border border-[#0B1F4D]/18 bg-[#F3F7FF] px-4 py-3 text-sm text-[#0B1F4D]">Thank you. Your request has been received.</p> : null}
             {errorMessage ? <p className="sm:col-span-2 rounded-2xl border border-danger-soft/25 bg-danger-soft/10 px-4 py-3 text-sm text-danger-soft">{errorMessage}</p> : null}
           </div>
         </form>
@@ -143,9 +144,9 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
 }
 
 function Field({ label, name, value, onChange, placeholder, required = false, type = 'text', inputMode }: { label: string; name: string; value: string; onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void; placeholder: string; required?: boolean; type?: string; inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'] }) {
-  return <div className="flex flex-col"><label htmlFor={name} className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-muted">{label}</label><input id={name} name={name} type={type} value={value} onChange={onChange} required={required} inputMode={inputMode} className={glassControlClass} placeholder={placeholder} /></div>
+  return <div className="flex flex-col"><label htmlFor={name} className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#42526E]">{label}</label><input id={name} name={name} type={type} value={value} onChange={onChange} required={required} inputMode={inputMode} className={glassControlClass} placeholder={placeholder} /></div>
 }
 
 function SelectField({ label, name, value, onChange, options, rawValues, placeholder, required = false, disabled = false }: { label: string; name: string; value: string; onChange: (e: ChangeEvent<HTMLSelectElement>) => void; options: string[]; rawValues?: string[]; placeholder?: string; required?: boolean; disabled?: boolean }) {
-  return <label className="flex flex-col"><span className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-muted">{label}</span><select name={name} value={value} onChange={onChange} required={required} disabled={disabled} className={glassControlClass}>{placeholder ? <option value="">{placeholder}</option> : null}{options.map((option, index) => <option key={`${name}-${option}`} value={rawValues?.[index] ?? option}>{option}</option>)}</select></label>
+  return <label className="flex flex-col"><span className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#42526E]">{label}</span><select name={name} value={value} onChange={onChange} required={required} disabled={disabled} className={glassControlClass}>{placeholder ? <option value="">{placeholder}</option> : null}{options.map((option, index) => <option key={`${name}-${option}`} value={rawValues?.[index] ?? option}>{option}</option>)}</select></label>
 }
