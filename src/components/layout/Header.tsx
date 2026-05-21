@@ -59,7 +59,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
       <div className="relative mx-auto flex h-[4.25rem] max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-3" aria-label="Planetlocksmiths home">
           <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-visible rounded-full transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-14 sm:w-14">
-            <Image src="/planetlocksmiths-logo.svg" alt="Planetlocksmiths" width={56} height={56} priority className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
+            <Image src="/Изображение HEIF.heic" alt="Planetlocksmiths" width={56} height={56} priority unoptimized className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
           </span>
           <span className="min-w-0">
             <span className="notranslate block truncate text-base font-black tracking-[-0.03em] text-[#0B1F4D] sm:text-lg" translate="no">Planetlocksmiths</span>
