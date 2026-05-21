@@ -69,6 +69,7 @@ export default async function LocaleHome({
       url: pageUrl,
       telephone: global.phoneDisplay,
       description: home.heroSubtitle,
+      priceRange: '$$-$$$',
       areaServed: areas.map((area) => [area.city, area.state].filter(Boolean).join(', ')).filter(Boolean),
       openingHours: global.serviceHours,
       makesOffer: services.map((service) => ({
@@ -113,9 +114,8 @@ export default async function LocaleHome({
         />
 
         <ConversionRail locale={locale} global={global} home={home} />
-        <ServicesGrid services={services} locale={locale} />
-
         <SiteGallery />
+        <ServicesGrid services={services} locale={locale} />
 
         <ServiceDepthSection
           locale={locale}
