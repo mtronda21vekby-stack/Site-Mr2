@@ -5,16 +5,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: '#0757D8',
-        surface: '#0B6CFF',
-        'surface-2': '#0A4FC4',
-        text: '#FFFFFF',
-        muted: '#DCEBFF',
-        line: 'rgba(255,255,255,0.18)',
-        'accent-blue': '#FFFFFF',
-        'accent-cyan': '#EAF5FF',
-        'accent-gold': '#FFFFFF',
-        'danger-soft': '#FFB4B4',
+        bg: '#FFFFFF',
+        surface: '#F7FAFF',
+        'surface-2': '#EEF4FF',
+        text: '#0B1F4D',
+        muted: '#42526E',
+        line: 'rgba(11,31,77,0.14)',
+        'accent-blue': '#0B1F4D',
+        'accent-cyan': '#123A73',
+        'accent-gold': '#0B1F4D',
+        'danger-soft': '#B42318',
       },
       fontFamily: {
         heading: ['Sora', 'sans-serif'],
