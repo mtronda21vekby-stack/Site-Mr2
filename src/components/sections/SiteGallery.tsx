@@ -38,19 +38,20 @@ export default async function SiteGallery() {
   const caseKeys = Array.from(beforeByCase.keys()).filter((key) => afterByCase.has(key)).slice(0, 4)
 
   return (
-    <section className="relative bg-[#02040A] px-5 py-16 md:px-8 md:py-24">
-      <div className="mx-auto max-w-7xl">
+    <section className="relative border-y border-[#0B1F4D]/10 bg-white px-5 py-16 md:px-8 md:py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(11,31,77,0.055),transparent_32rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_100%)]" />
+      <div className="relative mx-auto max-w-7xl">
         <div className="mb-10 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
           <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Real work proof</p>
-            <h2 className="mt-4 text-balance text-3xl font-black tracking-[-0.045em] text-white md:text-5xl">
+            <p className="text-xs font-black uppercase tracking-[0.32em] text-[#123A73]">Real work proof</p>
+            <h2 className="mt-4 text-balance text-3xl font-black tracking-[-0.045em] text-[#0B1F4D] md:text-5xl">
               Customer job photos from the field
             </h2>
-            <p className="mt-4 text-base leading-7 text-white/58">
+            <p className="mt-4 text-base leading-7 text-[#42526E]">
               Photos uploaded by the business: vehicle keys, lockouts, programming work, emergency calls, and completed mobile service jobs.
             </p>
           </div>
-          <a href="#request" className="inline-flex w-fit items-center rounded-full border border-accent-blue/35 bg-accent-blue/10 px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-accent-blue transition hover:-translate-y-0.5 hover:border-accent-cyan/45 hover:text-accent-cyan">
+          <a href="#request" className="inline-flex w-fit items-center rounded-full border border-[#0B1F4D]/25 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition hover:-translate-y-0.5 hover:border-[#0B1F4D]/45 hover:bg-[#F3F7FF]">
             Request service →
           </a>
         </div>
@@ -59,10 +60,10 @@ export default async function SiteGallery() {
           <div className="mb-14">
             <div className="mb-7 flex items-end justify-between gap-5">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.28em] text-accent-cyan/80">Before / After</p>
-                <h3 className="mt-3 text-2xl font-black text-white md:text-4xl">Proof-based service cases</h3>
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-[#123A73]">Before / After</p>
+                <h3 className="mt-3 text-2xl font-black text-[#0B1F4D] md:text-4xl">Proof-based service cases</h3>
               </div>
-              <p className="hidden max-w-sm text-right text-sm leading-6 text-white/45 md:block">
+              <p className="hidden max-w-sm text-right text-sm leading-6 text-[#42526E] md:block">
                 Paired images show what was found on arrival and the result after service.
               </p>
             </div>
