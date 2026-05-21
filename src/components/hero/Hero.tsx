@@ -11,7 +11,8 @@ interface HeroProps {
   secondaryCtaHref: string
 }
 
-export default function Hero({ title, subtitle, badges, primaryCtaLabel, primaryCtaHref, secondaryCtaLabel, secondaryCtaHref }: HeroProps) {
+export default function Hero(props: HeroProps) {
+  const { title, subtitle, badges, secondaryCtaHref } = props
   const visibleBadges = badges.slice(0, 4)
 
   return (
@@ -25,14 +26,6 @@ export default function Hero({ title, subtitle, badges, primaryCtaLabel, primary
 
           <h1 className="mx-auto max-w-6xl text-balance text-[clamp(2.85rem,8.6vw,6.9rem)] font-semibold leading-[0.88] tracking-[-0.07em] text-[#0B1F4D] lg:mx-0">{title}</h1>
           <p className="mx-auto mt-7 max-w-2xl text-pretty text-base leading-8 text-[#42526E] sm:text-lg lg:mx-0">{subtitle}</p>
-
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
-            <a href={primaryCtaHref} className="group inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-7 py-3 text-xl text-white shadow-[0_16px_42px_rgba(11,31,77,0.24)] transition duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.30)] active:translate-y-0 active:scale-[0.96] sm:w-auto" aria-label={primaryCtaLabel || 'Call'} title={primaryCtaLabel || 'Call'}>
-              <span aria-hidden="true" className="transition duration-300 group-hover:-rotate-12 group-hover:scale-110">📞</span>
-              <span className="sr-only">{primaryCtaLabel || 'Call'}</span>
-            </a>
-            <a href="#request-service" className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#0B1F4D]/22 bg-white px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-[#0B1F4D] shadow-[0_14px_36px_rgba(11,31,77,0.10)] transition duration-300 hover:-translate-y-1 hover:bg-[#F3F7FF] active:scale-[0.985] sm:w-auto">{secondaryCtaLabel || 'Request service'}</a>
-          </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-2.5 lg:justify-start">
             {(visibleBadges.length ? visibleBadges : ['Car lockouts', 'Keys + fobs', 'Mobile response']).map((badge) => (
@@ -68,15 +61,7 @@ export default function Hero({ title, subtitle, badges, primaryCtaLabel, primary
               ))}
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <a href={primaryCtaHref} className="group inline-flex min-h-11 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-4 py-3 text-xl text-white shadow-[0_14px_36px_rgba(11,31,77,0.20)] transition duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_52px_rgba(11,31,77,0.26)] active:translate-y-0 active:scale-[0.96]" aria-label="Call" title="Call">
-                <span aria-hidden="true" className="transition duration-300 group-hover:-rotate-12 group-hover:scale-110">📞</span>
-                <span className="sr-only">Call</span>
-              </a>
-              <a href="#request-service" className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#0B1F4D]/22 bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#0B1F4D] shadow-[0_14px_36px_rgba(11,31,77,0.08)] transition hover:-translate-y-1 hover:bg-[#F3F7FF] active:scale-[0.985]">Form</a>
-            </div>
-
-            <Link href={secondaryCtaHref} className="mt-4 inline-flex text-xs font-black uppercase tracking-[0.18em] text-[#0B1F4D] transition hover:text-[#123A73]">View all services →</Link>
+            <Link href={secondaryCtaHref} className="mt-6 inline-flex text-xs font-black uppercase tracking-[0.18em] text-[#0B1F4D] transition hover:text-[#123A73]">View all services →</Link>
           </div>
         </PremiumReveal>
       </div>
