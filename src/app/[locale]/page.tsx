@@ -6,18 +6,12 @@ import CinematicBackground from '@/components/layout/CinematicBackground'
 import JsonLd from '@/components/seo/JsonLd'
 import Hero from '@/components/hero/Hero'
 import ServicesGrid from '@/components/sections/ServicesGrid'
-import WhyChoose from '@/components/sections/WhyChoose'
-import EmergencyStrip from '@/components/sections/EmergencyStrip'
 import ReviewsSection from '@/components/sections/ReviewsSection'
 import FaqSection from '@/components/sections/FaqSection'
 import ContactSection from '@/components/sections/ContactSection'
-import CustomerInfoSection from '@/components/sections/CustomerInfoSection'
-import ServiceDepthSection from '@/components/sections/ServiceDepthSection'
-import ConversionRail from '@/components/sections/ConversionRail'
 import AreasShowcase from '@/components/sections/AreasShowcase'
 import SiteGallery from '@/components/sections/SiteGallery'
 import {
-  getContentBlocksFromSource,
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
   getReviewsFromSource,
@@ -44,20 +38,15 @@ export default async function LocaleHome({
   const { locale } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
 
-  const [global, home, reviews, faq, services, areas, blocks] = await Promise.all([
+  const [global, home, reviews, faq, services, areas] = await Promise.all([
     getGlobalSettingsFromSource(),
     getHomeContentFromSource(locale),
     getReviewsFromSource(locale),
     getFaqFromSource(locale),
     getServicesListFromSource(locale),
     getAreasListFromSource(locale),
-    getContentBlocksFromSource(locale, 'home'),
   ])
 
-  const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
-  const serviceDepthBlock = blockBySlot.get('service-depth')
-  const customerInfoBlock = blockBySlot.get('customer-info')
-  const areaSectionBlock = blockBySlot.get('area-section')
   const featuredAreas = areas.slice(0, 6)
   const pageUrl = `${siteUrl}/${locale}`
   const jsonLd = [
@@ -113,48 +102,20 @@ export default async function LocaleHome({
           secondaryCtaHref={`/${locale}/services`}
         />
 
-        <ConversionRail locale={locale} global={global} home={home} />
         <SiteGallery />
         <ServicesGrid services={services} locale={locale} />
-
-        <ServiceDepthSection
-          locale={locale}
-          services={services}
-          eyebrow={serviceDepthBlock?.eyebrow || home.faqTitle}
-          title={serviceDepthBlock?.title || home.emergencyTitle}
-          intro={serviceDepthBlock?.body || home.emergencyText}
-        />
-        <CustomerInfoSection
-          eyebrow={customerInfoBlock?.eyebrow || home.contactTitle}
-          title={customerInfoBlock?.title || home.contactTitle}
-          intro={customerInfoBlock?.body || home.contactText}
-          services={services}
-          faq={faq}
-        />
-        <WhyChoose items={home.whyChoose} />
-
-        <EmergencyStrip
-          title={home.emergencyTitle}
-          text={home.emergencyText}
-          phoneNumber={global.phonePrimary}
-          phoneDisplay={global.phoneDisplay}
-          locale={locale}
-        />
 
         <AreasShowcase
           locale={locale}
           areas={featuredAreas}
-          block={areaSectionBlock}
-          fallbackEyebrow={home.contactTitle}
-          fallbackTitle={home.heroSecondaryCta}
-          fallbackText={home.contactText}
-          fallbackCta={home.heroSecondaryCta}
+          fallbackEyebrow="Service areas"
+          fallbackTitle="Mobile automotive locksmith coverage"
+          fallbackText="Fast mobile service for drivers across the primary coverage area. Select a city to view local service details."
+          fallbackCta="View service areas"
         />
 
         <ReviewsSection title={home.reviewsTitle} items={reviews} />
         <FaqSection title={home.faqTitle} items={faq} />
-
-        <ConversionRail locale={locale} global={global} home={home} />
 
         <ContactSection
           title={home.contactTitle}
