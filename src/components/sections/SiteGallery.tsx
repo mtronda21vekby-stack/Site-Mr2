@@ -29,19 +29,7 @@ async function getGalleryImages(): Promise<SiteImage[]> {
 
 export default async function SiteGallery() {
   const images = await getGalleryImages()
-  if (!images.length) {
-    return (
-      <section className="relative px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/[0.035] p-8 text-white shadow-2xl backdrop-blur-xl">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Field gallery</p>
-          <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">Live work gallery</h2>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/55">
-            Upload photos in the admin panel to populate this section automatically.
-          </p>
-        </div>
-      </section>
-    )
-  }
+  if (!images.length) return null
 
   const beforeImages = images.filter((i) => i.category === 'before')
   const afterImages = images.filter((i) => i.category === 'after')
@@ -50,16 +38,21 @@ export default async function SiteGallery() {
   const caseKeys = Array.from(beforeByCase.keys()).filter((key) => afterByCase.has(key)).slice(0, 4)
 
   return (
-    <section className="relative px-5 py-20 md:px-8 md:py-28">
+    <section className="relative bg-[#02040A] px-5 py-16 md:px-8 md:py-24">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10 max-w-3xl">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Field gallery</p>
-          <h2 className="mt-4 text-3xl font-black tracking-tight text-white md:text-5xl">
-            Real locksmith work, uploaded from the admin panel.
-          </h2>
-          <p className="mt-4 text-base leading-7 text-white/58">
-            Fresh photos from vehicle key programming, lockouts, emergency calls, and mobile service jobs.
-          </p>
+        <div className="mb-10 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.32em] text-accent-cyan">Real work proof</p>
+            <h2 className="mt-4 text-balance text-3xl font-black tracking-[-0.045em] text-white md:text-5xl">
+              Customer job photos from the field
+            </h2>
+            <p className="mt-4 text-base leading-7 text-white/58">
+              Photos uploaded by the business: vehicle keys, lockouts, programming work, emergency calls, and completed mobile service jobs.
+            </p>
+          </div>
+          <a href="#request" className="inline-flex w-fit items-center rounded-full border border-accent-blue/35 bg-accent-blue/10 px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-accent-blue transition hover:-translate-y-0.5 hover:border-accent-cyan/45 hover:text-accent-cyan">
+            Request service →
+          </a>
         </div>
 
         {caseKeys.length > 0 && (
@@ -70,7 +63,7 @@ export default async function SiteGallery() {
                 <h3 className="mt-3 text-2xl font-black text-white md:text-4xl">Proof-based service cases</h3>
               </div>
               <p className="hidden max-w-sm text-right text-sm leading-6 text-white/45 md:block">
-                Upload paired before and after photos from the admin panel to create proof cases.
+                Paired images show what was found on arrival and the result after service.
               </p>
             </div>
 
