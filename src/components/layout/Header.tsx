@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -57,9 +58,8 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/24 to-transparent" />
       <div className="relative mx-auto flex h-[4.25rem] max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-3" aria-label="Planetlocksmiths home">
-          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#0B1F4D]/20 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.90),0_16px_34px_rgba(11,31,77,0.10)] backdrop-blur-2xl">
-            <span className="h-3 w-3 rounded-full bg-[#0B1F4D] shadow-[0_0_18px_rgba(11,31,77,0.30)]" />
-            <span className="absolute inset-1 rounded-2xl border border-[#0B1F4D]/10" />
+          <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-visible rounded-full transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-14 sm:w-14">
+            <Image src="/planetlocksmiths-logo.svg" alt="Planetlocksmiths" width={56} height={56} priority className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
           </span>
           <span className="min-w-0">
             <span className="notranslate block truncate text-base font-black tracking-[-0.03em] text-[#0B1F4D] sm:text-lg" translate="no">Planetlocksmiths</span>
