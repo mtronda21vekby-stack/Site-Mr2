@@ -10,28 +10,41 @@ interface HeroProps {
   secondaryCtaHref: string
 }
 
+function isInvalidContent(value: string) {
+  const normalized = value?.trim().toLowerCase()
+  return !normalized || normalized === '0' || normalized.includes('тут должно быть описание')
+}
+
 export default function Hero(props: HeroProps) {
   const { title, subtitle, badges } = props
+  const hasTitle = !isInvalidContent(title)
+  const hasSubtitle = !isInvalidContent(subtitle)
   const visibleBadges = badges.slice(0, 3)
+  const fallbackBadges = ['24/7 Mobile Service', 'Philadelphia Coverage', 'Car Keys & Programming']
 
   return (
-    <section className="relative overflow-hidden bg-transparent px-4 pb-10 pt-8 sm:px-6 md:pb-18 md:pt-14 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-7 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-center">
-        <PremiumReveal className="relative z-10 text-center lg:text-left">
-          <div className="mb-5 inline-flex max-w-full items-center gap-3 rounded-full border border-[#0B1F4D]/16 bg-white px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#123A73] shadow-[0_12px_34px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:text-[0.68rem] sm:tracking-[0.24em]">
+    <section className="relative overflow-hidden bg-transparent px-4 pb-10 pt-8 sm:px-6 md:pb-14 md:pt-12 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center">
+        <PremiumReveal className="relative z-10 flex min-h-[15rem] flex-col justify-center text-center lg:min-h-[22rem] lg:text-left">
+          <div className="mb-5 inline-flex max-w-full items-center self-center gap-3 rounded-full border border-[#0B1F4D]/16 bg-white px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#123A73] shadow-[0_12px_34px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:text-[0.68rem] sm:tracking-[0.24em] lg:self-start">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#0B1F4D] shadow-[0_0_16px_rgba(11,31,77,0.24)]" />
             <span className="truncate">24/7 Mobile Automotive Locksmith</span>
           </div>
 
-          <h1 className="mx-auto max-w-6xl text-balance text-[clamp(2.65rem,13vw,6.9rem)] font-semibold leading-[0.9] tracking-[-0.065em] text-[#0B1F4D] sm:text-[clamp(3.4rem,8.6vw,6.9rem)] lg:mx-0">
-            {title}
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-8 text-[#42526E] sm:text-lg lg:mx-0">
-            {subtitle}
-          </p>
+          {hasTitle ? (
+            <h1 className="mx-auto max-w-6xl text-balance text-[clamp(2.65rem,13vw,6.9rem)] font-semibold leading-[0.9] tracking-[-0.065em] text-[#0B1F4D] sm:text-[clamp(3.4rem,8.6vw,6.9rem)] lg:mx-0">
+              {title}
+            </h1>
+          ) : null}
 
-          <div className="mt-7 flex flex-wrap justify-center gap-2.5 lg:justify-start">
-            {(visibleBadges.length ? visibleBadges : ['24/7 Mobile Service', 'Philadelphia Coverage', 'Car Keys & Programming']).map((badge) => (
+          {hasSubtitle ? (
+            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-8 text-[#42526E] sm:text-lg lg:mx-0">
+              {subtitle}
+            </p>
+          ) : null}
+
+          <div className={`${hasTitle || hasSubtitle ? 'mt-7' : 'mt-2'} flex flex-wrap justify-center gap-2.5 lg:justify-start`}>
+            {(visibleBadges.length ? visibleBadges : fallbackBadges).map((badge) => (
               <span key={badge} className="rounded-full border border-[#0B1F4D]/14 bg-white px-4 py-2 text-xs font-semibold text-[#0B1F4D]/82 shadow-[0_10px_28px_rgba(11,31,77,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-[#0B1F4D]/28 hover:bg-[#F3F7FF]">
                 {badge}
               </span>
