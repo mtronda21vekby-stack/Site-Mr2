@@ -70,9 +70,9 @@ function imageForSlot(images: DecorImage[], index: number) {
 }
 
 function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
-  const cols = isMobile ? [-16, 20, 58, 88] : [-8, 10, 29, 49, 69, 89]
-  const rows = isMobile ? [3, 17, 32, 48, 64, 80] : [3, 17, 31, 45, 59, 73, 87]
-  const rotations = [-10, 7, -5, 9, -8, 6, -7, 10]
+  const cols = isMobile ? [-24, -2, 22, 48, 73, 94] : [-12, 3, 17, 32, 48, 64, 80, 96]
+  const rows = isMobile ? [2, 13, 24, 35, 46, 57, 68, 79, 90] : [2, 13, 24, 35, 46, 57, 68, 79, 90]
+  const rotations = [-10, 7, -5, 9, -8, 6, -7, 10, -4, 5]
 
   return Array.from({ length: count }, (_, index) => {
     const col = cols[index % cols.length]
@@ -80,11 +80,11 @@ function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
     const driftX = ((index * 7) % 11) - 5
     const driftY = ((index * 5) % 9) - 4
     const wide = index % 3 === 0
-    const width = isMobile ? (wide ? 8.1 : 7.05) : (wide ? 12.7 : 10.8)
-    const height = isMobile ? (wide ? 5.55 : 4.85) : (wide ? 8.1 : 7.0)
-    const baseOpacity = isMobile ? 0.46 : 0.42
-    const edgeBoost = col < 0 || col > 78 ? 0.12 : 0
-    const depth = (index % 4) * 0.025
+    const width = isMobile ? (wide ? 7.9 : 6.75) : (wide ? 12.2 : 10.3)
+    const height = isMobile ? (wide ? 5.4 : 4.65) : (wide ? 7.8 : 6.65)
+    const baseOpacity = isMobile ? 0.43 : 0.39
+    const edgeBoost = col < 0 || col > 82 ? 0.11 : 0
+    const depth = (index % 5) * 0.018
 
     return {
       left: `${col + driftX}%`,
@@ -92,14 +92,14 @@ function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
       width: `${width}rem`,
       height: `${height}rem`,
       rotate: `${rotations[index % rotations.length]}deg`,
-      opacity: Math.min(0.68, baseOpacity + edgeBoost - depth),
+      opacity: Math.min(0.66, baseOpacity + edgeBoost - depth),
     }
   })
 }
 
 function getRevealProgress(index: number, scrollY: number, viewportHeight: number, isMobile: boolean) {
   const cycle = Math.max(520, viewportHeight * (isMobile ? 0.92 : 0.84))
-  const offset = index * (isMobile ? 91 : 128)
+  const offset = index * (isMobile ? 72 : 96)
   const raw = ((scrollY + offset) % cycle) / cycle
   const enter = smoothstep(raw / 0.3)
   const exit = 1 - smoothstep((raw - 0.8) / 0.2)
@@ -123,17 +123,17 @@ function getMotionStyle(
 
   const reveal = getRevealProgress(index, scrollY, viewportHeight, isMobile)
   const direction = index % 2 === 0 ? 1 : -1
-  const speed = isMobile ? 0.015 + (index % 5) * 0.003 : 0.011 + (index % 6) * 0.003
+  const speed = isMobile ? 0.014 + (index % 5) * 0.0025 : 0.01 + (index % 6) * 0.0026
   const phase = index * 0.71
   const floatX = Math.sin(scrollY / 170 + phase) * (isMobile ? 9 : 15)
   const floatY = Math.cos(scrollY / 210 + phase) * (isMobile ? 8 : 12)
   const parallaxY = scrollY * speed * direction
   const parallaxX = scrollY * speed * 0.28 * -direction
-  const revealLift = (1 - reveal) * (isMobile ? 46 : 58)
+  const revealLift = (1 - reveal) * (isMobile ? 42 : 52)
   const scale = 0.86 + reveal * 0.14
   const rotateDrift = Math.sin(scrollY / 250 + phase) * (isMobile ? 1.5 : 2)
   const opacity = slot.opacity * (0.25 + reveal * 0.75)
-  const blur = (1 - reveal) * 0.38
+  const blur = (1 - reveal) * 0.34
 
   return {
     opacity,
@@ -149,8 +149,8 @@ export default function CinematicBackground() {
   const [scrollY, setScrollY] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(820)
   const [reduceMotion, setReduceMotion] = useState(false)
-  const desktopSlots = useMemo(() => buildSlots(26, false), [])
-  const mobileSlots = useMemo(() => buildSlots(18, true), [])
+  const desktopSlots = useMemo(() => buildSlots(42, false), [])
+  const mobileSlots = useMemo(() => buildSlots(28, true), [])
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -198,7 +198,7 @@ export default function CinematicBackground() {
             .in('category', ['background-decor', 'background-desktop', 'background-mobile'])
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false })
-            .limit(36),
+            .limit(54),
         ])
 
         if (!mounted) return
