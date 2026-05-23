@@ -7,6 +7,8 @@ export type Locale = 'en' | 'es' | 'ru';
 
 export type GlobalSettings = {
   brandName: string;
+  logoUrl?: string;
+  logoAlt?: string;
   phonePrimary: string;
   phoneDisplay: string;
   email?: string;
