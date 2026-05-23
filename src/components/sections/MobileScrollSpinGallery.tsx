@@ -81,7 +81,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
             onClick={() => setFilter(category)}
             className={`shrink-0 rounded-full border px-4 py-2 text-[0.66rem] font-black uppercase tracking-[0.18em] transition ${filter === category ? 'border-[#0B1F4D] bg-[#0B1F4D] text-white shadow-[0_16px_36px_rgba(11,31,77,0.22)]' : 'border-[#0B1F4D]/16 bg-white text-[#0B1F4D] shadow-[0_10px_24px_rgba(11,31,77,0.07)]'}`}
           >
-            {category}
+            {category === 'all' ? 'All' : category}
           </button>
         ))}
       </div>
@@ -97,7 +97,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
 
         <div className="absolute left-5 right-5 top-5 z-20 flex items-center justify-between gap-3">
           <div>
-            <p className="text-[0.62rem] font-black uppercase tracking-[0.24em] text-[#123A73]">Loop orbit gallery</p>
+            <p className="text-[0.62rem] font-black uppercase tracking-[0.24em] text-[#123A73]">Real work proof</p>
             <h3 className="mt-1 text-xl font-black tracking-[-0.045em] text-[#0B1F4D]">Photos rotate in a loop</h3>
           </div>
           <button
@@ -148,9 +148,6 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                     className="h-full w-full object-cover"
                   />
                   <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_36%,rgba(11,31,77,0.72))]" />
-                  <div className="pointer-events-none absolute left-4 top-4 rounded-full border border-white/70 bg-white/76 px-3 py-1 text-[0.6rem] font-black uppercase tracking-[0.18em] text-[#0B1F4D] shadow-[0_12px_32px_rgba(11,31,77,0.12)] backdrop-blur-xl">
-                    {(image.category || 'gallery')} · {index + 1}/{visibleImages.length}
-                  </div>
                   <div className="pointer-events-none absolute bottom-0 left-0 right-0 p-5 text-white">
                     <p className="text-[0.62rem] font-black uppercase tracking-[0.24em] text-white/72">Tap active photo</p>
                     <h3 className="mt-2 line-clamp-2 text-xl font-black tracking-[-0.035em]">
@@ -168,7 +165,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
             <button
               key={`dot-${image.id}`}
               type="button"
-              aria-label={`Show photo ${index + 1}`}
+              aria-label="Show photo"
               onClick={() => setActiveIndex(index)}
               className={`h-2.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'w-8 bg-[#0B1F4D]' : 'w-2.5 bg-[#0B1F4D]/22'}`}
             />
@@ -180,7 +177,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
         <div className="mt-5 rounded-[1.4rem] border border-[#0B1F4D]/10 bg-white/88 p-4 shadow-[0_18px_45px_rgba(11,31,77,0.08)] backdrop-blur-xl">
           <p className="text-[0.64rem] font-black uppercase tracking-[0.22em] text-[#123A73]">Now showing</p>
           <h3 className="mt-2 text-xl font-black tracking-[-0.035em] text-[#0B1F4D]">{activeImage.title || 'Mobile locksmith service'}</h3>
-          <p className="mt-2 text-sm leading-6 text-[#42526E]">The gallery rotates one photo at a time in a continuous loop. Tap the centered photo to open it.</p>
+          <p className="mt-2 text-sm leading-6 text-[#42526E]">Photos rotate one at a time in a continuous loop. Tap the centered photo to open it.</p>
         </div>
       ) : null}
 
@@ -209,10 +206,6 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
             Close
           </button>
 
-          <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white/70 backdrop-blur-xl">
-            {lightboxIndex + 1} / {visibleImages.length}
-          </div>
-
           <div className="flex h-full items-center justify-center">
             <div className="max-h-full w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl">
               <img
@@ -221,7 +214,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                 className="max-h-[74vh] w-full bg-black object-contain"
               />
               <div className="p-5">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-white/50">{current.category || 'gallery'}</p>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-white/50">{current.category || 'work photo'}</p>
                 <h3 className="mt-2 text-xl font-black text-white">{current.title || 'Mobile locksmith service'}</h3>
                 <p className="mt-2 text-sm text-white/45">Swipe left or right to browse.</p>
               </div>
