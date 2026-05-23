@@ -26,23 +26,25 @@ const defaultBackground: BackgroundState = {
 }
 
 const desktopSlots = [
-  { left: '4%', top: '14%', width: '8.5rem', rotate: '-9deg', opacity: 0.17 },
-  { left: '83%', top: '10%', width: '9.5rem', rotate: '8deg', opacity: 0.16 },
-  { left: '10%', top: '38%', width: '7.4rem', rotate: '7deg', opacity: 0.13 },
-  { left: '78%', top: '34%', width: '8.8rem', rotate: '-7deg', opacity: 0.15 },
-  { left: '3%', top: '68%', width: '9rem', rotate: '10deg', opacity: 0.13 },
-  { left: '88%', top: '66%', width: '7.8rem', rotate: '-10deg', opacity: 0.14 },
-  { left: '18%', top: '82%', width: '6.9rem', rotate: '-6deg', opacity: 0.11 },
-  { left: '68%', top: '84%', width: '8rem', rotate: '6deg', opacity: 0.12 },
+  { left: '3%', top: '10%', width: '10.5rem', height: '7.1rem', rotate: '-9deg', opacity: 0.46 },
+  { left: '80%', top: '8%', width: '11rem', height: '7.4rem', rotate: '8deg', opacity: 0.44 },
+  { left: '8%', top: '31%', width: '9.4rem', height: '6.5rem', rotate: '7deg', opacity: 0.38 },
+  { left: '76%', top: '30%', width: '10.8rem', height: '7rem', rotate: '-7deg', opacity: 0.42 },
+  { left: '2%', top: '56%', width: '10rem', height: '6.8rem', rotate: '10deg', opacity: 0.36 },
+  { left: '86%', top: '55%', width: '9.6rem', height: '6.5rem', rotate: '-10deg', opacity: 0.38 },
+  { left: '15%', top: '76%', width: '8.8rem', height: '6rem', rotate: '-6deg', opacity: 0.32 },
+  { left: '66%', top: '78%', width: '9.8rem', height: '6.4rem', rotate: '6deg', opacity: 0.34 },
 ]
 
 const mobileSlots = [
-  { left: '-7%', top: '9%', width: '5.6rem', rotate: '-10deg', opacity: 0.13 },
-  { left: '78%', top: '15%', width: '5.9rem', rotate: '9deg', opacity: 0.13 },
-  { left: '-6%', top: '39%', width: '5.3rem', rotate: '8deg', opacity: 0.11 },
-  { left: '82%', top: '46%', width: '5.4rem', rotate: '-8deg', opacity: 0.12 },
-  { left: '5%', top: '75%', width: '5.1rem', rotate: '-7deg', opacity: 0.10 },
-  { left: '74%', top: '80%', width: '5.8rem', rotate: '7deg', opacity: 0.11 },
+  { left: '-8%', top: '10%', width: '7.2rem', height: '5rem', rotate: '-10deg', opacity: 0.34 },
+  { left: '69%', top: '11%', width: '7.8rem', height: '5.3rem', rotate: '9deg', opacity: 0.36 },
+  { left: '-8%', top: '28%', width: '7rem', height: '4.9rem', rotate: '8deg', opacity: 0.30 },
+  { left: '71%', top: '31%', width: '7.4rem', height: '5rem', rotate: '-8deg', opacity: 0.32 },
+  { left: '5%', top: '50%', width: '6.8rem', height: '4.8rem', rotate: '-7deg', opacity: 0.26 },
+  { left: '70%', top: '54%', width: '7.6rem', height: '5.1rem', rotate: '7deg', opacity: 0.30 },
+  { left: '-4%', top: '73%', width: '7.2rem', height: '5rem', rotate: '9deg', opacity: 0.24 },
+  { left: '68%', top: '77%', width: '7.8rem', height: '5.2rem', rotate: '-9deg', opacity: 0.26 },
 ]
 
 function normalizeOpacity(value: unknown) {
@@ -136,7 +138,7 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${background.desktopUrl})`,
                 backgroundPosition: background.desktopPosition,
-                opacity: Math.min(0.10, background.opacity),
+                opacity: Math.min(0.08, background.opacity),
               }}
             />
           ) : null}
@@ -147,12 +149,14 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${mobileUrl})`,
                 backgroundPosition: background.mobilePosition,
-                opacity: Math.min(0.08, background.opacity),
+                opacity: Math.min(0.06, background.opacity),
               }}
             />
           ) : null}
         </>
       ) : null}
+
+      <div className="absolute inset-0 bg-white/42 backdrop-blur-[0.5px]" />
 
       {desktopDecor.length ? (
         <div className="absolute inset-0 hidden md:block">
@@ -161,7 +165,7 @@ export default function CinematicBackground() {
             return (
               <div
                 key={`desktop-bg-${image.id}`}
-                className="absolute overflow-hidden rounded-[1.15rem] border border-white/80 bg-white/70 p-1.5 shadow-[0_24px_70px_rgba(11,31,77,0.10)] backdrop-blur-sm"
+                className="absolute overflow-hidden rounded-[1.2rem] border border-white/90 bg-white/78 p-1.5 shadow-[0_24px_70px_rgba(11,31,77,0.16)] backdrop-blur-sm"
                 style={{
                   left: slot.left,
                   top: slot.top,
@@ -170,7 +174,7 @@ export default function CinematicBackground() {
                   transform: `rotate(${slot.rotate})`,
                 }}
               >
-                <img src={image.imageUrl} alt={image.alt} className="h-24 w-full rounded-[0.8rem] object-cover" loading="lazy" draggable="false" />
+                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.85rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
               </div>
             )
           })}
@@ -184,7 +188,7 @@ export default function CinematicBackground() {
             return (
               <div
                 key={`mobile-bg-${image.id}`}
-                className="absolute overflow-hidden rounded-[0.95rem] border border-white/80 bg-white/70 p-1 shadow-[0_16px_44px_rgba(11,31,77,0.09)] backdrop-blur-sm"
+                className="absolute overflow-hidden rounded-[1rem] border border-white/90 bg-white/78 p-1 shadow-[0_16px_44px_rgba(11,31,77,0.14)] backdrop-blur-sm"
                 style={{
                   left: slot.left,
                   top: slot.top,
@@ -193,17 +197,16 @@ export default function CinematicBackground() {
                   transform: `rotate(${slot.rotate})`,
                 }}
               >
-                <img src={image.imageUrl} alt={image.alt} className="h-20 w-full rounded-[0.7rem] object-cover" loading="lazy" draggable="false" />
+                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.72rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
               </div>
             )
           })}
         </div>
       ) : null}
 
-      <div className="absolute inset-0 bg-white/74 backdrop-blur-[1px]" />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,31,77,0.07)_1px,transparent_1px),linear-gradient(rgba(11,31,77,0.055)_1px,transparent_1px)] bg-[size:96px_96px] opacity-16 [mask-image:radial-gradient(circle_at_50%_0%,black_0%,transparent_72%)]" />
-      <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-white via-white/78 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-[34rem] bg-gradient-to-t from-white via-white/82 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-white/86 via-white/44 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[24rem] bg-gradient-to-t from-white/88 via-white/46 to-transparent" />
     </div>
   )
 }
