@@ -23,6 +23,7 @@ Open Supabase Dashboard → SQL Editor and run these files in order:
 supabase/migrations/202605230001_add_logo_to_site_settings.sql
 supabase/migrations/202605230002_admin_cms_foundation.sql
 supabase/migrations/202605230003_orders_admin_fields.sql
+supabase/migrations/202605230004_site_background_settings.sql
 ```
 
 The migrations create or update:
@@ -40,6 +41,7 @@ The migrations create or update:
 - RLS policies for public content reads and authenticated admin writes
 - Public insert policy for `orders`
 - Admin order fields: `vehicle_make_model`, `urgency`, `preferred_time`, `admin_note`, `assigned_to`
+- CMS-managed background fields: `background_image_url`, `background_mobile_image_url`, `background_alt`, `background_opacity`, `background_position`, `background_mobile_position`
 
 ## Admin authentication
 
@@ -79,6 +81,35 @@ Save settings
 ```
 
 The public header reads `logo_url` and `logo_alt` from `site_settings`. Header UI is marked `notranslate` so browser translation should not rewrite brand text/buttons.
+
+## Background workflow
+
+Go to:
+
+```txt
+/admin/backgrounds
+```
+
+Recommended background files:
+
+- Desktop: WebP/JPG, 2400×1400 or larger
+- Mobile: WebP/JPG, 1200×1800 or larger
+- Keep opacity around `0.10`–`0.24` so text and CTA remain readable
+
+Background images upload through Supabase Auth + Supabase Storage into bucket:
+
+```txt
+site-images
+```
+
+URLs are saved in:
+
+```txt
+site_settings.background_image_url
+site_settings.background_mobile_image_url
+```
+
+The public `CinematicBackground` component reads these CMS fields and applies the background globally across public pages.
 
 ## Photo workflow
 
@@ -137,6 +168,7 @@ Admin order actions:
 ## Core admin pages
 
 - `/admin/settings` — brand, logo, phone, email, hours
+- `/admin/backgrounds` — global site background images
 - `/admin/home` — home page copy by locale
 - `/admin/services` — services CMS
 - `/admin/areas` — service areas CMS
@@ -155,17 +187,21 @@ After deployment:
 3. Upload transparent PNG/WebP logo.
 4. Save settings.
 5. Open `/en`, `/en/services`, and `/en/contact`; verify header logo appears everywhere.
-6. Open `/admin/photos`.
-7. Upload one gallery image.
-8. Open `/en` on mobile; verify the rotating photo carousel appears without overlay text.
-9. Submit a request through `/en/contact#request-service`.
-10. Open `/admin/orders`; verify the request appears.
-11. Change status and save internal note.
-12. Edit Home content in `/admin/home`.
-13. Verify `/en` updates.
-14. Edit one Service in `/admin/services`.
-15. Verify `/en/services` updates.
-16. Open `/admin/audit` and fix critical warnings.
+6. Open `/admin/backgrounds`.
+7. Upload desktop and mobile background images.
+8. Save backgrounds.
+9. Open `/en` on desktop and mobile; verify the background appears subtly behind the UI.
+10. Open `/admin/photos`.
+11. Upload one gallery image.
+12. Open `/en` on mobile; verify the rotating photo carousel appears without overlay text.
+13. Submit a request through `/en/contact#request-service`.
+14. Open `/admin/orders`; verify the request appears.
+15. Change status and save internal note.
+16. Edit Home content in `/admin/home`.
+17. Verify `/en` updates.
+18. Edit one Service in `/admin/services`.
+19. Verify `/en/services` updates.
+20. Open `/admin/audit` and fix critical warnings.
 
 ## Known rule
 
