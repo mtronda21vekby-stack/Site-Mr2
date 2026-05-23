@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -16,6 +15,7 @@ interface HeaderProps {
 }
 
 const activeLocales: ActiveLocale[] = ['en', 'es']
+const logoSrc = '/planetlocksmiths-logo.svg?v=approved-logo-3'
 
 const navConfig: Record<Locale, Array<{ label: string; href: (locale: Locale) => string }>> = {
   en: [
@@ -55,7 +55,15 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
       <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label="Planetlocksmiths home">
           <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
-            <Image src="/planetlocksmiths-logo.svg" alt="Planetlocksmiths" width={160} height={117} priority sizes="(max-width: 640px) 75px, 96px" className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
+            <img
+              src={logoSrc}
+              alt="Planetlocksmiths"
+              width="160"
+              height="117"
+              decoding="async"
+              fetchPriority="high"
+              className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
+            />
           </span>
           <span className="min-w-0 leading-none">
             <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">Planetlocksmiths</span>
