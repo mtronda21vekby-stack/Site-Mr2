@@ -112,6 +112,72 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   z-index: 1;
 }
 
+.cinematic-shell :where(a, button) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cinematic-shell :where(a, button):focus-visible {
+  outline: 3px solid rgba(11, 31, 77, 0.24);
+  outline-offset: 4px;
+}
+
+.cinematic-shell :where(a, button):where([class*="rounded-full"], [class*="inline-flex"]):not([href*="/services/"]):not([href*="/areas/"]) {
+  will-change: transform, box-shadow, background-color, border-color, color;
+  transition-property: transform, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: 280ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cinematic-shell :where(a, button):where([class*="rounded-full"], [class*="inline-flex"]):not([href*="/services/"]):not([href*="/areas/"]):hover {
+  transform: translateY(-4px);
+}
+
+.cinematic-shell :where(a, button):where([class*="rounded-full"], [class*="inline-flex"]):not([href*="/services/"]):not([href*="/areas/"]):active {
+  transform: translateY(-1px) scale(0.985);
+}
+
+.cinematic-shell :where(a[href^="tel:"], a[href*="#request"], a[href*="/contact"], button[type="submit"]) {
+  border-color: rgba(11, 31, 77, 0.16) !important;
+  background: #0b1f4d !important;
+  color: #ffffff !important;
+  box-shadow: 0 18px 44px rgba(11, 31, 77, 0.22) !important;
+}
+
+.cinematic-shell :where(a[href^="tel:"], a[href*="#request"], a[href*="/contact"], button[type="submit"]):hover {
+  border-color: rgba(11, 31, 77, 0.34) !important;
+  background: #123a73 !important;
+  color: #ffffff !important;
+  box-shadow: 0 24px 64px rgba(11, 31, 77, 0.28) !important;
+}
+
+.cinematic-shell :where(a[href^="tel:"], a[href*="#request"], a[href*="/contact"], button[type="submit"]) :where(span, svg) {
+  color: inherit !important;
+}
+
+.cinematic-shell :where(a[href^="tel:"]) {
+  min-width: 3rem;
+}
+
+.cinematic-shell :where(a[href^="tel:"]) span[aria-hidden="true"] {
+  display: inline-block;
+  transform-origin: center;
+}
+
+.cinematic-shell :where(a[href^="tel:"]):hover span[aria-hidden="true"] {
+  transform: rotate(-12deg) scale(1.12);
+}
+
+.cinematic-shell :where(a:not([href^="tel:"]):not([href*="#request"]):not([href*="/contact"]):where([class*="rounded-full"])) {
+  border-color: rgba(11, 31, 77, 0.18) !important;
+  color: #0b1f4d !important;
+}
+
+.cinematic-shell :where(a:not([href^="tel:"]):not([href*="#request"]):not([href*="/contact"]):where([class*="rounded-full"]):hover) {
+  border-color: rgba(11, 31, 77, 0.34) !important;
+  background: #f3f7ff !important;
+  color: #0b1f4d !important;
+}
+
 .planet-key-mark {
   --planet-scroll-rotate: 0deg;
   --planet-scroll-drift: 0px;
@@ -182,4 +248,6 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
   .planet-key-mark { transform: translate3d(-50%, 0, 0); }
+  .cinematic-shell :where(a, button) { transition-duration: 0.001ms !important; }
+  .cinematic-shell :where(a, button):hover { transform: none !important; }
 }
