@@ -17,6 +17,7 @@ type SettingsState = {
 }
 
 const FORM_ID = 'admin-settings-form'
+const IMAGE_BUCKET = 'site-images'
 
 const initialState: SettingsState = {
   id: '',
@@ -27,6 +28,10 @@ const initialState: SettingsState = {
   phoneDisplay: '(267) 000-0000',
   email: 'hello@planetlocksmiths.com',
   serviceHours: '24/7 Mobile Service',
+}
+
+function sanitizeFileName(name: string) {
+  return name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
 }
 
 export default function AdminSettingsPage() {
@@ -55,10 +60,7 @@ export default function AdminSettingsPage() {
           return
         }
 
-        const result = await (supabase.from('site_settings') as any)
-          .select('*')
-          .limit(1)
-
+        const result = await (supabase.from('site_settings') as any).select('*').limit(1)
         if (result.error) throw new Error(result.error.message)
 
         const row = Array.isArray(result.data) ? result.data[0] : null
@@ -85,7 +87,6 @@ export default function AdminSettingsPage() {
     }
 
     boot()
-
     return () => {
       mounted = false
     }
@@ -110,32 +111,40 @@ export default function AdminSettingsPage() {
     setIsUploadingLogo(true)
 
     try {
-      const body = new FormData()
-      body.append('file', file)
-      body.append('category', 'logo')
-      body.append('title', `${form.brandName || 'Planetlocksmiths'} logo`)
-      body.append('alt', form.logoAlt || form.brandName || 'Planetlocksmiths')
-
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body,
-      })
-
-      const data = await response.json().catch(() => ({}))
-
-      if (!response.ok) {
-        throw new Error(data?.error || 'Не удалось загрузить логотип')
+      const sessionResult = await supabase.auth.getSession()
+      if (!sessionResult?.data?.session) {
+        router.replace('/admin/login')
+        return
       }
 
-      const url = String(data?.url || '').trim()
-      if (!url) throw new Error('Upload API не вернул URL логотипа')
+      const filePath = `logo/${Date.now()}-${sanitizeFileName(file.name)}`
+      const uploadResult = await supabase.storage.from(IMAGE_BUCKET).upload(filePath, file, {
+        cacheControl: '31536000',
+        contentType: file.type,
+        upsert: false,
+      })
+
+      if (uploadResult.error) throw new Error(uploadResult.error.message)
+
+      const publicUrlResult = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(filePath)
+      const url = String(publicUrlResult.data?.publicUrl || '').trim()
+      if (!url) throw new Error('Supabase Storage не вернул публичный URL логотипа')
+
+      await (supabase.from('site_images') as any).insert({
+        image_url: url,
+        storage_path: filePath,
+        title: `${form.brandName || 'Planetlocksmiths'} logo`,
+        alt: form.logoAlt || form.brandName || 'Planetlocksmiths',
+        category: 'logo',
+        is_published: true,
+      })
 
       setForm((prev) => ({
         ...prev,
         logoUrl: url,
         logoAlt: prev.logoAlt || prev.brandName || 'Planetlocksmiths',
       }))
-      setSuccessMessage('Логотип загружен. Нажми “Сохранить настройки”, чтобы применить его на сайте.')
+      setSuccessMessage('Логотип загружен через Supabase. Нажми “Сохранить настройки”, чтобы применить его на сайте.')
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить логотип')
     } finally {
@@ -192,9 +201,7 @@ export default function AdminSettingsPage() {
         <div>
           <p style={eyebrowStyle}>Сайт / глобальные настройки</p>
           <h1 style={titleStyle}>Настройки сайта</h1>
-          <p style={mutedStyle}>
-            Управление брендом, логотипом, телефоном, email, часами работы и контактными CTA. Эти данные используются в шапке, формах и контактных блоках сайта.
-          </p>
+          <p style={mutedStyle}>Управление брендом, логотипом, телефоном, email, часами работы и контактными CTA. Эти данные используются в шапке, формах и контактных блоках сайта.</p>
         </div>
 
         <div style={heroActionsStyle}>
@@ -218,11 +225,7 @@ export default function AdminSettingsPage() {
 
         <div style={logoEditorStyle}>
           <div style={logoPreviewStyle}>
-            {form.logoUrl ? (
-              <img src={form.logoUrl} alt={form.logoAlt || form.brandName} style={logoImageStyle} />
-            ) : (
-              <span style={logoEmptyStyle}>LOGO</span>
-            )}
+            {form.logoUrl ? <img src={form.logoUrl} alt={form.logoAlt || form.brandName} style={logoImageStyle} /> : <span style={logoEmptyStyle}>LOGO</span>}
           </div>
 
           <div style={logoControlsStyle}>
@@ -256,37 +259,19 @@ export default function AdminSettingsPage() {
 }
 
 function InfoCard({ title, value, note }: { title: string; value: string; note: string }) {
-  return (
-    <article style={infoCardStyle}>
-      <p style={eyebrowStyle}>{title}</p>
-      <strong style={infoValueStyle}>{value}</strong>
-      <span style={infoNoteStyle}>{note}</span>
-    </article>
-  )
+  return <article style={infoCardStyle}><p style={eyebrowStyle}>{title}</p><strong style={infoValueStyle}>{value}</strong><span style={infoNoteStyle}>{note}</span></article>
 }
 
 function SectionTitle({ title, text }: { title: string; text: string }) {
-  return (
-    <div style={sectionTitleWrapStyle}>
-      <p style={eyebrowStyle}>Редактирование</p>
-      <h2 style={sectionTitleStyle}>{title}</h2>
-      <p style={mutedStyle}>{text}</p>
-    </div>
-  )
+  return <div style={sectionTitleWrapStyle}><p style={eyebrowStyle}>Редактирование</p><h2 style={sectionTitleStyle}>{title}</h2><p style={mutedStyle}>{text}</p></div>
 }
 
 function Field({ label, value, placeholder, onChange }: { label: string; value: string; placeholder: string; onChange: (value: string) => void }) {
-  return (
-    <label style={fieldStyle}>
-      <span style={labelStyle}>{label}</span>
-      <input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} style={inputStyle} />
-    </label>
-  )
+  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} style={inputStyle} /></label>
 }
 
 function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) {
-  const isError = type === 'error'
-  return <div style={isError ? messageErrorStyle : messageSuccessStyle}>{children}</div>
+  return <div style={type === 'error' ? messageErrorStyle : messageSuccessStyle}>{children}</div>
 }
 
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
