@@ -26,12 +26,27 @@ type GeneratedSlot = {
   opacity: number
 }
 
+type MotionStyle = {
+  transform: string
+  opacity: number
+  filter?: string
+}
+
 const defaultBackground: BackgroundState = {
   desktopUrl: '',
   mobileUrl: '',
   opacity: 0.08,
   desktopPosition: 'center center',
   mobilePosition: 'center center',
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function smoothstep(value: number) {
+  const x = clamp(value, 0, 1)
+  return x * x * (3 - 2 * x)
 }
 
 function normalizeOpacity(value: unknown) {
@@ -67,9 +82,9 @@ function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
     const wide = index % 3 === 0
     const width = isMobile ? (wide ? 5.9 : 5.15) : (wide ? 8.1 : 6.9)
     const height = isMobile ? (wide ? 4.05 : 3.55) : (wide ? 5.25 : 4.55)
-    const baseOpacity = isMobile ? 0.21 : 0.20
+    const baseOpacity = isMobile ? 0.25 : 0.22
     const edgeBoost = col < 0 || col > 74 ? 0.08 : 0
-    const depth = (index % 4) * 0.025
+    const depth = (index % 4) * 0.02
 
     return {
       left: `${col + driftX}%`,
@@ -77,24 +92,54 @@ function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
       width: `${width}rem`,
       height: `${height}rem`,
       rotate: `${rotations[index % rotations.length]}deg`,
-      opacity: Math.min(0.34, baseOpacity + edgeBoost - depth),
+      opacity: Math.min(0.38, baseOpacity + edgeBoost - depth),
     }
   })
 }
 
-function getMotionTransform(index: number, rotate: string, scrollY: number, reduceMotion: boolean, isMobile: boolean) {
-  if (reduceMotion) return `rotate(${rotate})`
+function getRevealProgress(index: number, scrollY: number, viewportHeight: number, isMobile: boolean) {
+  const cycle = Math.max(520, viewportHeight * (isMobile ? 0.9 : 0.82))
+  const offset = index * (isMobile ? 83 : 116)
+  const raw = ((scrollY + offset) % cycle) / cycle
+  const enter = smoothstep(raw / 0.34)
+  const exit = 1 - smoothstep((raw - 0.76) / 0.24)
+  return clamp(Math.min(enter, exit), 0, 1)
+}
 
+function getMotionStyle(
+  index: number,
+  slot: GeneratedSlot,
+  scrollY: number,
+  viewportHeight: number,
+  reduceMotion: boolean,
+  isMobile: boolean
+): MotionStyle {
+  if (reduceMotion) {
+    return {
+      transform: `rotate(${slot.rotate})`,
+      opacity: slot.opacity,
+    }
+  }
+
+  const reveal = getRevealProgress(index, scrollY, viewportHeight, isMobile)
   const direction = index % 2 === 0 ? 1 : -1
-  const speed = isMobile ? 0.028 + (index % 5) * 0.006 : 0.018 + (index % 6) * 0.005
+  const speed = isMobile ? 0.018 + (index % 5) * 0.004 : 0.013 + (index % 6) * 0.004
   const phase = index * 0.71
-  const floatX = Math.sin(scrollY / 190 + phase) * (isMobile ? 9 : 14)
-  const floatY = Math.cos(scrollY / 230 + phase) * (isMobile ? 7 : 11)
+  const floatX = Math.sin(scrollY / 170 + phase) * (isMobile ? 8 : 13)
+  const floatY = Math.cos(scrollY / 210 + phase) * (isMobile ? 7 : 10)
   const parallaxY = scrollY * speed * direction
-  const parallaxX = scrollY * speed * 0.36 * -direction
-  const rotateDrift = Math.sin(scrollY / 260 + phase) * (isMobile ? 1.8 : 2.4)
+  const parallaxX = scrollY * speed * 0.3 * -direction
+  const revealLift = (1 - reveal) * (isMobile ? 58 : 72)
+  const scale = 0.78 + reveal * 0.22
+  const rotateDrift = Math.sin(scrollY / 250 + phase) * (isMobile ? 1.8 : 2.4)
+  const opacity = slot.opacity * (0.08 + reveal * 0.92)
+  const blur = (1 - reveal) * 1.1
 
-  return `translate3d(${floatX + parallaxX}px, ${floatY + parallaxY}px, 0) rotate(calc(${rotate} + ${rotateDrift}deg))`
+  return {
+    opacity,
+    filter: `blur(${blur}px)`,
+    transform: `translate3d(${floatX + parallaxX}px, ${floatY + parallaxY + revealLift}px, 0) scale(${scale}) rotate(calc(${slot.rotate} + ${rotateDrift}deg))`,
+  }
 }
 
 export default function CinematicBackground() {
@@ -102,6 +147,7 @@ export default function CinematicBackground() {
   const [background, setBackground] = useState<BackgroundState>(defaultBackground)
   const [decorImages, setDecorImages] = useState<DecorImage[]>([])
   const [scrollY, setScrollY] = useState(0)
+  const [viewportHeight, setViewportHeight] = useState(820)
   const [reduceMotion, setReduceMotion] = useState(false)
   const desktopSlots = useMemo(() => buildSlots(34, false), [])
   const mobileSlots = useMemo(() => buildSlots(22, true), [])
@@ -115,27 +161,26 @@ export default function CinematicBackground() {
   }, [])
 
   useEffect(() => {
-    if (reduceMotion) return
-
     let raf = 0
-    const onScroll = () => {
+    const onScrollOrResize = () => {
       if (raf) return
       raf = window.requestAnimationFrame(() => {
         raf = 0
         setScrollY(window.scrollY || window.pageYOffset || 0)
+        setViewportHeight(window.innerHeight || 820)
       })
     }
 
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+    onScrollOrResize()
+    window.addEventListener('scroll', onScrollOrResize, { passive: true })
+    window.addEventListener('resize', onScrollOrResize)
 
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      window.removeEventListener('scroll', onScrollOrResize)
+      window.removeEventListener('resize', onScrollOrResize)
       if (raf) window.cancelAnimationFrame(raf)
     }
-  }, [reduceMotion])
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -206,8 +251,8 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${background.desktopUrl})`,
                 backgroundPosition: background.desktopPosition,
-                opacity: Math.min(0.045, background.opacity),
-                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.018}px, 0)`,
+                opacity: Math.min(0.035, background.opacity),
+                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.012}px, 0)`,
               }}
             />
           ) : null}
@@ -218,8 +263,8 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${mobileUrl})`,
                 backgroundPosition: background.mobilePosition,
-                opacity: Math.min(0.03, background.opacity),
-                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.012}px, 0)`,
+                opacity: Math.min(0.024, background.opacity),
+                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.008}px, 0)`,
               }}
             />
           ) : null}
@@ -233,18 +278,20 @@ export default function CinematicBackground() {
           {desktopSlots.map((slot, index) => {
             const image = imageForSlot(decorImages, index)
             if (!image) return null
+            const motion = getMotionStyle(index, slot, scrollY, viewportHeight, reduceMotion, false)
 
             return (
               <div
                 key={`desktop-bg-${index}-${image.id}`}
-                className="absolute overflow-hidden rounded-[0.85rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_14px_36px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px] transition-transform duration-300 ease-out"
+                className="absolute overflow-hidden rounded-[0.85rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_14px_36px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px] transition-[transform,opacity,filter] duration-500 ease-out"
                 style={{
                   left: slot.left,
                   top: slot.top,
                   width: slot.width,
-                  opacity: slot.opacity,
-                  transform: getMotionTransform(index, slot.rotate, scrollY, reduceMotion, false),
-                  willChange: reduceMotion ? undefined : 'transform',
+                  opacity: motion.opacity,
+                  filter: motion.filter,
+                  transform: motion.transform,
+                  willChange: reduceMotion ? undefined : 'transform, opacity, filter',
                 }}
               >
                 <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.62rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
@@ -259,18 +306,20 @@ export default function CinematicBackground() {
           {mobileSlots.map((slot, index) => {
             const image = imageForSlot(decorImages, index)
             if (!image) return null
+            const motion = getMotionStyle(index, slot, scrollY, viewportHeight, reduceMotion, true)
 
             return (
               <div
                 key={`mobile-bg-${index}-${image.id}`}
-                className="absolute overflow-hidden rounded-[0.72rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_10px_26px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px] transition-transform duration-300 ease-out"
+                className="absolute overflow-hidden rounded-[0.72rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_10px_26px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px] transition-[transform,opacity,filter] duration-500 ease-out"
                 style={{
                   left: slot.left,
                   top: slot.top,
                   width: slot.width,
-                  opacity: slot.opacity,
-                  transform: getMotionTransform(index, slot.rotate, scrollY, reduceMotion, true),
-                  willChange: reduceMotion ? undefined : 'transform',
+                  opacity: motion.opacity,
+                  filter: motion.filter,
+                  transform: motion.transform,
+                  willChange: reduceMotion ? undefined : 'transform, opacity, filter',
                 }}
               >
                 <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.54rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
