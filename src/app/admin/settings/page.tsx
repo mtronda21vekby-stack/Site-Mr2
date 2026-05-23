@@ -8,6 +8,8 @@ import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 type SettingsState = {
   id: string
   brandName: string
+  logoUrl: string
+  logoAlt: string
   phonePrimary: string
   phoneDisplay: string
   email: string
@@ -18,7 +20,9 @@ const FORM_ID = 'admin-settings-form'
 
 const initialState: SettingsState = {
   id: '',
-  brandName: 'Planet Locksmiths',
+  brandName: 'Planetlocksmiths',
+  logoUrl: '',
+  logoAlt: 'Planetlocksmiths',
   phonePrimary: '+1 (267) 000-0000',
   phoneDisplay: '(267) 000-0000',
   email: 'hello@planetlocksmiths.com',
@@ -31,6 +35,7 @@ export default function AdminSettingsPage() {
   const [form, setForm] = useState<SettingsState>(initialState)
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -51,7 +56,7 @@ export default function AdminSettingsPage() {
         }
 
         const result = await (supabase.from('site_settings') as any)
-          .select('id, brand_name, phone_primary, phone_display, email, service_hours')
+          .select('*')
           .limit(1)
 
         if (result.error) throw new Error(result.error.message)
@@ -59,9 +64,12 @@ export default function AdminSettingsPage() {
         const row = Array.isArray(result.data) ? result.data[0] : null
 
         if (mounted && row) {
+          const brandName = row.brand_name ?? initialState.brandName
           setForm({
             id: row.id ?? '',
-            brandName: row.brand_name ?? initialState.brandName,
+            brandName,
+            logoUrl: row.logo_url ?? initialState.logoUrl,
+            logoAlt: row.logo_alt ?? brandName,
             phonePrimary: row.phone_primary ?? initialState.phonePrimary,
             phoneDisplay: row.phone_display ?? initialState.phoneDisplay,
             email: row.email ?? initialState.email,
@@ -87,6 +95,54 @@ export default function AdminSettingsPage() {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
+  async function handleLogoUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setErrorMessage('Можно загрузить только изображение логотипа')
+      return
+    }
+
+    setErrorMessage('')
+    setSuccessMessage('')
+    setIsUploadingLogo(true)
+
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      body.append('category', 'logo')
+      body.append('title', `${form.brandName || 'Planetlocksmiths'} logo`)
+      body.append('alt', form.logoAlt || form.brandName || 'Planetlocksmiths')
+
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body,
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Не удалось загрузить логотип')
+      }
+
+      const url = String(data?.url || '').trim()
+      if (!url) throw new Error('Upload API не вернул URL логотипа')
+
+      setForm((prev) => ({
+        ...prev,
+        logoUrl: url,
+        logoAlt: prev.logoAlt || prev.brandName || 'Planetlocksmiths',
+      }))
+      setSuccessMessage('Логотип загружен. Нажми “Сохранить настройки”, чтобы применить его на сайте.')
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить логотип')
+    } finally {
+      setIsUploadingLogo(false)
+    }
+  }
+
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrorMessage('')
@@ -96,6 +152,8 @@ export default function AdminSettingsPage() {
     try {
       const payload = {
         brand_name: form.brandName.trim() || null,
+        logo_url: form.logoUrl.trim() || null,
+        logo_alt: form.logoAlt.trim() || form.brandName.trim() || null,
         phone_primary: form.phonePrimary.trim() || null,
         phone_display: form.phoneDisplay.trim() || null,
         email: form.email.trim() || null,
@@ -135,7 +193,7 @@ export default function AdminSettingsPage() {
           <p style={eyebrowStyle}>Сайт / глобальные настройки</p>
           <h1 style={titleStyle}>Настройки сайта</h1>
           <p style={mutedStyle}>
-            Управление брендом, телефоном, email, часами работы и контактными CTA. Эти данные используются в шапке, формах и контактных блоках сайта.
+            Управление брендом, логотипом, телефоном, email, часами работы и контактными CTA. Эти данные используются в шапке, формах и контактных блоках сайта.
           </p>
         </div>
 
@@ -146,6 +204,7 @@ export default function AdminSettingsPage() {
       </section>
 
       <section style={guideGridStyle}>
+        <InfoCard title="Логотип" value={form.logoUrl ? 'Задан' : 'Не задан'} note="Показывается в шапке сайта, если URL сохранен." />
         <InfoCard title="Телефон" value={form.phoneDisplay || form.phonePrimary || 'Не указан'} note="Показывается в CTA и контактных блоках." />
         <InfoCard title="Email" value={form.email || 'Не указан'} note="Используется в контактной информации." />
         <InfoCard title="Часы работы" value={form.serviceHours || 'Не указаны'} note="Отображается на сайте для клиентов." />
@@ -155,10 +214,35 @@ export default function AdminSettingsPage() {
       {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
 
       <form id={FORM_ID} onSubmit={handleSave} style={formStyle}>
+        <SectionTitle title="Логотип" text="Лучший формат — PNG/WebP с прозрачным фоном. Если загрузить JPG с белым фоном, белый фон останется в самом файле." />
+
+        <div style={logoEditorStyle}>
+          <div style={logoPreviewStyle}>
+            {form.logoUrl ? (
+              <img src={form.logoUrl} alt={form.logoAlt || form.brandName} style={logoImageStyle} />
+            ) : (
+              <span style={logoEmptyStyle}>LOGO</span>
+            )}
+          </div>
+
+          <div style={logoControlsStyle}>
+            <label style={uploadButtonStyle}>
+              {isUploadingLogo ? 'Загружается...' : 'Загрузить логотип'}
+              <input type="file" accept="image/png,image/webp,image/svg+xml,image/jpeg" onChange={handleLogoUpload} disabled={isUploadingLogo} style={fileInputStyle} />
+            </label>
+            <button type="button" onClick={() => updateField('logoUrl', '')} style={dangerButtonStyle}>Убрать логотип</button>
+          </div>
+        </div>
+
+        <div style={fieldGridStyle}>
+          <Field label="URL логотипа" value={form.logoUrl} onChange={(value) => updateField('logoUrl', value)} placeholder="https://.../logo.png" />
+          <Field label="Alt текст логотипа" value={form.logoAlt} onChange={(value) => updateField('logoAlt', value)} placeholder="Planetlocksmiths logo" />
+        </div>
+
         <SectionTitle title="Бренд и контакты" text="Можно вводить любые данные без ограничений. Пустые поля сохраняются как пустые значения." />
 
         <div style={fieldGridStyle}>
-          <Field label="Название бренда" value={form.brandName} onChange={(value) => updateField('brandName', value)} placeholder="Planet Locksmiths" />
+          <Field label="Название бренда" value={form.brandName} onChange={(value) => updateField('brandName', value)} placeholder="Planetlocksmiths" />
           <Field label="Основной телефон" value={form.phonePrimary} onChange={(value) => updateField('phonePrimary', value)} placeholder="+1 (267) 000-0000" />
           <Field label="Телефон для отображения" value={form.phoneDisplay} onChange={(value) => updateField('phoneDisplay', value)} placeholder="(267) 000-0000" />
           <Field label="Email" value={form.email} onChange={(value) => updateField('email', value)} placeholder="hello@planetlocksmiths.com" />
@@ -221,6 +305,14 @@ const infoNoteStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, lineHeigh
 const formStyle: CSSProperties = { display: 'grid', gap: 18, borderRadius: 26, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(11,16,32,0.86), rgba(5,7,11,0.78))', padding: 18 }
 const sectionTitleWrapStyle: CSSProperties = { display: 'grid', gap: 4 }
 const sectionTitleStyle: CSSProperties = { margin: 0, color: '#F5F7FB', fontSize: 24, lineHeight: 1.1, letterSpacing: -0.7 }
+const logoEditorStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0, 240px) 1fr', gap: 16, alignItems: 'center' }
+const logoPreviewStyle: CSSProperties = { minHeight: 132, borderRadius: 22, border: '1px dashed rgba(255,255,255,0.22)', background: 'linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 14, overflow: 'hidden' }
+const logoImageStyle: CSSProperties = { display: 'block', width: '100%', maxWidth: 210, maxHeight: 110, objectFit: 'contain' }
+const logoEmptyStyle: CSSProperties = { color: '#95A0B8', fontSize: 12, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase' }
+const logoControlsStyle: CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
+const uploadButtonStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(45,226,230,0.5)', background: 'rgba(45,226,230,0.15)', color: '#2DE2E6', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.2, cursor: 'pointer' }
+const dangerButtonStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(255,122,122,0.3)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.2, cursor: 'pointer' }
+const fileInputStyle: CSSProperties = { display: 'none' }
 const fieldGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }
 const fieldStyle: CSSProperties = { display: 'grid', gap: 8 }
 const labelStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, fontWeight: 800 }
