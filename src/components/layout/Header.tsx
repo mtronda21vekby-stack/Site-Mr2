@@ -124,7 +124,7 @@ function LanguageSwitcher({ currentLocale, pathname, isMobile = false }: { curre
               href={buildLocalizedHref(pathname, targetLocale)}
               aria-current={isActive ? 'page' : undefined}
               data-language-option="true"
-              className={`inline-flex min-h-9 items-center justify-center rounded-[999px] px-3 text-xs font-black uppercase tracking-[0.13em] transition duration-300 ${isActive ? 'bg-[#0B1F4D] text-white shadow-[0_10px_26px_rgba(11,77,0.18)] hover:bg-[#123A73]' : 'bg-[#F7FAFF] text-[#0B1F4D] hover:-translate-y-0.5 hover:bg-[#EEF4FF]'} ${isMobile ? 'min-h-11' : 'min-w-11'}`}
+              className={`inline-flex min-h-9 items-center justify-center rounded-[999px] px-3 text-xs font-black uppercase tracking-[0.13em] transition duration-300 ${isActive ? 'bg-[#0B1F4D] text-white shadow-[0_10px_26px_rgba(11,31,77,0.18)] hover:bg-[#123A73]' : 'bg-[#F7FAFF] text-[#0B1F4D] hover:-translate-y-0.5 hover:bg-[#EEF4FF]'} ${isMobile ? 'min-h-11' : 'min-w-11'}`}
               title={targetLocale === 'en' ? 'English' : 'Spanish'}
             >
               {labels[targetLocale]}
