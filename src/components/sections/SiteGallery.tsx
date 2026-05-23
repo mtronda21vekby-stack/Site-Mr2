@@ -1,3 +1,4 @@
+import { createClient } from '@supabase/supabase-js'
 import GalleryLightbox from './GalleryLightbox'
 import BeforeAfterSlider from './BeforeAfterSlider'
 
@@ -7,6 +8,7 @@ type SiteImage = {
   title: string | null
   alt: string | null
   category: string | null
+  sort_order?: number | null
 }
 
 function getCaseKey(image: SiteImage) {
@@ -15,14 +17,37 @@ function getCaseKey(image: SiteImage) {
   return match?.[1] || '1'
 }
 
+function getSupabaseCmsClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !anonKey) return null
+
+  return createClient(url, anonKey, {
+    auth: { persistSession: false },
+  })
+}
+
 async function getGalleryImages(): Promise<SiteImage[]> {
+  const supabase = getSupabaseCmsClient()
+  if (!supabase) return []
+
   try {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const res = await fetch(`${siteUrl}/api/admin/photos`, { cache: 'no-store' })
-    if (!res.ok) return []
-    const data = await res.json()
-    return (data.photos ?? []).slice(0, 24)
-  } catch {
+    const result = await (supabase.from('site_images') as any)
+      .select('id,title,alt,category,image_url,sort_order,created_at')
+      .eq('is_published', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(24)
+
+    if (result.error) {
+      console.error('site_images select error:', result.error)
+      return []
+    }
+
+    return Array.isArray(result.data) ? result.data : []
+  } catch (error) {
+    console.error('getGalleryImages failed:', error)
     return []
   }
 }
@@ -51,7 +76,7 @@ export default async function SiteGallery() {
               Photos uploaded by the business: vehicle keys, lockouts, programming work, emergency calls, and completed mobile service jobs.
             </p>
           </div>
-          <a href="#request" className="inline-flex w-fit items-center rounded-full border border-[#0B1F4D]/25 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition hover:-translate-y-0.5 hover:border-[#0B1F4D]/45 hover:bg-[#F3F7FF]">
+          <a href="#request-service" className="inline-flex w-fit items-center rounded-full border border-[#0B1F4D]/25 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition hover:-translate-y-0.5 hover:border-[#0B1F4D]/45 hover:bg-[#F3F7FF]">
             Request service →
           </a>
         </div>
