@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
 type AdminPhoto = {
   id: string
@@ -9,11 +11,21 @@ type AdminPhoto = {
   title?: string | null
   alt?: string | null
   category?: string | null
+  sort_order?: number | null
+  is_published?: boolean | null
 }
 
-type EditState = Record<string, { title: string; alt: string; category: string }>
+type EditState = Record<string, { title: string; alt: string; category: string; sortOrder: number; isPublished: boolean }>
+
+const IMAGE_BUCKET = 'site-images'
+
+function sanitizeFileName(name: string) {
+  return name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
+}
 
 export default function AdminPhotosPage() {
+  const router = useRouter()
+  const supabase: any = useMemo(() => getSupabaseClient() as any, [])
   const [file, setFile] = useState<File | null>(null)
   const [beforeFile, setBeforeFile] = useState<File | null>(null)
   const [afterFile, setAfterFile] = useState<File | null>(null)
@@ -24,6 +36,7 @@ export default function AdminPhotosPage() {
   const [photos, setPhotos] = useState<AdminPhoto[]>([])
   const [edits, setEdits] = useState<EditState>({})
   const [loading, setLoading] = useState(false)
+  const [isBooting, setIsBooting] = useState(true)
 
   const [title, setTitle] = useState('')
   const [alt, setAlt] = useState('')
@@ -31,39 +44,66 @@ export default function AdminPhotosPage() {
   const [caseTitle, setCaseTitle] = useState('case')
   const [caseAlt, setCaseAlt] = useState('')
 
-  const loadPhotos = async () => {
-    const res = await fetch('/api/admin/photos')
-    const data = await res.json().catch(() => ({}))
-    if (res.ok) {
-      const loadedPhotos: AdminPhoto[] = data.photos ?? []
-      setPhotos(loadedPhotos)
-      setEdits(
-        Object.fromEntries(
-          loadedPhotos.map((p) => [
-            p.id,
-            {
-              title: p.title || '',
-              alt: p.alt || '',
-              category: p.category || 'gallery',
-            },
-          ]),
-        ),
-      )
+  async function ensureSession() {
+    const sessionResult = await supabase.auth.getSession()
+    const session = sessionResult?.data?.session
+    if (!session) {
+      router.replace('/admin/login')
+      return false
     }
+    return true
+  }
+
+  async function loadPhotos() {
+    const ok = await ensureSession()
+    if (!ok) return
+
+    const result = await (supabase.from('site_images') as any)
+      .select('id,title,alt,category,image_url,storage_path,sort_order,is_published,created_at')
+      .order('created_at', { ascending: false })
+
+    if (result.error) {
+      setStatus(result.error.message || 'Не удалось загрузить фото')
+      return
+    }
+
+    const loadedPhotos: AdminPhoto[] = Array.isArray(result.data) ? result.data : []
+    setPhotos(loadedPhotos)
+    setEdits(
+      Object.fromEntries(
+        loadedPhotos.map((p) => [
+          p.id,
+          {
+            title: p.title || '',
+            alt: p.alt || '',
+            category: p.category || 'gallery',
+            sortOrder: Number(p.sort_order ?? 0),
+            isPublished: Boolean(p.is_published ?? true),
+          },
+        ]),
+      ),
+    )
   }
 
   useEffect(() => {
-    loadPhotos()
+    let mounted = true
+    async function boot() {
+      await loadPhotos()
+      if (mounted) setIsBooting(false)
+    }
+    boot()
+    return () => { mounted = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function onSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
     setFile(f)
     setPreview(URL.createObjectURL(f))
   }
 
-  const onPairSelect = (type: 'before' | 'after', e: React.ChangeEvent<HTMLInputElement>) => {
+  function onPairSelect(type: 'before' | 'after', e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
     if (type === 'before') {
@@ -75,24 +115,38 @@ export default function AdminPhotosPage() {
     }
   }
 
-  const uploadOne = async (selectedFile: File, selectedTitle: string, selectedAlt: string, selectedCategory: string) => {
-    const form = new FormData()
-    form.append('file', selectedFile)
-    form.append('title', selectedTitle)
-    form.append('alt', selectedAlt)
-    form.append('category', selectedCategory)
+  async function uploadOne(selectedFile: File, selectedTitle: string, selectedAlt: string, selectedCategory: string) {
+    if (!selectedFile.type.startsWith('image/')) throw new Error('Можно загружать только изображения')
 
-    const res = await fetch('/api/admin/upload', {
-      method: 'POST',
-      body: form,
+    const filePath = `${selectedCategory || 'gallery'}/${Date.now()}-${sanitizeFileName(selectedFile.name)}`
+    const uploadResult = await supabase.storage.from(IMAGE_BUCKET).upload(filePath, selectedFile, {
+      cacheControl: '31536000',
+      contentType: selectedFile.type,
+      upsert: false,
     })
 
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(data.error || 'Ошибка загрузки')
+    if (uploadResult.error) throw new Error(uploadResult.error.message)
+
+    const publicUrlResult = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(filePath)
+    const imageUrl = String(publicUrlResult.data?.publicUrl || '').trim()
+    if (!imageUrl) throw new Error('Supabase Storage не вернул публичный URL')
+
+    const dbResult = await (supabase.from('site_images') as any).insert({
+      image_url: imageUrl,
+      storage_path: filePath,
+      title: selectedTitle.trim() || null,
+      alt: selectedAlt.trim() || selectedTitle.trim() || null,
+      category: selectedCategory.trim() || 'gallery',
+      is_published: true,
+    })
+
+    if (dbResult.error) throw new Error(dbResult.error.message)
   }
 
-  const upload = async () => {
+  async function upload() {
     if (!file || loading) return
+    const ok = await ensureSession()
+    if (!ok) return
 
     setLoading(true)
     setStatus('Загрузка...')
@@ -113,15 +167,18 @@ export default function AdminPhotosPage() {
     }
   }
 
-  const uploadPair = async () => {
+  async function uploadPair() {
     if (!beforeFile || !afterFile || loading) return
+    const ok = await ensureSession()
+    if (!ok) return
 
     setLoading(true)
     setStatus('Загрузка кейса...')
 
     try {
-      await uploadOne(beforeFile, caseTitle, caseAlt || `${caseTitle} до`, 'before')
-      await uploadOne(afterFile, caseTitle, caseAlt || `${caseTitle} после`, 'after')
+      const caseId = `${caseTitle || 'case'}-${Date.now()}`
+      await uploadOne(beforeFile, caseId, caseAlt || `${caseTitle} до`, 'before')
+      await uploadOne(afterFile, caseId, caseAlt || `${caseTitle} после`, 'after')
       setStatus('Кейс загружен')
       setBeforeFile(null)
       setAfterFile(null)
@@ -137,32 +194,39 @@ export default function AdminPhotosPage() {
     }
   }
 
-  const updateEdit = (id: string, field: 'title' | 'alt' | 'category', value: string) => {
+  function updateEdit(id: string, field: 'title' | 'alt' | 'category' | 'sortOrder' | 'isPublished', value: string | number | boolean) {
     setEdits((prev) => ({
       ...prev,
       [id]: {
         title: prev[id]?.title || '',
         alt: prev[id]?.alt || '',
         category: prev[id]?.category || 'gallery',
+        sortOrder: Number(prev[id]?.sortOrder ?? 0),
+        isPublished: Boolean(prev[id]?.isPublished ?? true),
         [field]: value,
       },
     }))
   }
 
-  const savePhoto = async (id: string) => {
+  async function savePhoto(id: string) {
+    const ok = await ensureSession()
+    if (!ok) return
     const edit = edits[id]
     if (!edit) return
 
     setStatus('Сохранение...')
-    const res = await fetch('/api/admin/photos', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...edit }),
-    })
+    const result = await (supabase.from('site_images') as any)
+      .update({
+        title: edit.title.trim() || null,
+        alt: edit.alt.trim() || null,
+        category: edit.category.trim() || 'gallery',
+        sort_order: Number(edit.sortOrder || 0),
+        is_published: edit.isPublished,
+      })
+      .eq('id', id)
 
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok) {
-      setStatus(data.error || 'Ошибка сохранения')
+    if (result.error) {
+      setStatus(result.error.message || 'Ошибка сохранения')
       return
     }
 
@@ -170,17 +234,38 @@ export default function AdminPhotosPage() {
     await loadPhotos()
   }
 
-  const remove = async (id: string) => {
+  async function remove(id: string) {
+    const ok = await ensureSession()
+    if (!ok) return
     if (!confirm('Удалить фото?')) return
 
-    await fetch('/api/admin/photos', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
+    const photo = photos.find((item) => item.id === id)
+    setStatus('Удаление...')
+
+    if (photo?.storage_path) {
+      const storageResult = await supabase.storage.from(IMAGE_BUCKET).remove([photo.storage_path])
+      if (storageResult.error) {
+        setStatus(storageResult.error.message || 'Не удалось удалить файл из storage')
+        return
+      }
+    }
+
+    const dbResult = await (supabase.from('site_images') as any).delete().eq('id', id)
+    if (dbResult.error) {
+      setStatus(dbResult.error.message || 'Не удалось удалить запись')
+      return
+    }
 
     setStatus('Удалено')
     await loadPhotos()
+  }
+
+  if (isBooting) {
+    return (
+      <main className="min-h-screen bg-black px-5 py-8 text-white">
+        <div className="mx-auto max-w-6xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">Загрузка...</div>
+      </main>
+    )
   }
 
   return (
@@ -189,73 +274,51 @@ export default function AdminPhotosPage() {
         <div className="mb-8 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">Админ фото</p>
           <h1 className="mt-2 text-3xl font-black md:text-5xl">Загрузка и редактирование фотографий</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
-            Загружайте фотографии, создавайте пары до/после и редактируйте название, описание и категорию прямо под каждым изображением.
-          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">Фото теперь загружаются напрямую через Supabase Storage и сохраняются в таблицу site_images через Supabase Auth. Без отдельного ADMIN_PASSWORD API.</p>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl">
             <h2 className="text-xl font-black">Одиночное фото</h2>
             <input type="file" accept="image/*" onChange={onSelect} className="mt-5 block w-full text-sm text-white/70" />
-
             <input placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <textarea placeholder="Alt текст / описание" value={alt} onChange={(e) => setAlt(e.target.value)} className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
-
-            <input placeholder="Категория: gallery / services / before / after / любая своя" value={category} onChange={(e) => setCategory(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
-
+            <input placeholder="Категория: gallery / services / before / after / logo" value={category} onChange={(e) => setCategory(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             {preview && <img src={preview} alt="Превью" className="mt-4 max-h-64 w-full rounded-2xl bg-black/50 object-contain" />}
-
-            <button onClick={upload} disabled={!file || loading} className="mt-5 rounded-full border border-accent-cyan/35 bg-accent-cyan/10 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">
-              Загрузить фото
-            </button>
+            <button onClick={upload} disabled={!file || loading} className="mt-5 rounded-full border border-accent-cyan/35 bg-accent-cyan/10 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">Загрузить фото</button>
           </section>
 
           <section className="rounded-3xl border border-accent-cyan/20 bg-accent-cyan/[0.055] p-5 shadow-2xl backdrop-blur-xl">
             <h2 className="text-xl font-black">Кейс до / после</h2>
             <input placeholder="Название кейса" value={caseTitle} onChange={(e) => setCaseTitle(e.target.value)} className="mt-4 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <textarea placeholder="Описание кейса" value={caseAlt} onChange={(e) => setCaseAlt(e.target.value)} className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
-
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label className="rounded-2xl border border-white/10 bg-black/35 p-4">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">До</span>
-                <input type="file" accept="image/*" onChange={(e) => onPairSelect('before', e)} className="mt-3 block w-full text-xs" />
-                {beforePreview && <img src={beforePreview} alt="До" className="mt-3 h-44 w-full rounded-xl object-cover" />}
-              </label>
-
-              <label className="rounded-2xl border border-white/10 bg-black/35 p-4">
-                <span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">После</span>
-                <input type="file" accept="image/*" onChange={(e) => onPairSelect('after', e)} className="mt-3 block w-full text-xs" />
-                {afterPreview && <img src={afterPreview} alt="После" className="mt-3 h-44 w-full rounded-xl object-cover" />}
-              </label>
+              <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">До</span><input type="file" accept="image/*" onChange={(e) => onPairSelect('before', e)} className="mt-3 block w-full text-xs" />{beforePreview && <img src={beforePreview} alt="До" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
+              <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">После</span><input type="file" accept="image/*" onChange={(e) => onPairSelect('after', e)} className="mt-3 block w-full text-xs" />{afterPreview && <img src={afterPreview} alt="После" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
             </div>
-
-            <button onClick={uploadPair} disabled={!beforeFile || !afterFile || loading} className="mt-5 rounded-full border border-accent-cyan/45 bg-accent-cyan/15 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">
-              Загрузить кейс
-            </button>
+            <button onClick={uploadPair} disabled={!beforeFile || !afterFile || loading} className="mt-5 rounded-full border border-accent-cyan/45 bg-accent-cyan/15 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">Загрузить кейс</button>
           </section>
         </div>
 
-        <div className="mt-4 text-sm text-white/60">{status}</div>
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/70">{status || 'Готово к работе'}</div>
 
         <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {photos.map((p) => {
-            const edit = edits[p.id] || { title: '', alt: '', category: 'gallery' }
-
+            const edit = edits[p.id] || { title: '', alt: '', category: 'gallery', sortOrder: 0, isPublished: true }
             return (
               <article key={p.id} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] shadow-2xl backdrop-blur-xl">
                 <img src={p.image_url} alt={p.alt || 'Фото сайта'} className="h-64 w-full object-cover" />
                 <div className="space-y-3 p-4">
                   <input value={edit.title} onChange={(e) => updateEdit(p.id, 'title', e.target.value)} placeholder="Название" className="w-full rounded-xl border border-white/10 bg-black/70 px-3 py-2 text-sm text-white" />
                   <textarea value={edit.alt} onChange={(e) => updateEdit(p.id, 'alt', e.target.value)} placeholder="Описание / alt" className="min-h-20 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-2 text-sm text-white" />
-                  <input value={edit.category} onChange={(e) => updateEdit(p.id, 'category', e.target.value)} placeholder="Категория" className="w-full rounded-xl border border-white/10 bg-black/70 px-3 py-2 text-sm text-white" />
+                  <div className="grid grid-cols-[1fr_90px] gap-2">
+                    <input value={edit.category} onChange={(e) => updateEdit(p.id, 'category', e.target.value)} placeholder="Категория" className="w-full rounded-xl border border-white/10 bg-black/70 px-3 py-2 text-sm text-white" />
+                    <input type="number" value={edit.sortOrder} onChange={(e) => updateEdit(p.id, 'sortOrder', Number(e.target.value))} placeholder="Sort" className="w-full rounded-xl border border-white/10 bg-black/70 px-3 py-2 text-sm text-white" />
+                  </div>
+                  <label className="flex items-center gap-2 text-sm text-white/70"><input type="checkbox" checked={edit.isPublished} onChange={(e) => updateEdit(p.id, 'isPublished', e.target.checked)} /> Опубликовано</label>
                   <div className="flex gap-2">
-                    <button onClick={() => savePhoto(p.id)} className="rounded-full border border-accent-cyan/35 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-accent-cyan">
-                      Сохранить
-                    </button>
-                    <button onClick={() => remove(p.id)} className="rounded-full border border-red-400/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-300">
-                      Удалить
-                    </button>
+                    <button onClick={() => savePhoto(p.id)} className="rounded-full border border-accent-cyan/35 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-accent-cyan">Сохранить</button>
+                    <button onClick={() => remove(p.id)} className="rounded-full border border-red-400/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-300">Удалить</button>
                   </div>
                 </div>
               </article>
