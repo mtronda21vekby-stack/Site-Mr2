@@ -15,6 +15,8 @@ import {
 type SiteSettingsRow = {
   id: string
   brand_name: string | null
+  logo_url: string | null
+  logo_alt: string | null
   phone_primary: string | null
   phone_display: string | null
   email: string | null
@@ -155,6 +157,10 @@ function normalizeItems(value: unknown): string[] {
   }
 
   return value.map((item) => String(item).trim()).filter(Boolean)
+}
+
+function normalizeText(value: string | null | undefined): string {
+  return String(value || '').trim()
 }
 
 function normalizePhonePrimary(value: string | null | undefined, fallback: string): string {
@@ -304,7 +310,7 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
 
   try {
     const result = await (supabase.from('site_settings') as any)
-      .select('id, brand_name, phone_primary, phone_display, email, service_hours')
+      .select('id, brand_name, logo_url, logo_alt, phone_primary, phone_display, email, service_hours')
       .limit(1)
 
     if (result.error || !result.data?.[0]) {
@@ -314,10 +320,15 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
     const row = result.data[0] as SiteSettingsRow
     const phonePrimary = normalizePhonePrimary(row.phone_primary, fileFallback.phonePrimary)
     const phoneDisplay = normalizePhoneDisplay(row.phone_display, fileFallback.phoneDisplay, phonePrimary)
+    const brandName = row.brand_name ?? fileFallback.brandName
+    const logoUrl = normalizeText(row.logo_url)
+    const logoAlt = normalizeText(row.logo_alt) || brandName
 
     return {
       ...fileFallback,
-      brandName: row.brand_name ?? fileFallback.brandName,
+      brandName,
+      logoUrl,
+      logoAlt,
       phonePrimary,
       phoneDisplay,
       email: row.email ?? fileFallback.email,
