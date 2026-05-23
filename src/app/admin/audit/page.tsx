@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 type IssueLevel = 'good' | 'warn' | 'danger'
-type AuditType = 'home' | 'settings' | 'service' | 'area' | 'content-block'
+type AuditType = 'home' | 'settings' | 'service' | 'area' | 'content-block' | 'media' | 'order' | 'infra'
 
 type AuditItem = {
   type: AuditType
@@ -17,12 +17,17 @@ type AuditItem = {
   issues: string[]
 }
 
+type SelectResult = { rows: any[]; error: string }
+
 const typeLabels: Record<AuditType, string> = {
   home: 'Главная',
   settings: 'Настройки',
   service: 'Услуга',
   area: 'Город',
   'content-block': 'Контент-блок',
+  media: 'Медиа',
+  order: 'Заявки',
+  infra: 'Инфраструктура',
 }
 
 const levelLabels: Record<IssueLevel, string> = {
@@ -30,6 +35,18 @@ const levelLabels: Record<IssueLevel, string> = {
   warn: 'Проверить',
   danger: 'Критично',
 }
+
+const requiredTables = [
+  'site_settings',
+  'home_pages',
+  'services',
+  'areas',
+  'reviews',
+  'faq_items',
+  'site_content_blocks',
+  'site_images',
+  'orders',
+]
 
 export default function AdminAuditPage() {
   const router = useRouter()
@@ -52,20 +69,41 @@ export default function AdminAuditPage() {
           return
         }
 
-        const [home, settings, services, areas, blocks] = await Promise.all([
+        const [home, settings, services, areas, blocks, images, orders, reviews, faq] = await Promise.all([
           safeSelect(supabase, 'home_pages', 'id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, emergency_title, emergency_text, contact_title, contact_text, faq_title'),
-          safeSelect(supabase, 'site_settings', 'id, brand_name, phone_primary, phone_display, email, service_hours'),
+          safeSelect(supabase, 'site_settings', 'id, brand_name, logo_url, logo_alt, phone_primary, phone_display, email, service_hours'),
           safeSelect(supabase, 'services', 'id, locale, slug, title, excerpt, intro, seo_title, seo_description, is_published'),
           safeSelect(supabase, 'areas', 'id, locale, slug, city, title, intro, highlights, supported_services, seo_title, seo_description, is_published'),
           safeSelect(supabase, 'site_content_blocks', 'id, locale, page_key, slot, eyebrow, title, body, items, cta_label, cta_href, is_published'),
+          safeSelect(supabase, 'site_images', 'id, image_url, storage_path, title, alt, category, sort_order, is_published, created_at'),
+          safeSelect(supabase, 'orders', 'id, name, phone, service_needed, status, created_at'),
+          safeSelect(supabase, 'reviews', 'id, locale, name, quote, rating, is_published'),
+          safeSelect(supabase, 'faq_items', 'id, locale, question, answer, is_published'),
         ])
 
+        const tableResults: Record<string, SelectResult> = {
+          site_settings: settings,
+          home_pages: home,
+          services,
+          areas,
+          site_content_blocks: blocks,
+          site_images: images,
+          orders,
+          reviews,
+          faq_items: faq,
+        }
+
         const nextItems: AuditItem[] = [
-          ...auditHomeRows(home.rows),
-          auditSettingsRow(settings.rows[0]),
-          ...auditServiceRows(services.rows),
-          ...auditAreaRows(areas.rows),
+          auditInfra(tableResults),
+          ...auditHomeRows(home.rows, home.error),
+          auditSettingsRow(settings.rows[0], settings.error),
+          ...auditServiceRows(services.rows, services.error),
+          ...auditAreaRows(areas.rows, areas.error),
           ...auditBlockRows(blocks.rows, blocks.error),
+          auditMediaRows(images.rows, images.error),
+          auditOrdersRows(orders.rows, orders.error),
+          auditReviewsRows(reviews.rows, reviews.error),
+          auditFaqRows(faq.rows, faq.error),
         ].sort((a, b) => a.score - b.score)
 
         if (mounted) setItems(nextItems)
@@ -86,22 +124,20 @@ export default function AdminAuditPage() {
   const goodItems = items.filter((item) => item.level === 'good')
   const siteScore = items.length ? Math.round(items.reduce((sum, item) => sum + item.score, 0) / items.length) : 0
 
-  if (isBooting) {
-    return <div style={panelStyle}><p style={eyebrowStyle}>Аудит</p><h1 style={titleStyle}>Загрузка...</h1></div>
-  }
+  if (isBooting) return <div style={panelStyle}><p style={eyebrowStyle}>Аудит</p><h1 style={titleStyle}>Загрузка...</h1></div>
 
   return (
     <div style={pageStyle}>
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>Planet Locksmiths / контроль качества</p>
+          <p style={eyebrowStyle}>Planetlocksmiths / CMS контроль качества</p>
           <h1 style={heroTitleStyle}>Аудит сайта</h1>
-          <p style={mutedStyle}>Проверка главной, настроек, услуг, городов и контент-блоков. Страница показывает, что нужно исправить перед показом заказчику или запуском рекламы.</p>
+          <p style={mutedStyle}>Проверка Supabase CMS, логотипа, фото, главной, услуг, городов, отзывов, FAQ, заявок и контент-блоков. Это рабочий чеклист перед показом клиенту и запуском рекламы.</p>
         </div>
         <div style={heroActionsStyle}>
-          <a href="/admin/content-blocks" style={ghostButtonStyle}>Блоки</a>
+          <a href="/admin/settings" style={ghostButtonStyle}>Настройки</a>
+          <a href="/admin/photos" style={ghostButtonStyle}>Фото</a>
           <a href="/admin/home" style={ghostButtonStyle}>Главная</a>
-          <a href="/admin/services" style={ghostButtonStyle}>Услуги</a>
           <a href="/en" target="_blank" rel="noreferrer" style={primaryButtonStyle}>Открыть сайт</a>
         </div>
       </section>
@@ -125,11 +161,14 @@ export default function AdminAuditPage() {
           <div style={filtersStyle}>
             <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as 'all' | AuditType)} style={selectStyle}>
               <option value="all">Все типы</option>
-              <option value="home">Главная</option>
+              <option value="infra">Инфраструктура</option>
               <option value="settings">Настройки</option>
+              <option value="media">Медиа</option>
+              <option value="home">Главная</option>
               <option value="service">Услуги</option>
               <option value="area">Города</option>
               <option value="content-block">Блоки</option>
+              <option value="order">Заявки</option>
             </select>
             <select value={levelFilter} onChange={(event) => setLevelFilter(event.target.value as 'all' | IssueLevel)} style={selectStyle}>
               <option value="all">Все статусы</option>
@@ -149,7 +188,7 @@ export default function AdminAuditPage() {
   )
 }
 
-async function safeSelect(supabase: any, table: string, select: string): Promise<{ rows: any[]; error: string }> {
+async function safeSelect(supabase: any, table: string, select: string): Promise<SelectResult> {
   try {
     const result = await supabase.from(table).select(select)
     if (result.error) return { rows: [], error: result.error.message || `Ошибка таблицы ${table}` }
@@ -159,7 +198,17 @@ async function safeSelect(supabase: any, table: string, select: string): Promise
   }
 }
 
-function auditHomeRows(rows: any[]): AuditItem[] {
+function auditInfra(results: Record<string, SelectResult>): AuditItem {
+  const issues = requiredTables.flatMap((table) => results[table]?.error ? [`${table}: ${results[table].error}`] : [])
+  const emptyCritical = ['site_settings', 'home_pages'].filter((table) => !results[table]?.error && !results[table]?.rows.length)
+  issues.push(...emptyCritical.map((table) => `${table}: нет данных`))
+  return makeItem('infra', 'Supabase CMS foundation', '/admin/audit', undefined, issues)
+}
+
+function auditHomeRows(rows: any[], tableError: string): AuditItem[] {
+  if (tableError) return [makeItem('home', 'Главная недоступна', '/admin/home', undefined, [tableError])]
+  if (!rows.length) return [makeItem('home', 'Главная не заполнена', '/admin/home', undefined, ['Нет строк home_pages'])]
+
   return rows.map((row) => {
     const issues: string[] = []
     if (!text(row.hero_title)) issues.push('Нет hero-заголовка')
@@ -175,10 +224,13 @@ function auditHomeRows(rows: any[]): AuditItem[] {
   })
 }
 
-function auditSettingsRow(row: any): AuditItem {
+function auditSettingsRow(row: any, tableError: string): AuditItem {
   const issues: string[] = []
+  if (tableError) issues.push(tableError)
   if (!row) issues.push('Нет строки site_settings')
   if (!text(row?.brand_name)) issues.push('Нет названия бренда')
+  if (!text(row?.logo_url)) issues.push('Нет логотипа в site_settings.logo_url')
+  if (!text(row?.logo_alt)) issues.push('Нет alt текста логотипа')
   if (!text(row?.phone_primary)) issues.push('Нет основного телефона')
   if (!text(row?.phone_display)) issues.push('Нет телефона для отображения')
   if (!text(row?.email)) issues.push('Нет email')
@@ -186,14 +238,17 @@ function auditSettingsRow(row: any): AuditItem {
   return makeItem('settings', 'Глобальные настройки', '/admin/settings', '/en', issues)
 }
 
-function auditServiceRows(rows: any[]): AuditItem[] {
+function auditServiceRows(rows: any[], tableError: string): AuditItem[] {
+  if (tableError) return [makeItem('service', 'Услуги недоступны', '/admin/services', undefined, [tableError])]
+  if (!rows.length) return [makeItem('service', 'Услуги не заполнены', '/admin/services', undefined, ['Нет строк services'])]
+
   return rows.map((row) => {
     const issues: string[] = []
     if (!row.is_published) issues.push('Страница в черновике')
     if (!text(row.slug)) issues.push('Нет slug')
     if (!text(row.title)) issues.push('Нет заголовка')
     if (len(row.excerpt) < 80) issues.push('Excerpt слишком короткий')
-    if (len(row.intro) < 300) issues.push('Intro слишком короткий')
+    if (len(row.intro) < 240) issues.push('Intro слишком короткий')
     if (!text(row.seo_title)) issues.push('Нет SEO title')
     if (len(row.seo_description) < 120) issues.push('SEO description слишком короткий')
     const locale = row.locale || 'en'
@@ -202,7 +257,10 @@ function auditServiceRows(rows: any[]): AuditItem[] {
   })
 }
 
-function auditAreaRows(rows: any[]): AuditItem[] {
+function auditAreaRows(rows: any[], tableError: string): AuditItem[] {
+  if (tableError) return [makeItem('area', 'Города недоступны', '/admin/areas', undefined, [tableError])]
+  if (!rows.length) return [makeItem('area', 'Города не заполнены', '/admin/areas', undefined, ['Нет строк areas'])]
+
   return rows.map((row) => {
     const issues: string[] = []
     const highlights = Array.isArray(row.highlights) ? row.highlights : []
@@ -211,7 +269,7 @@ function auditAreaRows(rows: any[]): AuditItem[] {
     if (!text(row.slug)) issues.push('Нет slug')
     if (!text(row.city)) issues.push('Нет города')
     if (!text(row.title)) issues.push('Нет заголовка')
-    if (len(row.intro) < 250) issues.push('Intro слишком короткий')
+    if (len(row.intro) < 220) issues.push('Intro слишком короткий')
     if (highlights.length < 3) issues.push('Меньше 3 highlights')
     if (supported.length < 4) issues.push('Меньше 4 supported services')
     if (!text(row.seo_title)) issues.push('Нет SEO title')
@@ -232,15 +290,55 @@ function auditBlockRows(rows: any[], tableError: string): AuditItem[] {
     { pageKey: 'footer', slots: ['brand', 'services', 'navigation'] },
   ]
 
-  const items: AuditItem[] = []
-  for (const group of required) {
+  return required.map((group) => {
     const matching = rows.filter((row) => row.page_key === group.pageKey && row.is_published !== false)
     const slots = new Set(matching.map((row) => row.slot).filter(Boolean))
     const issues = group.slots.filter((slot) => !slots.has(slot)).map((slot) => `Нет блока ${group.pageKey} / ${slot}`)
-    items.push(makeItem('content-block', `Блоки: ${group.pageKey}`, '/admin/content-blocks', '/admin/content-blocks', issues))
-  }
+    return makeItem('content-block', `Блоки: ${group.pageKey}`, '/admin/content-blocks', '/admin/content-blocks', issues)
+  })
+}
 
-  return items
+function auditMediaRows(rows: any[], tableError: string): AuditItem {
+  const issues: string[] = []
+  if (tableError) issues.push(tableError)
+  const published = rows.filter((row) => row.is_published !== false)
+  const logos = published.filter((row) => row.category === 'logo')
+  const gallery = published.filter((row) => row.category === 'gallery')
+  const before = published.filter((row) => row.category === 'before')
+  const after = published.filter((row) => row.category === 'after')
+  if (!published.length) issues.push('Нет опубликованных изображений')
+  if (!logos.length) issues.push('Нет logo-изображения в site_images')
+  if (gallery.length < 3) issues.push('Меньше 3 gallery-фото')
+  if (before.length !== after.length) issues.push('Количество before/after фото не совпадает')
+  if (rows.some((row) => !text(row.image_url))) issues.push('Есть изображения без image_url')
+  return makeItem('media', `Медиа CMS: ${published.length} опубликовано`, '/admin/photos', '/en', issues)
+}
+
+function auditOrdersRows(rows: any[], tableError: string): AuditItem {
+  const issues: string[] = []
+  if (tableError) issues.push(tableError)
+  const active = rows.filter((row) => ['new', 'contacted', 'scheduled', 'in_progress'].includes(String(row.status || '')))
+  if (!rows.length) issues.push('Заявок пока нет — проверь форму request service после деплоя')
+  if (active.some((row) => !text(row.phone))) issues.push('Есть активные заявки без телефона')
+  return makeItem('order', `Заявки: ${rows.length}`, '/admin/orders', undefined, issues)
+}
+
+function auditReviewsRows(rows: any[], tableError: string): AuditItem {
+  const issues: string[] = []
+  if (tableError) issues.push(tableError)
+  const published = rows.filter((row) => row.is_published !== false)
+  if (published.length < 3) issues.push('Меньше 3 опубликованных отзывов')
+  if (published.some((row) => !text(row.name) || !text(row.quote))) issues.push('Есть отзывы без имени или текста')
+  return makeItem('content-block', `Отзывы: ${published.length}`, '/admin/reviews', '/en/reviews', issues)
+}
+
+function auditFaqRows(rows: any[], tableError: string): AuditItem {
+  const issues: string[] = []
+  if (tableError) issues.push(tableError)
+  const published = rows.filter((row) => row.is_published !== false)
+  if (published.length < 6) issues.push('Меньше 6 опубликованных FAQ')
+  if (published.some((row) => !text(row.question) || !text(row.answer))) issues.push('Есть FAQ без вопроса или ответа')
+  return makeItem('content-block', `FAQ: ${published.length}`, '/admin/faq', '/en/faq', issues)
 }
 
 function makeItem(type: AuditType, title: string, href: string, previewHref: string | undefined, issues: string[]): AuditItem {
