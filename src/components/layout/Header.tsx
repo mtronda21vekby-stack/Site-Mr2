@@ -24,9 +24,9 @@ const navConfig: Record<Locale, Array<{ label: string; href: (locale: Locale) =>
     { label: 'Service Areas', href: (locale) => `/${locale}/areas` },
   ],
   es: [
-    { label: 'Inicio', href: (locale) => `/${locale}` },
-    { label: 'Servicios', href: (locale) => `/${locale}/services` },
-    { label: 'Áreas', href: (locale) => `/${locale}/areas` },
+    { label: 'Home', href: (locale) => `/${locale}` },
+    { label: 'Services', href: (locale) => `/${locale}/services` },
+    { label: 'Service Areas', href: (locale) => `/${locale}/areas` },
   ],
   ru: [
     { label: 'Home', href: () => '/en' },
@@ -37,7 +37,7 @@ const navConfig: Record<Locale, Array<{ label: string; href: (locale: Locale) =>
 
 const ctaLabels: Record<Locale, { request: string; call: string; menu: string }> = {
   en: { request: 'Request', call: 'Call', menu: 'Menu' },
-  es: { request: 'Solicitud', call: 'Llamar', menu: 'Menú' },
+  es: { request: 'Request', call: 'Call', menu: 'Menu' },
   ru: { request: 'Request', call: 'Call', menu: 'Menu' },
 }
 
@@ -55,7 +55,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
       <div className="relative mx-auto flex h-[4.25rem] max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-3" aria-label="Planetlocksmiths home">
           <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-visible rounded-full transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-14 sm:w-14">
-            <Image src="/Изображение HEIF.heic" alt="Planetlocksmiths" width={56} height={56} priority unoptimized className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
+            <Image src="/planetlocksmiths-logo.svg" alt="Planetlocksmiths" width={56} height={56} priority className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
           </span>
           <span className="min-w-0">
             <span className="notranslate block truncate text-base font-black tracking-[-0.03em] text-[#0B1F4D] sm:text-lg" translate="no">Planetlocksmiths</span>
@@ -81,7 +81,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
 
         <button type="button" className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-[#0B1F4D]/18 bg-white px-4 text-xs font-black uppercase tracking-[0.16em] text-[#0B1F4D] shadow-[0_12px_32px_rgba(11,31,77,0.08)] backdrop-blur-2xl md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           <span>{labels.menu}</span>
-          <span className="text-lg leading-none">{open ? '×' : '☰'}</span>
+          <span className="text-lg leading-none">{open ? 'x' : 'menu'}</span>
         </button>
       </div>
 
@@ -106,7 +106,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
 }
 
 function LanguageSwitcher({ currentLocale, pathname, isMobile = false }: { currentLocale: ActiveLocale; pathname: string | null; isMobile?: boolean }) {
-  const labels: Record<ActiveLocale, string> = isMobile ? { en: 'English', es: 'Español' } : { en: 'EN', es: 'ES' }
+  const labels: Record<ActiveLocale, string> = isMobile ? { en: 'English', es: 'Spanish' } : { en: 'EN', es: 'ES' }
 
   return (
     <div className={`notranslate rounded-full border border-[#0B1F4D]/14 bg-white shadow-[0_12px_32px_rgba(11,31,77,0.07)] backdrop-blur-2xl ${isMobile ? 'w-full p-1.5' : 'p-1'}`} aria-label="Language switcher" translate="no">
@@ -119,8 +119,9 @@ function LanguageSwitcher({ currentLocale, pathname, isMobile = false }: { curre
               key={targetLocale}
               href={buildLocalizedHref(pathname, targetLocale)}
               aria-current={isActive ? 'page' : undefined}
-              className={`inline-flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-black uppercase tracking-[0.13em] transition duration-300 ${isActive ? 'bg-[#0B1F4D] text-white shadow-[0_10px_26px_rgba(11,31,77,0.18)]' : 'bg-[#F7FAFF] text-[#0B1F4D] hover:-translate-y-0.5 hover:bg-[#EEF4FF]'} ${isMobile ? 'min-h-11' : 'min-w-11'}`}
-              title={targetLocale === 'en' ? 'English' : 'Español'}
+              data-language-option="true"
+              className={`inline-flex min-h-9 items-center justify-center rounded-[999px] px-3 text-xs font-black uppercase tracking-[0.13em] transition duration-300 ${isActive ? 'bg-[#0B1F4D] text-white shadow-[0_10px_26px_rgba(11,31,77,0.18)] hover:bg-[#123A73]' : 'bg-[#F7FAFF] text-[#0B1F4D] hover:-translate-y-0.5 hover:bg-[#EEF4FF]'} ${isMobile ? 'min-h-11' : 'min-w-11'}`}
+              title={targetLocale === 'en' ? 'English' : 'Spanish'}
             >
               {labels[targetLocale]}
             </Link>
