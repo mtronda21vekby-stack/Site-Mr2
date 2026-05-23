@@ -62,17 +62,40 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
   if (!visibleImages.length) return null
 
   const openActive = () => setLightboxIndex(activeIndex)
+  const activateNext = () => setActiveIndex((value) => normalizeIndex(value + 1, visibleImages.length))
+  const activatePrev = () => setActiveIndex((value) => normalizeIndex(value - 1, visibleImages.length))
   const next = () => setLightboxIndex((value) => (value === null ? value : normalizeIndex(value + 1, visibleImages.length)))
   const prev = () => setLightboxIndex((value) => (value === null ? value : normalizeIndex(value - 1, visibleImages.length)))
+
+  function handleCarouselTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    setIsTouching(true)
+    touchStartX.current = event.touches[0]?.clientX ?? null
+  }
+
+  function handleCarouselTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+    setIsTouching(false)
+    if (touchStartX.current === null) return
+
+    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
+    const delta = endX - touchStartX.current
+
+    if (Math.abs(delta) > 42) {
+      if (delta < 0) activateNext()
+      else activatePrev()
+    }
+
+    touchStartX.current = null
+  }
 
   return (
     <>
       <div
-        className="relative h-[24rem] overflow-hidden rounded-[2.1rem] border border-[#0B1F4D]/10 bg-[radial-gradient(circle_at_50%_45%,rgba(11,31,77,0.10),transparent_13rem),linear-gradient(180deg,#FFFFFF_0%,#F3F7FF_100%)] shadow-[0_28px_90px_rgba(11,31,77,0.12)]"
-        onTouchStart={() => setIsTouching(true)}
-        onTouchEnd={() => setIsTouching(false)}
+        translate="no"
+        className="notranslate relative h-[24rem] touch-pan-y overflow-hidden rounded-[2.1rem] border border-[#0B1F4D]/10 bg-[radial-gradient(circle_at_50%_45%,rgba(11,31,77,0.10),transparent_13rem),linear-gradient(180deg,#FFFFFF_0%,#F3F7FF_100%)] shadow-[0_28px_90px_rgba(11,31,77,0.12)]"
+        onTouchStart={handleCarouselTouchStart}
+        onTouchEnd={handleCarouselTouchEnd}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,247,255,0.86)_0%,transparent_24%,transparent_76%,rgba(243,247,255,0.86)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(243,247,255,0.88)_0%,transparent_20%,transparent_80%,rgba(243,247,255,0.88)_100%)]" />
 
         <div className="absolute inset-0 [perspective:1000px]">
           {visibleImages.map((image, index) => {
@@ -110,6 +133,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                   alt={image.alt || image.title || 'Service photo'}
                   loading={abs <= 1 ? 'eager' : 'lazy'}
                   className="h-full w-full object-cover"
+                  draggable="false"
                 />
               </button>
             )
@@ -131,7 +155,8 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
 
       {current && lightboxIndex !== null ? (
         <div
-          className="fixed inset-0 z-[100] bg-[#020814]/94 p-4 backdrop-blur-2xl"
+          translate="no"
+          className="notranslate fixed inset-0 z-[100] bg-[#020814]/94 p-4 backdrop-blur-2xl"
           onTouchStart={(event) => {
             touchStartX.current = event.touches[0]?.clientX ?? null
           }}
@@ -161,6 +186,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                 src={current.image_url}
                 alt={current.alt || current.title || 'Service photo'}
                 className="max-h-[82vh] w-full bg-black object-contain"
+                draggable="false"
               />
             </div>
           </div>
