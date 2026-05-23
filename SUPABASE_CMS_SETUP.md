@@ -22,9 +22,10 @@ Open Supabase Dashboard → SQL Editor and run these files in order:
 ```txt
 supabase/migrations/202605230001_add_logo_to_site_settings.sql
 supabase/migrations/202605230002_admin_cms_foundation.sql
+supabase/migrations/202605230003_orders_admin_fields.sql
 ```
 
-The second migration creates or updates:
+The migrations create or update:
 
 - `site_settings`
 - `home_pages`
@@ -37,6 +38,8 @@ The second migration creates or updates:
 - `orders`
 - Storage bucket: `site-images`
 - RLS policies for public content reads and authenticated admin writes
+- Public insert policy for `orders`
+- Admin order fields: `vehicle_make_model`, `urgency`, `preferred_time`, `admin_note`, `assigned_to`
 
 ## Admin authentication
 
@@ -75,7 +78,7 @@ After upload, click:
 Save settings
 ```
 
-The public header reads `logo_url` and `logo_alt` from `site_settings`.
+The public header reads `logo_url` and `logo_alt` from `site_settings`. Header UI is marked `notranslate` so browser translation should not rewrite brand text/buttons.
 
 ## Photo workflow
 
@@ -97,7 +100,39 @@ Records are saved in:
 site_images
 ```
 
-The public gallery reads published photos.
+The public gallery reads published photos from `site_images` with `is_published = true`.
+
+On mobile, the gallery is intentionally simple: horizontal rotating photos, no marketing copy over the carousel, tap centered photo to open fullscreen.
+
+## Orders workflow
+
+Public users submit requests through:
+
+```txt
+/en/contact#request-service
+```
+
+Requests are saved into:
+
+```txt
+orders
+```
+
+Admin can manage them at:
+
+```txt
+/admin/orders
+```
+
+Admin order actions:
+
+- filter by status
+- filter by urgency
+- search by name, phone, email, service, location, vehicle
+- update status
+- assign dispatcher/technician
+- save internal admin notes
+- delete invalid/test requests
 
 ## Core admin pages
 
@@ -119,14 +154,18 @@ After deployment:
 2. Open `/admin/settings`.
 3. Upload transparent PNG/WebP logo.
 4. Save settings.
-5. Open `/en` and verify header logo.
+5. Open `/en`, `/en/services`, and `/en/contact`; verify header logo appears everywhere.
 6. Open `/admin/photos`.
 7. Upload one gallery image.
-8. Open `/en` and verify gallery image appears.
-9. Edit Home content in `/admin/home`.
-10. Verify `/en` updates.
-11. Edit one Service in `/admin/services`.
-12. Verify `/en/services` updates.
+8. Open `/en` on mobile; verify the rotating photo carousel appears without overlay text.
+9. Submit a request through `/en/contact#request-service`.
+10. Open `/admin/orders`; verify the request appears.
+11. Change status and save internal note.
+12. Edit Home content in `/admin/home`.
+13. Verify `/en` updates.
+14. Edit one Service in `/admin/services`.
+15. Verify `/en/services` updates.
+16. Open `/admin/audit` and fix critical warnings.
 
 ## Known rule
 
