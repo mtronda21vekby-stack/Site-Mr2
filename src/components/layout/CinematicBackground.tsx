@@ -82,12 +82,60 @@ function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
   })
 }
 
+function getMotionTransform(index: number, rotate: string, scrollY: number, reduceMotion: boolean, isMobile: boolean) {
+  if (reduceMotion) return `rotate(${rotate})`
+
+  const direction = index % 2 === 0 ? 1 : -1
+  const speed = isMobile ? 0.028 + (index % 5) * 0.006 : 0.018 + (index % 6) * 0.005
+  const phase = index * 0.71
+  const floatX = Math.sin(scrollY / 190 + phase) * (isMobile ? 9 : 14)
+  const floatY = Math.cos(scrollY / 230 + phase) * (isMobile ? 7 : 11)
+  const parallaxY = scrollY * speed * direction
+  const parallaxX = scrollY * speed * 0.36 * -direction
+  const rotateDrift = Math.sin(scrollY / 260 + phase) * (isMobile ? 1.8 : 2.4)
+
+  return `translate3d(${floatX + parallaxX}px, ${floatY + parallaxY}px, 0) rotate(calc(${rotate} + ${rotateDrift}deg))`
+}
+
 export default function CinematicBackground() {
   const supabase = useMemo(() => getSupabaseClient() as any, [])
   const [background, setBackground] = useState<BackgroundState>(defaultBackground)
   const [decorImages, setDecorImages] = useState<DecorImage[]>([])
+  const [scrollY, setScrollY] = useState(0)
+  const [reduceMotion, setReduceMotion] = useState(false)
   const desktopSlots = useMemo(() => buildSlots(34, false), [])
   const mobileSlots = useMemo(() => buildSlots(22, true), [])
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReduceMotion(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    if (reduceMotion) return
+
+    let raf = 0
+    const onScroll = () => {
+      if (raf) return
+      raf = window.requestAnimationFrame(() => {
+        raf = 0
+        setScrollY(window.scrollY || window.pageYOffset || 0)
+      })
+    }
+
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) window.cancelAnimationFrame(raf)
+    }
+  }, [reduceMotion])
 
   useEffect(() => {
     let mounted = true
@@ -159,6 +207,7 @@ export default function CinematicBackground() {
                 backgroundImage: `url(${background.desktopUrl})`,
                 backgroundPosition: background.desktopPosition,
                 opacity: Math.min(0.045, background.opacity),
+                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.018}px, 0)`,
               }}
             />
           ) : null}
@@ -170,6 +219,7 @@ export default function CinematicBackground() {
                 backgroundImage: `url(${mobileUrl})`,
                 backgroundPosition: background.mobilePosition,
                 opacity: Math.min(0.03, background.opacity),
+                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.012}px, 0)`,
               }}
             />
           ) : null}
@@ -187,13 +237,14 @@ export default function CinematicBackground() {
             return (
               <div
                 key={`desktop-bg-${index}-${image.id}`}
-                className="absolute overflow-hidden rounded-[0.85rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_14px_36px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px]"
+                className="absolute overflow-hidden rounded-[0.85rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_14px_36px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px] transition-transform duration-300 ease-out"
                 style={{
                   left: slot.left,
                   top: slot.top,
                   width: slot.width,
                   opacity: slot.opacity,
-                  transform: `rotate(${slot.rotate})`,
+                  transform: getMotionTransform(index, slot.rotate, scrollY, reduceMotion, false),
+                  willChange: reduceMotion ? undefined : 'transform',
                 }}
               >
                 <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.62rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
@@ -212,13 +263,14 @@ export default function CinematicBackground() {
             return (
               <div
                 key={`mobile-bg-${index}-${image.id}`}
-                className="absolute overflow-hidden rounded-[0.72rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_10px_26px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px]"
+                className="absolute overflow-hidden rounded-[0.72rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_10px_26px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px] transition-transform duration-300 ease-out"
                 style={{
                   left: slot.left,
                   top: slot.top,
                   width: slot.width,
                   opacity: slot.opacity,
-                  transform: `rotate(${slot.rotate})`,
+                  transform: getMotionTransform(index, slot.rotate, scrollY, reduceMotion, true),
+                  willChange: reduceMotion ? undefined : 'transform',
                 }}
               >
                 <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.54rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
