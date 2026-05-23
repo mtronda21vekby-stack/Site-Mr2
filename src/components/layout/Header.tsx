@@ -52,10 +52,10 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
   return (
     <header className="sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
-      <div className="relative mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:h-[4.25rem] sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label="Planetlocksmiths home">
-          <span className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-visible rounded-full transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">
-            <Image src="/planetlocksmiths-logo.svg" alt="Planetlocksmiths" width={64} height={64} priority sizes="56px" className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
+          <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
+            <Image src="/planetlocksmiths-logo.svg" alt="Planetlocksmiths" width={160} height={117} priority sizes="(max-width: 640px) 75px, 96px" className="h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]" />
           </span>
           <span className="min-w-0 leading-none">
             <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">Planetlocksmiths</span>
@@ -79,7 +79,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
           <CallButton phoneNumber={phonePrimary} phoneDisplay={phoneDisplay} label={labels.call} className="min-h-11 min-w-11 px-0 py-0 text-lg shadow-[0_16px_38px_rgba(11,31,77,0.22)]" title={`${labels.call} ${phoneDisplay}`} />
         </div>
 
-        <button type="button" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full border border-[#0B1F4D]/18 bg-white px-5 text-xs font-black uppercase tracking-[0.16em] text-[#0B1F4D] shadow-[0_12px_32px_rgba(11,31,77,0.08)] backdrop-blur-2xl md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <button type="button" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full border border-[#0B1F4D]/18 bg-white px-4 text-xs font-black uppercase tracking-[0.16em] text-[#0B1F4D] shadow-[0_12px_32px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:px-5 md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           <span>{open ? 'Close' : labels.menu}</span>
           <span aria-hidden="true" className="relative h-3.5 w-4">
             <span className={`absolute left-0 top-0 h-0.5 w-4 rounded-full bg-current transition duration-300 ${open ? 'translate-y-[0.38rem] rotate-45' : ''}`} />
