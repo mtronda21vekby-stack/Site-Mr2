@@ -52,7 +52,7 @@ function smoothstep(value: number) {
 function normalizeOpacity(value: unknown) {
   const number = Number(value)
   if (!Number.isFinite(number)) return defaultBackground.opacity
-  return Math.min(0.2, Math.max(0.02, number))
+  return Math.min(0.18, Math.max(0.02, number))
 }
 
 function uniqueDecorImages(images: DecorImage[]) {
@@ -70,21 +70,21 @@ function imageForSlot(images: DecorImage[], index: number) {
 }
 
 function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
-  const cols = isMobile ? [-24, -2, 22, 48, 73, 94] : [-12, 3, 17, 32, 48, 64, 80, 96]
-  const rows = isMobile ? [2, 13, 24, 35, 46, 57, 68, 79, 90] : [2, 13, 24, 35, 46, 57, 68, 79, 90]
-  const rotations = [-10, 7, -5, 9, -8, 6, -7, 10, -4, 5]
+  const cols = isMobile ? [-42, 3, 50, 88] : [-16, 8, 36, 64, 91]
+  const rows = isMobile ? [4, 22, 40, 58, 76, 94] : [3, 20, 37, 54, 71, 88]
+  const rotations = [-11, 7, -6, 10, -8, 6, -9, 8]
 
   return Array.from({ length: count }, (_, index) => {
     const col = cols[index % cols.length]
     const row = rows[Math.floor(index / cols.length) % rows.length]
-    const driftX = ((index * 7) % 11) - 5
-    const driftY = ((index * 5) % 9) - 4
-    const wide = index % 3 === 0
-    const width = isMobile ? (wide ? 7.9 : 6.75) : (wide ? 12.2 : 10.3)
-    const height = isMobile ? (wide ? 5.4 : 4.65) : (wide ? 7.8 : 6.65)
-    const baseOpacity = isMobile ? 0.43 : 0.39
-    const edgeBoost = col < 0 || col > 82 ? 0.11 : 0
-    const depth = (index % 5) * 0.018
+    const driftX = ((index * 7) % 13) - 6
+    const driftY = ((index * 5) % 11) - 5
+    const hero = index % 4 === 0
+    const width = isMobile ? (hero ? 14.4 : 11.6) : (hero ? 20.5 : 16.2)
+    const height = isMobile ? (hero ? 9.8 : 7.9) : (hero ? 13.1 : 10.4)
+    const baseOpacity = isMobile ? 0.58 : 0.52
+    const edgeBoost = col < 0 || col > 78 ? 0.1 : 0
+    const depth = (index % 4) * 0.026
 
     return {
       left: `${col + driftX}%`,
@@ -92,17 +92,17 @@ function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
       width: `${width}rem`,
       height: `${height}rem`,
       rotate: `${rotations[index % rotations.length]}deg`,
-      opacity: Math.min(0.66, baseOpacity + edgeBoost - depth),
+      opacity: Math.min(0.78, baseOpacity + edgeBoost - depth),
     }
   })
 }
 
 function getRevealProgress(index: number, scrollY: number, viewportHeight: number, isMobile: boolean) {
-  const cycle = Math.max(520, viewportHeight * (isMobile ? 0.92 : 0.84))
-  const offset = index * (isMobile ? 72 : 96)
+  const cycle = Math.max(560, viewportHeight * (isMobile ? 0.95 : 0.86))
+  const offset = index * (isMobile ? 112 : 144)
   const raw = ((scrollY + offset) % cycle) / cycle
-  const enter = smoothstep(raw / 0.3)
-  const exit = 1 - smoothstep((raw - 0.8) / 0.2)
+  const enter = smoothstep(raw / 0.28)
+  const exit = 1 - smoothstep((raw - 0.82) / 0.18)
   return clamp(Math.min(enter, exit), 0, 1)
 }
 
@@ -123,17 +123,17 @@ function getMotionStyle(
 
   const reveal = getRevealProgress(index, scrollY, viewportHeight, isMobile)
   const direction = index % 2 === 0 ? 1 : -1
-  const speed = isMobile ? 0.014 + (index % 5) * 0.0025 : 0.01 + (index % 6) * 0.0026
+  const speed = isMobile ? 0.012 + (index % 4) * 0.0024 : 0.009 + (index % 5) * 0.0024
   const phase = index * 0.71
-  const floatX = Math.sin(scrollY / 170 + phase) * (isMobile ? 9 : 15)
-  const floatY = Math.cos(scrollY / 210 + phase) * (isMobile ? 8 : 12)
+  const floatX = Math.sin(scrollY / 180 + phase) * (isMobile ? 13 : 20)
+  const floatY = Math.cos(scrollY / 230 + phase) * (isMobile ? 11 : 16)
   const parallaxY = scrollY * speed * direction
-  const parallaxX = scrollY * speed * 0.28 * -direction
-  const revealLift = (1 - reveal) * (isMobile ? 42 : 52)
-  const scale = 0.86 + reveal * 0.14
-  const rotateDrift = Math.sin(scrollY / 250 + phase) * (isMobile ? 1.5 : 2)
-  const opacity = slot.opacity * (0.25 + reveal * 0.75)
-  const blur = (1 - reveal) * 0.34
+  const parallaxX = scrollY * speed * 0.25 * -direction
+  const revealLift = (1 - reveal) * (isMobile ? 38 : 50)
+  const scale = 0.9 + reveal * 0.1
+  const rotateDrift = Math.sin(scrollY / 270 + phase) * (isMobile ? 1.4 : 1.8)
+  const opacity = slot.opacity * (0.34 + reveal * 0.66)
+  const blur = (1 - reveal) * 0.24
 
   return {
     opacity,
@@ -149,8 +149,8 @@ export default function CinematicBackground() {
   const [scrollY, setScrollY] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(820)
   const [reduceMotion, setReduceMotion] = useState(false)
-  const desktopSlots = useMemo(() => buildSlots(42, false), [])
-  const mobileSlots = useMemo(() => buildSlots(28, true), [])
+  const desktopSlots = useMemo(() => buildSlots(24, false), [])
+  const mobileSlots = useMemo(() => buildSlots(14, true), [])
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -198,7 +198,7 @@ export default function CinematicBackground() {
             .in('category', ['background-decor', 'background-desktop', 'background-mobile'])
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false })
-            .limit(54),
+            .limit(36),
         ])
 
         if (!mounted) return
@@ -241,7 +241,7 @@ export default function CinematicBackground() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(11,31,77,0.038),transparent_30rem),radial-gradient(circle_at_86%_12%,rgba(18,58,115,0.028),transparent_26rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_48%,#FFFFFF_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(11,31,77,0.032),transparent_30rem),radial-gradient(circle_at_86%_12%,rgba(18,58,115,0.024),transparent_26rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_48%,#FFFFFF_100%)]" />
 
       {hasLargeBackground ? (
         <>
@@ -251,8 +251,8 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${background.desktopUrl})`,
                 backgroundPosition: background.desktopPosition,
-                opacity: Math.min(0.024, background.opacity),
-                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.012}px, 0)`,
+                opacity: Math.min(0.018, background.opacity),
+                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.01}px, 0)`,
               }}
             />
           ) : null}
@@ -263,8 +263,8 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${mobileUrl})`,
                 backgroundPosition: background.mobilePosition,
-                opacity: Math.min(0.018, background.opacity),
-                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.008}px, 0)`,
+                opacity: Math.min(0.012, background.opacity),
+                transform: reduceMotion ? undefined : `translate3d(0, ${scrollY * -0.006}px, 0)`,
               }}
             />
           ) : null}
@@ -281,7 +281,7 @@ export default function CinematicBackground() {
             return (
               <div
                 key={`desktop-bg-${index}-${image.id}`}
-                className="absolute overflow-hidden rounded-[1.05rem] border border-white/80 bg-white/48 p-1 shadow-[0_18px_42px_rgba(11,31,77,0.16)] backdrop-blur-[0.3px] transition-[transform,opacity,filter] duration-500 ease-out"
+                className="absolute overflow-hidden rounded-[1.25rem] border border-white/70 bg-white/32 p-1.5 shadow-[0_26px_70px_rgba(11,31,77,0.22)] backdrop-blur-[0.2px] transition-[transform,opacity,filter] duration-500 ease-out"
                 style={{
                   left: slot.left,
                   top: slot.top,
@@ -292,7 +292,7 @@ export default function CinematicBackground() {
                   willChange: reduceMotion ? undefined : 'transform, opacity, filter',
                 }}
               >
-                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.78rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
+                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.92rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
               </div>
             )
           })}
@@ -309,7 +309,7 @@ export default function CinematicBackground() {
             return (
               <div
                 key={`mobile-bg-${index}-${image.id}`}
-                className="absolute overflow-hidden rounded-[0.95rem] border border-white/80 bg-white/48 p-0.5 shadow-[0_14px_34px_rgba(11,31,77,0.16)] backdrop-blur-[0.3px] transition-[transform,opacity,filter] duration-500 ease-out"
+                className="absolute overflow-hidden rounded-[1.1rem] border border-white/70 bg-white/32 p-1 shadow-[0_22px_58px_rgba(11,31,77,0.22)] backdrop-blur-[0.2px] transition-[transform,opacity,filter] duration-500 ease-out"
                 style={{
                   left: slot.left,
                   top: slot.top,
@@ -320,16 +320,16 @@ export default function CinematicBackground() {
                   willChange: reduceMotion ? undefined : 'transform, opacity, filter',
                 }}
               >
-                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.7rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
+                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.82rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
               </div>
             )
           })}
         </div>
       ) : null}
 
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,31,77,0.052)_1px,transparent_1px),linear-gradient(rgba(11,31,77,0.04)_1px,transparent_1px)] bg-[size:96px_96px] opacity-16 [mask-image:radial-gradient(circle_at_50%_0%,black_0%,transparent_74%)]" />
-      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/46 via-white/18 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-[12rem] bg-gradient-to-t from-white/50 via-white/16 to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,31,77,0.046)_1px,transparent_1px),linear-gradient(rgba(11,31,77,0.034)_1px,transparent_1px)] bg-[size:96px_96px] opacity-14 [mask-image:radial-gradient(circle_at_50%_0%,black_0%,transparent_76%)]" />
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/34 via-white/12 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[10rem] bg-gradient-to-t from-white/40 via-white/12 to-transparent" />
     </div>
   )
 }
