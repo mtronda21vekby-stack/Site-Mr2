@@ -89,7 +89,14 @@ export default async function LocaleHome({
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
       <JsonLd data={jsonLd} />
       <CinematicBackground />
-      <Header locale={locale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={locale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
 
       <main className="flex flex-col">
         <Hero
