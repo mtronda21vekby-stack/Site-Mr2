@@ -106,16 +106,27 @@ export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderPro
 }
 
 function LanguageSwitcher({ currentLocale, pathname, isMobile = false }: { currentLocale: ActiveLocale; pathname: string | null; isMobile?: boolean }) {
+  const labels: Record<ActiveLocale, string> = isMobile ? { en: 'English', es: 'Español' } : { en: 'EN', es: 'ES' }
+
   return (
-    <div className={`notranslate inline-flex items-center rounded-full border border-[#0B1F4D]/14 bg-white p-1 shadow-[0_12px_32px_rgba(11,31,77,0.07)] backdrop-blur-2xl ${isMobile ? 'w-full justify-between' : ''}`} aria-label="Language switcher" translate="no">
-      {activeLocales.map((targetLocale) => {
-        const isActive = targetLocale === currentLocale
-        return (
-          <Link key={targetLocale} href={buildLocalizedHref(pathname, targetLocale)} className={`rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.14em] transition duration-300 ${isActive ? 'bg-[#0B1F4D] text-white shadow-[0_10px_26px_rgba(11,31,77,0.18)]' : 'text-[#0B1F4D] hover:bg-[#F3F7FF]'} ${isMobile ? 'flex-1 text-center' : ''}`}>
-            {targetLocale}
-          </Link>
-        )
-      })}
+    <div className={`notranslate rounded-full border border-[#0B1F4D]/14 bg-white shadow-[0_12px_32px_rgba(11,31,77,0.07)] backdrop-blur-2xl ${isMobile ? 'w-full p-1.5' : 'p-1'}`} aria-label="Language switcher" translate="no">
+      {isMobile ? <p className="px-3 pb-2 pt-1 text-[0.64rem] font-black uppercase tracking-[0.18em] text-[#42526E]">Language</p> : null}
+      <div className={`grid ${isMobile ? 'grid-cols-2 gap-1.5' : 'grid-cols-2 gap-1'}`}>
+        {activeLocales.map((targetLocale) => {
+          const isActive = targetLocale === currentLocale
+          return (
+            <Link
+              key={targetLocale}
+              href={buildLocalizedHref(pathname, targetLocale)}
+              aria-current={isActive ? 'page' : undefined}
+              className={`inline-flex min-h-9 items-center justify-center rounded-full px-3 text-xs font-black uppercase tracking-[0.13em] transition duration-300 ${isActive ? 'bg-[#0B1F4D] text-white shadow-[0_10px_26px_rgba(11,31,77,0.18)]' : 'bg-[#F7FAFF] text-[#0B1F4D] hover:-translate-y-0.5 hover:bg-[#EEF4FF]'} ${isMobile ? 'min-h-11' : 'min-w-11'}`}
+              title={targetLocale === 'en' ? 'English' : 'Español'}
+            >
+              {labels[targetLocale]}
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }
