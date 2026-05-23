@@ -19,13 +19,12 @@ export default function MobileStickyCta({
   const requestHref = `/${activeLocale}/contact#request-service`
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[#0B1F4D]/12 bg-white/90 p-3 shadow-[0_-18px_70px_rgba(11,31,77,0.14)] backdrop-blur-[30px] md:hidden">
+    <div translate="no" className="notranslate fixed inset-x-0 bottom-0 z-50 border-t border-[#0B1F4D]/12 bg-white/90 p-3 shadow-[0_-18px_70px_rgba(11,31,77,0.14)] backdrop-blur-[30px] md:hidden">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(11,31,77,0.045),transparent_44%,rgba(18,58,115,0.035))]" />
       <div className="relative mx-auto grid max-w-md grid-cols-[4rem_1fr] gap-3">
         <a
           href={`tel:${phoneNumber}`}
-          className="notranslate group inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-4 text-xl text-white shadow-[0_16px_42px_rgba(11,31,77,0.24)] transition duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.30)] active:translate-y-0 active:scale-[0.96]"
-          translate="no"
+          className="group inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-4 text-xl text-white shadow-[0_16px_42px_rgba(11,31,77,0.24)] transition duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.30)] active:translate-y-0 active:scale-[0.96]"
           aria-label={copy.callAria}
           title={copy.callAria}
         >
