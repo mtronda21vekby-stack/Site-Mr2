@@ -14,6 +14,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       { href: '/admin/direct', label: 'Панель' },
       { href: '/admin/photos', label: 'Фото' },
+      { href: '/admin/backgrounds', label: 'Фоны сайта' },
       { href: '/admin/orders', label: 'Заявки' },
       { href: '/admin/settings', label: 'Настройки' },
       { href: '/admin/audit', label: 'Аудит' },
