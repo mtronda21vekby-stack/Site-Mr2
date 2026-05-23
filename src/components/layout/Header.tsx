@@ -12,10 +12,12 @@ interface HeaderProps {
   locale: Locale
   phoneDisplay: string
   phonePrimary: string
+  brandName?: string
+  logoUrl?: string
+  logoAlt?: string
 }
 
 const activeLocales: ActiveLocale[] = ['en', 'es']
-const logoSrc = '/planetlocksmiths-logo.svg?v=approved-logo-3'
 
 const navConfig: Record<Locale, Array<{ label: string; href: (locale: Locale) => string }>> = {
   en: [
@@ -41,32 +43,35 @@ const ctaLabels: Record<Locale, { request: string; call: string; menu: string }>
   ru: { request: 'Request', call: 'Call', menu: 'Menu' },
 }
 
-export default function Header({ locale, phoneDisplay, phonePrimary }: HeaderProps) {
+export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planetlocksmiths', logoUrl = '', logoAlt }: HeaderProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const navItems = navConfig[locale]
   const labels = ctaLabels[locale]
   const requestHref = `/${activeLocale}/contact#request-service`
+  const visibleLogoUrl = logoUrl.trim()
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
       <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
-        <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label="Planetlocksmiths home">
-          <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
-            <img
-              src={logoSrc}
-              alt="Planetlocksmiths"
-              width="160"
-              height="117"
-              decoding="async"
-              fetchPriority="high"
-              className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
-            />
-          </span>
+        <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${brandName} home`}>
+          {visibleLogoUrl ? (
+            <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
+              <img
+                src={visibleLogoUrl}
+                alt={logoAlt || brandName}
+                width="160"
+                height="117"
+                decoding="async"
+                fetchPriority="high"
+                className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
+              />
+            </span>
+          ) : null}
           <span className="min-w-0 leading-none">
-            <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">Planetlocksmiths</span>
+            <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">{brandName}</span>
             <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile auto key response</span>
           </span>
         </Link>
