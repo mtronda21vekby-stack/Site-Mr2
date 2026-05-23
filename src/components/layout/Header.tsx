@@ -108,7 +108,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   }, [brandName, logoUrl, supabase])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
+    <header translate="no" className="notranslate sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
       <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${visibleBrandName} home`}>
@@ -126,7 +126,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
             </span>
           ) : null}
           <span className="min-w-0 leading-none">
-            <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">{visibleBrandName}</span>
+            <span className="block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg">{visibleBrandName}</span>
             <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile auto key response</span>
           </span>
         </Link>
@@ -181,7 +181,7 @@ function LanguageSwitcher({ currentLocale, pathname, isMobile = false }: { curre
   const labels: Record<ActiveLocale, string> = isMobile ? { en: 'English', es: 'Spanish' } : { en: 'EN', es: 'ES' }
 
   return (
-    <div className={`notranslate rounded-full border border-[#0B1F4D]/14 bg-white shadow-[0_12px_32px_rgba(11,31,77,0.07)] backdrop-blur-2xl ${isMobile ? 'w-full p-1.5' : 'p-1'}`} aria-label="Language switcher" translate="no">
+    <div className={`rounded-full border border-[#0B1F4D]/14 bg-white shadow-[0_12px_32px_rgba(11,31,77,0.07)] backdrop-blur-2xl ${isMobile ? 'w-full p-1.5' : 'p-1'}`} aria-label="Language switcher">
       {isMobile ? <p className="px-3 pb-2 pt-1 text-[0.64rem] font-black uppercase tracking-[0.18em] text-[#42526E]">Language</p> : null}
       <div className={`grid ${isMobile ? 'grid-cols-2 gap-1.5' : 'grid-cols-2 gap-1'}`}>
         {activeLocales.map((targetLocale) => {
