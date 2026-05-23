@@ -17,40 +17,27 @@ type DecorImage = {
   alt: string
 }
 
+type GeneratedSlot = {
+  left: string
+  top: string
+  width: string
+  height: string
+  rotate: string
+  opacity: number
+}
+
 const defaultBackground: BackgroundState = {
   desktopUrl: '',
   mobileUrl: '',
-  opacity: 0.12,
+  opacity: 0.08,
   desktopPosition: 'center center',
   mobilePosition: 'center center',
 }
 
-const desktopSlots = [
-  { left: '3%', top: '10%', width: '10.5rem', height: '7.1rem', rotate: '-9deg', opacity: 0.46 },
-  { left: '80%', top: '8%', width: '11rem', height: '7.4rem', rotate: '8deg', opacity: 0.44 },
-  { left: '8%', top: '31%', width: '9.4rem', height: '6.5rem', rotate: '7deg', opacity: 0.38 },
-  { left: '76%', top: '30%', width: '10.8rem', height: '7rem', rotate: '-7deg', opacity: 0.42 },
-  { left: '2%', top: '56%', width: '10rem', height: '6.8rem', rotate: '10deg', opacity: 0.36 },
-  { left: '86%', top: '55%', width: '9.6rem', height: '6.5rem', rotate: '-10deg', opacity: 0.38 },
-  { left: '15%', top: '76%', width: '8.8rem', height: '6rem', rotate: '-6deg', opacity: 0.32 },
-  { left: '66%', top: '78%', width: '9.8rem', height: '6.4rem', rotate: '6deg', opacity: 0.34 },
-]
-
-const mobileSlots = [
-  { left: '-8%', top: '10%', width: '7.2rem', height: '5rem', rotate: '-10deg', opacity: 0.34 },
-  { left: '69%', top: '11%', width: '7.8rem', height: '5.3rem', rotate: '9deg', opacity: 0.36 },
-  { left: '-8%', top: '28%', width: '7rem', height: '4.9rem', rotate: '8deg', opacity: 0.30 },
-  { left: '71%', top: '31%', width: '7.4rem', height: '5rem', rotate: '-8deg', opacity: 0.32 },
-  { left: '5%', top: '50%', width: '6.8rem', height: '4.8rem', rotate: '-7deg', opacity: 0.26 },
-  { left: '70%', top: '54%', width: '7.6rem', height: '5.1rem', rotate: '7deg', opacity: 0.30 },
-  { left: '-4%', top: '73%', width: '7.2rem', height: '5rem', rotate: '9deg', opacity: 0.24 },
-  { left: '68%', top: '77%', width: '7.8rem', height: '5.2rem', rotate: '-9deg', opacity: 0.26 },
-]
-
 function normalizeOpacity(value: unknown) {
   const number = Number(value)
   if (!Number.isFinite(number)) return defaultBackground.opacity
-  return Math.min(0.35, Math.max(0.04, number))
+  return Math.min(0.22, Math.max(0.02, number))
 }
 
 function uniqueDecorImages(images: DecorImage[]) {
@@ -62,10 +49,45 @@ function uniqueDecorImages(images: DecorImage[]) {
   })
 }
 
+function imageForSlot(images: DecorImage[], index: number) {
+  if (!images.length) return null
+  return images[index % images.length]
+}
+
+function buildSlots(count: number, isMobile: boolean): GeneratedSlot[] {
+  const cols = isMobile ? [-10, 18, 48, 78] : [-4, 9, 23, 38, 54, 70, 86]
+  const rows = isMobile ? [4, 17, 30, 43, 56, 69, 82] : [4, 16, 28, 40, 52, 64, 76, 88]
+  const rotations = [-9, 6, -4, 8, -7, 5, -6, 9]
+
+  return Array.from({ length: count }, (_, index) => {
+    const col = cols[index % cols.length]
+    const row = rows[Math.floor(index / cols.length) % rows.length]
+    const driftX = ((index * 7) % 9) - 4
+    const driftY = ((index * 5) % 7) - 3
+    const wide = index % 3 === 0
+    const width = isMobile ? (wide ? 5.9 : 5.15) : (wide ? 8.1 : 6.9)
+    const height = isMobile ? (wide ? 4.05 : 3.55) : (wide ? 5.25 : 4.55)
+    const baseOpacity = isMobile ? 0.21 : 0.20
+    const edgeBoost = col < 0 || col > 74 ? 0.08 : 0
+    const depth = (index % 4) * 0.025
+
+    return {
+      left: `${col + driftX}%`,
+      top: `${row + driftY}%`,
+      width: `${width}rem`,
+      height: `${height}rem`,
+      rotate: `${rotations[index % rotations.length]}deg`,
+      opacity: Math.min(0.34, baseOpacity + edgeBoost - depth),
+    }
+  })
+}
+
 export default function CinematicBackground() {
   const supabase = useMemo(() => getSupabaseClient() as any, [])
   const [background, setBackground] = useState<BackgroundState>(defaultBackground)
   const [decorImages, setDecorImages] = useState<DecorImage[]>([])
+  const desktopSlots = useMemo(() => buildSlots(34, false), [])
+  const mobileSlots = useMemo(() => buildSlots(22, true), [])
 
   useEffect(() => {
     let mounted = true
@@ -83,7 +105,7 @@ export default function CinematicBackground() {
             .in('category', ['background-decor', 'background-desktop', 'background-mobile'])
             .order('sort_order', { ascending: true })
             .order('created_at', { ascending: false })
-            .limit(18),
+            .limit(36),
         ])
 
         if (!mounted) return
@@ -123,12 +145,10 @@ export default function CinematicBackground() {
 
   const hasLargeBackground = Boolean(background.desktopUrl || background.mobileUrl)
   const mobileUrl = background.mobileUrl || background.desktopUrl
-  const desktopDecor = decorImages.length ? decorImages.slice(0, desktopSlots.length) : []
-  const mobileDecor = decorImages.length ? decorImages.slice(0, mobileSlots.length) : []
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(11,31,77,0.055),transparent_34rem),radial-gradient(circle_at_86%_12%,rgba(18,58,115,0.04),transparent_28rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_48%,#FFFFFF_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(11,31,77,0.045),transparent_30rem),radial-gradient(circle_at_86%_12%,rgba(18,58,115,0.035),transparent_26rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_48%,#FFFFFF_100%)]" />
 
       {hasLargeBackground ? (
         <>
@@ -138,7 +158,7 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${background.desktopUrl})`,
                 backgroundPosition: background.desktopPosition,
-                opacity: Math.min(0.08, background.opacity),
+                opacity: Math.min(0.045, background.opacity),
               }}
             />
           ) : null}
@@ -149,23 +169,25 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${mobileUrl})`,
                 backgroundPosition: background.mobilePosition,
-                opacity: Math.min(0.06, background.opacity),
+                opacity: Math.min(0.03, background.opacity),
               }}
             />
           ) : null}
         </>
       ) : null}
 
-      <div className="absolute inset-0 bg-white/42 backdrop-blur-[0.5px]" />
+      <div className="absolute inset-0 bg-white/18" />
 
-      {desktopDecor.length ? (
+      {decorImages.length ? (
         <div className="absolute inset-0 hidden md:block">
-          {desktopDecor.map((image, index) => {
-            const slot = desktopSlots[index % desktopSlots.length]
+          {desktopSlots.map((slot, index) => {
+            const image = imageForSlot(decorImages, index)
+            if (!image) return null
+
             return (
               <div
-                key={`desktop-bg-${image.id}`}
-                className="absolute overflow-hidden rounded-[1.2rem] border border-white/90 bg-white/78 p-1.5 shadow-[0_24px_70px_rgba(11,31,77,0.16)] backdrop-blur-sm"
+                key={`desktop-bg-${index}-${image.id}`}
+                className="absolute overflow-hidden rounded-[0.85rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_14px_36px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px]"
                 style={{
                   left: slot.left,
                   top: slot.top,
@@ -174,21 +196,23 @@ export default function CinematicBackground() {
                   transform: `rotate(${slot.rotate})`,
                 }}
               >
-                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.85rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
+                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.62rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
               </div>
             )
           })}
         </div>
       ) : null}
 
-      {mobileDecor.length ? (
+      {decorImages.length ? (
         <div className="absolute inset-0 md:hidden">
-          {mobileDecor.map((image, index) => {
-            const slot = mobileSlots[index % mobileSlots.length]
+          {mobileSlots.map((slot, index) => {
+            const image = imageForSlot(decorImages, index)
+            if (!image) return null
+
             return (
               <div
-                key={`mobile-bg-${image.id}`}
-                className="absolute overflow-hidden rounded-[1rem] border border-white/90 bg-white/78 p-1 shadow-[0_16px_44px_rgba(11,31,77,0.14)] backdrop-blur-sm"
+                key={`mobile-bg-${index}-${image.id}`}
+                className="absolute overflow-hidden rounded-[0.72rem] border border-white/90 bg-white/68 p-0.5 shadow-[0_10px_26px_rgba(11,31,77,0.10)] backdrop-blur-[0.5px]"
                 style={{
                   left: slot.left,
                   top: slot.top,
@@ -197,16 +221,17 @@ export default function CinematicBackground() {
                   transform: `rotate(${slot.rotate})`,
                 }}
               >
-                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.72rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
+                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.54rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" />
               </div>
             )
           })}
         </div>
       ) : null}
 
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,31,77,0.07)_1px,transparent_1px),linear-gradient(rgba(11,31,77,0.055)_1px,transparent_1px)] bg-[size:96px_96px] opacity-16 [mask-image:radial-gradient(circle_at_50%_0%,black_0%,transparent_72%)]" />
-      <div className="absolute inset-x-0 top-0 h-52 bg-gradient-to-b from-white/86 via-white/44 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-[24rem] bg-gradient-to-t from-white/88 via-white/46 to-transparent" />
+      <div className="absolute inset-0 bg-white/12" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(11,31,77,0.06)_1px,transparent_1px),linear-gradient(rgba(11,31,77,0.045)_1px,transparent_1px)] bg-[size:96px_96px] opacity-18 [mask-image:radial-gradient(circle_at_50%_0%,black_0%,transparent_72%)]" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/62 via-white/24 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[16rem] bg-gradient-to-t from-white/70 via-white/28 to-transparent" />
     </div>
   )
 }
