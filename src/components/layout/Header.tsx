@@ -2,11 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import CallButton from '@/components/ui/CallButton'
 
 export type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
+
+type HeaderBrandState = {
+  brandName: string
+  logoUrl: string
+  logoAlt: string
+}
 
 interface HeaderProps {
   locale: Locale
@@ -45,23 +52,71 @@ const ctaLabels: Record<Locale, { request: string; call: string; menu: string }>
 
 export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planetlocksmiths', logoUrl = '', logoAlt }: HeaderProps) {
   const pathname = usePathname()
+  const supabase = useMemo(() => getSupabaseClient() as any, [])
   const [open, setOpen] = useState(false)
+  const [brand, setBrand] = useState<HeaderBrandState>({
+    brandName,
+    logoUrl: logoUrl.trim(),
+    logoAlt: logoAlt || brandName,
+  })
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const navItems = navConfig[locale]
   const labels = ctaLabels[locale]
   const requestHref = `/${activeLocale}/contact#request-service`
-  const visibleLogoUrl = logoUrl.trim()
+  const visibleLogoUrl = brand.logoUrl.trim()
+  const visibleBrandName = brand.brandName || brandName
+  const visibleLogoAlt = brand.logoAlt || visibleBrandName
+
+  useEffect(() => {
+    setBrand({
+      brandName,
+      logoUrl: logoUrl.trim(),
+      logoAlt: logoAlt || brandName,
+    })
+  }, [brandName, logoUrl, logoAlt])
+
+  useEffect(() => {
+    let mounted = true
+
+    async function loadHeaderBrand() {
+      if (logoUrl.trim()) return
+
+      try {
+        const result = await (supabase.from('site_settings') as any)
+          .select('brand_name, logo_url, logo_alt')
+          .limit(1)
+          .maybeSingle()
+
+        if (!mounted || result.error || !result.data) return
+
+        const row = result.data
+        setBrand((current) => ({
+          brandName: String(row.brand_name || current.brandName || brandName).trim() || brandName,
+          logoUrl: String(row.logo_url || current.logoUrl || '').trim(),
+          logoAlt: String(row.logo_alt || row.brand_name || current.logoAlt || brandName).trim() || brandName,
+        }))
+      } catch {
+        // Keep safe text-only fallback.
+      }
+    }
+
+    loadHeaderBrand()
+
+    return () => {
+      mounted = false
+    }
+  }, [brandName, logoUrl, supabase])
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
       <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
-        <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${brandName} home`}>
+        <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${visibleBrandName} home`}>
           {visibleLogoUrl ? (
             <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
               <img
                 src={visibleLogoUrl}
-                alt={logoAlt || brandName}
+                alt={visibleLogoAlt}
                 width="160"
                 height="117"
                 decoding="async"
@@ -71,7 +126,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
             </span>
           ) : null}
           <span className="min-w-0 leading-none">
-            <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">{brandName}</span>
+            <span className="notranslate block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg" translate="no">{visibleBrandName}</span>
             <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile auto key response</span>
           </span>
         </Link>
