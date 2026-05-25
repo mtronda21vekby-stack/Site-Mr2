@@ -1,26 +1,34 @@
 [
   {
-    "question": "¿Proporcionan servicio 24/7?",
-    "answer": "Sí. Planetlocksmiths opera como un servicio de cerrajería automotriz móvil disponible las 24 horas, todos los días."
+    "question": "¿Ofrecen servicio de cerrajería automotriz 24/7?",
+    "answer": "Sí. Planetlocksmiths está orientado a solicitudes móviles de cerrajería automotriz 24/7 en Filadelfia. La disponibilidad puede depender del horario, tipo de vehículo, ubicación y complejidad del servicio."
   },
   {
-    "question": "¿Tienen una ubicación física?",
-    "answer": "Por el momento, el servicio es únicamente móvil."
+    "question": "¿Pueden ayudar si las llaves están dentro del auto?",
+    "answer": "Sí. El desbloqueo de auto es uno de los servicios móviles principales. Envía tu ubicación exacta, año, marca y modelo para preparar el método correcto."
   },
   {
-    "question": "¿Pueden ayudar con llaves de auto perdidas?",
-    "answer": "Sí. Nos encargamos del reemplazo y programación de llaves automotrices."
+    "question": "¿Pueden reemplazar una llave perdida si no tengo copia?",
+    "answer": "En muchos casos, sí. Depende del año, marca, modelo, tipo de llave y sistema de seguridad. Envía los datos del vehículo antes del despacho para revisar compatibilidad."
   },
   {
-    "question": "¿Trabajan en toda Filadelfia?",
-    "answer": "Sí. Filadelfia es la principal área de servicio."
+    "question": "¿Programan llaveros y llaves transponder?",
+    "answer": "Sí, hay soporte de programación para muchos controles, smart keys, llaveros push-to-start y llaves transponder. Algunos vehículos requieren procedimientos de concesionario o autorización especial."
   },
   {
-    "question": "¿Puedo solicitar ayuda urgente?",
-    "answer": "Sí. Se atienden solicitudes urgentes y el mismo día según disponibilidad."
+    "question": "¿Tengo que llevar el vehículo a algún lugar?",
+    "answer": "No. El servicio es móvil. El técnico va a la ubicación del vehículo cuando el trabajo se acepta y se programa."
   },
   {
-    "question": "¿Trabajan con llaves y llaveros modernos?",
-    "answer": "Sí. La programación y soporte de llaves automotrices hace parte de nuestro servicio."
+    "question": "¿Qué información debo enviar antes del servicio?",
+    "answer": "Envía tu nombre, teléfono, ubicación exacta, año/marca/modelo del vehículo, situación de la llave y si está perdida, encerrada, rota o no programa."
+  },
+  {
+    "question": "¿Pueden dar un precio exacto en línea?",
+    "answer": "La cotización final depende del vehículo, tipo de llave, programación, horario, ubicación y restricciones de seguridad. El formulario ayuda a preparar una estimación más precisa."
+  },
+  {
+    "question": "¿Trabajan con cerraduras de casas?",
+    "answer": "Planetlocksmiths está enfocado en cerrajería automotriz móvil. Si se agregan servicios residenciales o comerciales después, deben aparecer por separado en la sección de servicios."
   }
 ]
