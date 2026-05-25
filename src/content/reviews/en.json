@@ -1,17 +1,26 @@
 [
   {
-    "name": "Alex M.",
+    "name": "Recent customer",
     "rating": 5,
-    "quote": "Locked myself out late at night and Planetlocksmiths got me back on the road in no time."
+    "quote": "Fast communication, mobile arrival, and clear explanation of the key replacement process.",
+    "city": "Philadelphia, PA"
   },
   {
-    "name": "Jennifer S.",
+    "name": "Philadelphia driver",
     "rating": 5,
-    "quote": "Fast and professional service when I needed a new key programmed."
+    "quote": "Helpful service when the key fob stopped working and I needed a practical next step.",
+    "city": "Philadelphia, PA"
   },
   {
-    "name": "Carlos R.",
-    "rating": 4,
-    "quote": "Great communication and solved my ignition issue same day."
+    "name": "Local vehicle owner",
+    "rating": 5,
+    "quote": "The technician explained what was possible for my vehicle before starting the job.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Emergency request",
+    "rating": 5,
+    "quote": "Good option when you are locked out and need mobile automotive locksmith help.",
+    "city": "Philadelphia, PA"
   }
 ]
