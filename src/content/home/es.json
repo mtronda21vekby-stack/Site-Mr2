@@ -1,63 +1,63 @@
 {
-  "heroTitle": "Servicio de Cerrajería Automotriz en Filadelfia — 24/7",
-  "heroSubtitle": "Si no puedes abrir tu auto, perdiste la llave o necesitas una llave nueva con programación, Planetlocksmiths ofrece servicio móvil automotriz en toda Filadelfia con atención urgente y el mismo día.",
-  "heroPrimaryCta": "Llámanos ahora",
+  "heroTitle": "Cerrajero automotriz móvil 24/7 en Filadelfia",
+  "heroSubtitle": "¿No puedes abrir tu auto, perdiste la llave o necesitas programar un llavero de reemplazo? Planetlocksmiths ofrece ayuda móvil de cerrajería automotriz en Filadelfia para bloqueos urgentes, llaves nuevas, llaveros, programación transponder y problemas de encendido.",
+  "heroPrimaryCta": "Llamar ahora",
   "heroSecondaryCta": "Solicitar servicio",
   "heroBadges": [
     "Servicio móvil 24/7",
-    "Cobertura Filadelfia",
-    "Llaves y programación"
+    "Cobertura en Filadelfia",
+    "Llaves, llaveros y programación"
   ],
   "heroOrbitWords": [
     "Bloqueo",
-    "Reemplazo",
-    "Programación",
-    "Llaveros"
+    "Llave perdida",
+    "Llavero",
+    "Programación"
   ],
   "featuredServices": [
     {
       "title": "Bloqueo de automóvil",
-      "excerpt": "Ayuda móvil rápida cuando su vehículo está bloqueado y no se puede acceder a la llave.",
+      "excerpt": "Ayuda móvil cuando las llaves están dentro del vehículo o el auto no abre.",
       "slug": "car-lockout"
     },
     {
-      "title": "Reemplazo de llave de automóvil",
-      "excerpt": "Soluciones de reemplazo para llaves perdidas, rotas o dañadas.",
+      "title": "Reemplazo de llave perdida",
+      "excerpt": "Soluciones cuando la única llave del auto se perdió, fue robada, se rompió o ya no funciona.",
+      "slug": "lost-car-key-replacement"
+    },
+    {
+      "title": "Reemplazo de llave de auto",
+      "excerpt": "Llaves de reemplazo para llaves dañadas, gastadas, rotas o extraviadas.",
       "slug": "car-key-replacement"
     },
     {
-      "title": "Programación de llaves",
-      "excerpt": "Soporte de programación para muchas llaves de vehículos modernos, mandos y llaveros.",
-      "slug": "key-programming"
+      "title": "Programación de llaveros",
+      "excerpt": "Soporte de programación para muchos controles remotos, smart keys y llaveros push-to-start.",
+      "slug": "key-fob-programming"
     },
     {
-      "title": "Asistencia con llaveros",
-      "excerpt": "Ayuda con accesos relacionados con llaveros y necesidades de reemplazo.",
-      "slug": "key-fob-assistance"
+      "title": "Programación de llave transponder",
+      "excerpt": "Programación de llaves con chip para muchos vehículos con sistema inmovilizador antirrobo.",
+      "slug": "transponder-key-programming"
     },
     {
-      "title": "Problemas de llave de encendido",
-      "excerpt": "Soporte para problemas relacionados con la llave de encendido y problemas de acceso relacionados.",
+      "title": "Problemas con llave de encendido",
+      "excerpt": "Ayuda cuando la llave no gira, se queda atascada o el sistema de encendido causa problemas.",
       "slug": "ignition-key-issues"
-    },
-    {
-      "title": "Servicio móvil de emergencia",
-      "excerpt": "Respuesta 24/7 para situaciones urgentes de llaves y cerraduras automotrices.",
-      "slug": "emergency-mobile-service"
     }
   ],
   "whyChoose": [
-    "Enfoque móvil solo automotriz",
-    "Respuesta urgente 24/7",
-    "Disponibilidad de servicio el mismo día",
-    "Soporte de llaves y llaveros modernos",
-    "Comunicación clara desde la solicitud hasta la llegada",
-    "Servicio en toda Filadelfia"
+    "Servicio móvil enfocado en cerrajería automotriz",
+    "Solicitudes urgentes 24/7",
+    "Bloqueos, llaves perdidas, llaveros y programación",
+    "Servicio en vecindarios de Filadelfia",
+    "Comunicación clara antes del despacho",
+    "Datos del vehículo revisados antes del trabajo"
   ],
-  "emergencyTitle": "¿Necesitas ayuda urgente de cerrajería automotriz?",
-  "emergencyText": "Servicio móvil en toda Filadelfia para bloqueos, llaves perdidas, reemplazos y soporte de programación.",
-  "reviewsTitle": "Opiniones",
-  "faqTitle": "Preguntas frecuentes",
-  "contactTitle": "Contáctanos",
-  "contactText": "Para asistencia inmediata o para solicitar servicio, contáctanos usando el formulario a continuación o llámanos directamente."
+  "emergencyTitle": "¿No puedes abrir tu auto o perdiste la llave?",
+  "emergencyText": "Solicita ayuda móvil para bloqueos de auto, llaves perdidas, reemplazo de llaves, programación de llaveros y problemas de encendido en Filadelfia.",
+  "reviewsTitle": "Lo que valoran los clientes",
+  "faqTitle": "Preguntas de cerrajería",
+  "contactTitle": "Solicitar cerrajero móvil",
+  "contactText": "Envía tu nombre, teléfono, detalles del vehículo, ubicación y lo que ocurrió. Para bloqueos urgentes o llaves perdidas, llamar suele ser la opción más rápida."
 }
