@@ -75,18 +75,6 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
             </div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
-            <div className="flex items-center justify-between gap-4 p-5">
-              <div className="min-w-0">
-                <p className="truncate text-xs font-black uppercase tracking-[0.22em] text-accent-cyan/80">
-                  {image.category || 'gallery'}
-                </p>
-                <h3 className="mt-1 truncate text-sm font-bold text-white/82">
-                  {image.title || 'Mobile locksmith service'}
-                </h3>
-              </div>
-              <div className="h-2 w-2 shrink-0 rounded-full bg-accent-cyan shadow-[0_0_18px_rgba(45,226,230,0.8)]" />
-            </div>
           </button>
         ))}
       </div>
@@ -116,10 +104,6 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
             Close
           </button>
 
-          <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white/70 backdrop-blur-xl">
-            {active + 1} / {filteredImages.length}
-          </div>
-
           <div className="flex h-full items-center justify-center">
             <button
               type="button"
@@ -129,17 +113,12 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
               ←
             </button>
 
-            <div className="mx-0 flex max-h-full max-w-6xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl md:mx-6">
+            <div className="mx-0 max-h-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl md:mx-6">
               <img
                 src={current.image_url}
                 alt={current.alt || current.title || 'Planet Locksmiths service photo'}
-                className="max-h-[72vh] w-full object-contain bg-black"
+                className="max-h-[82vh] w-full object-contain bg-black"
               />
-              <div className="p-5">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-accent-cyan/80">{current.category || 'gallery'}</p>
-                <h3 className="mt-2 text-xl font-black text-white">{current.title || 'Mobile locksmith service'}</h3>
-                <p className="mt-2 text-sm text-white/45 md:hidden">Swipe left or right to browse.</p>
-              </div>
             </div>
 
             <button
