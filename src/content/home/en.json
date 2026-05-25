@@ -1,63 +1,63 @@
 {
-  "heroTitle": "Automotive Locksmith Service Across Philadelphia — 24/7",
-  "heroSubtitle": "Locked out, dealing with a lost key, or need a replacement programmed? Planetlocksmiths provides mobile automotive locksmith service across Philadelphia with urgent and same-day availability.",
+  "heroTitle": "24/7 Mobile Automotive Locksmith in Philadelphia",
+  "heroSubtitle": "Locked out, lost your car key, or need a replacement fob programmed? Planetlocksmiths sends mobile automotive locksmith help across Philadelphia for urgent lockouts, replacement keys, key fobs, transponder programming, and ignition key issues.",
   "heroPrimaryCta": "Call Now",
   "heroSecondaryCta": "Request Service",
   "heroBadges": [
     "24/7 Mobile Service",
     "Philadelphia Coverage",
-    "Car Keys & Programming"
+    "Car Keys, Fobs & Programming"
   ],
   "heroOrbitWords": [
     "Lockout",
-    "Replacement",
-    "Programming",
-    "Fob"
+    "Lost Key",
+    "Fob",
+    "Programming"
   ],
   "featuredServices": [
     {
-      "title": "Car Lockout",
-      "excerpt": "Fast mobile help when your vehicle is locked and the key is not accessible.",
+      "title": "Car Lockout Service",
+      "excerpt": "Mobile help when the keys are locked inside your vehicle or the vehicle will not open.",
       "slug": "car-lockout"
     },
     {
+      "title": "Lost Car Key Replacement",
+      "excerpt": "Replacement solutions when your only car key is lost, stolen, broken, or no longer usable.",
+      "slug": "lost-car-key-replacement"
+    },
+    {
       "title": "Car Key Replacement",
-      "excerpt": "Replacement solutions for lost, broken, or damaged car keys.",
+      "excerpt": "Replacement keys for damaged, worn, broken, or missing automotive keys.",
       "slug": "car-key-replacement"
     },
     {
-      "title": "Key Programming",
-      "excerpt": "Programming support for many modern vehicle keys, remotes, and fobs.",
-      "slug": "key-programming"
+      "title": "Key Fob Programming",
+      "excerpt": "Programming support for many remote keys, smart keys, and push-to-start fobs.",
+      "slug": "key-fob-programming"
     },
     {
-      "title": "Key Fob Assistance",
-      "excerpt": "Help with fob-related access and replacement needs.",
-      "slug": "key-fob-assistance"
+      "title": "Transponder Key Programming",
+      "excerpt": "Chip key programming for many vehicles with anti-theft immobilizer systems.",
+      "slug": "transponder-key-programming"
     },
     {
       "title": "Ignition Key Issues",
-      "excerpt": "Support for ignition-related key problems and related access issues.",
+      "excerpt": "Help when the key will not turn, is stuck, or the ignition key system is causing access problems.",
       "slug": "ignition-key-issues"
-    },
-    {
-      "title": "Emergency Mobile Service",
-      "excerpt": "24/7 response for urgent automotive key and lock situations.",
-      "slug": "emergency-mobile-service"
     }
   ],
   "whyChoose": [
-    "Mobile automotive-only focus",
-    "24/7 urgent response",
-    "Same-day service availability",
-    "Modern key and fob support",
-    "Clear communication from request to arrival",
-    "Service across Philadelphia"
+    "Mobile automotive-focused locksmith service",
+    "24/7 urgent request availability",
+    "Lockouts, lost keys, fobs, and programming support",
+    "Service across Philadelphia neighborhoods",
+    "Clear communication before dispatch",
+    "Vehicle details reviewed before the job"
   ],
-  "emergencyTitle": "Need urgent automotive locksmith help?",
-  "emergencyText": "Mobile service across Philadelphia for lockouts, lost keys, replacements, and programming support.",
-  "reviewsTitle": "Reviews",
-  "faqTitle": "Frequently Asked Questions",
-  "contactTitle": "Get in touch",
-  "contactText": "For immediate assistance or to request service, reach out using the form below or call us directly."
+  "emergencyTitle": "Locked out or missing your car key right now?",
+  "emergencyText": "Request fast mobile locksmith help for car lockouts, lost keys, replacement keys, key fob programming, and ignition-related key problems across Philadelphia.",
+  "reviewsTitle": "What customers value",
+  "faqTitle": "Locksmith Questions",
+  "contactTitle": "Request Mobile Locksmith Service",
+  "contactText": "Send your name, phone number, vehicle details, location, and what happened. For urgent lockouts or lost keys, calling is usually the fastest option."
 }
