@@ -24,12 +24,11 @@ type CardSlot = {
 }
 
 const desktopSlots: CardSlot[] = [
-  { left: '-7%', top: '5%', width: '19rem', height: '27rem', rotate: '-8deg', opacity: 0.48, zIndex: 1, driftX: '18px', driftY: '-14px', duration: '18s', delay: '0s' },
-  { left: '74%', top: '4%', width: '20rem', height: '28rem', rotate: '7deg', opacity: 0.5, zIndex: 2, driftX: '-16px', driftY: '16px', duration: '21s', delay: '-4s' },
-  { left: '7%', top: '48%', width: '16rem', height: '23rem', rotate: '6deg', opacity: 0.34, zIndex: 1, driftX: '14px', driftY: '18px', duration: '23s', delay: '-7s' },
-  { left: '60%', top: '50%', width: '17.5rem', height: '25rem', rotate: '-6deg', opacity: 0.36, zIndex: 1, driftX: '-18px', driftY: '-12px', duration: '20s', delay: '-10s' },
-  { left: '36%', top: '20%', width: '14.5rem', height: '21rem', rotate: '3deg', opacity: 0.22, zIndex: 0, driftX: '10px', driftY: '12px', duration: '24s', delay: '-13s' },
-  { left: '88%', top: '54%', width: '14rem', height: '20rem', rotate: '-9deg', opacity: 0.32, zIndex: 0, driftX: '-12px', driftY: '14px', duration: '22s', delay: '-16s' },
+  { left: '-9%', top: '2%', width: '21rem', height: '30rem', rotate: '-8deg', opacity: 0.48, zIndex: 1, driftX: '14px', driftY: '-10px', duration: '18s', delay: '0s' },
+  { left: '70%', top: '3%', width: '21.5rem', height: '30.8rem', rotate: '8deg', opacity: 0.5, zIndex: 2, driftX: '-14px', driftY: '12px', duration: '21s', delay: '-5s' },
+  { left: '-3%', top: '42%', width: '18.4rem', height: '26.4rem', rotate: '7deg', opacity: 0.34, zIndex: 1, driftX: '12px', driftY: '12px', duration: '23s', delay: '-9s' },
+  { left: '74%', top: '45%', width: '19rem', height: '27.2rem', rotate: '-7deg', opacity: 0.36, zIndex: 1, driftX: '-12px', driftY: '-10px', duration: '20s', delay: '-12s' },
+  { left: '38%', top: '21%', width: '15.8rem', height: '22.8rem', rotate: '3deg', opacity: 0.2, zIndex: 0, driftX: '9px', driftY: '10px', duration: '24s', delay: '-15s' },
 ]
 
 const mobileSlots: CardSlot[] = [
