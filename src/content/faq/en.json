@@ -1,26 +1,34 @@
 [
   {
-    "question": "Do you provide service 24/7?",
-    "answer": "Yes. Planetlocksmiths operates as a mobile automotive locksmith service available 24/7."
+    "question": "Do you provide 24/7 automotive locksmith service?",
+    "answer": "Yes. Planetlocksmiths is positioned for 24/7 mobile automotive locksmith requests across Philadelphia. Availability can depend on technician schedule, vehicle type, location, and service complexity."
   },
   {
-    "question": "Do you have a shop location?",
-    "answer": "At this time, service is mobile only."
+    "question": "Can you help if my keys are locked inside the car?",
+    "answer": "Yes. Car lockout service is one of the main mobile services. Provide your exact location, vehicle year, make, and model so the technician can prepare the right access method."
   },
   {
-    "question": "Can you help with lost car keys?",
-    "answer": "Yes. We handle automotive key replacement and related programming services."
+    "question": "Can you replace a lost car key if I have no spare?",
+    "answer": "In many cases, yes. The process depends on the vehicle year, make, model, key type, and security system. Send your vehicle details before dispatch so compatibility can be checked."
   },
   {
-    "question": "Do you work across Philadelphia?",
-    "answer": "Yes. Philadelphia is the primary service area."
+    "question": "Do you program key fobs and transponder keys?",
+    "answer": "Yes, programming support is available for many remote keys, smart keys, push-to-start fobs, and transponder keys. Some vehicles require dealer-level procedures or special authorization."
   },
   {
-    "question": "Can I request urgent help?",
-    "answer": "Yes. Urgent and same-day requests are supported based on availability."
+    "question": "Do I need to bring the vehicle somewhere?",
+    "answer": "No. The service is mobile. The technician comes to the vehicle location when the job is accepted and scheduled."
   },
   {
-    "question": "Do you work with modern car keys and fobs?",
-    "answer": "Yes. Automotive key and programming support is part of the service offering."
+    "question": "What information should I send before service?",
+    "answer": "Send your name, phone number, exact location, vehicle year/make/model, key situation, and whether the key is lost, locked in, broken, or not programming."
+  },
+  {
+    "question": "Can you give an exact price online?",
+    "answer": "A final quote depends on vehicle details, key type, programming requirements, time, location, and whether the vehicle has additional security restrictions. The request form helps prepare an accurate estimate."
+  },
+  {
+    "question": "Do you work on house locks?",
+    "answer": "Planetlocksmiths is focused on mobile automotive locksmith service. If residential or commercial service is added later, it should be listed separately in the services section."
   }
 ]
