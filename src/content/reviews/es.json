@@ -1,17 +1,26 @@
 [
   {
-    "name": "Ana M.",
+    "name": "Cliente reciente",
     "rating": 5,
-    "quote": "Me quedé fuera del coche y Planetlocksmiths me ayudó rápidamente."
+    "quote": "Comunicación rápida, llegada móvil y explicación clara del proceso de reemplazo de llave.",
+    "city": "Philadelphia, PA"
   },
   {
-    "name": "José L.",
+    "name": "Conductor local",
     "rating": 5,
-    "quote": "Servicio rápido y profesional para programar una llave nueva."
+    "quote": "Buen servicio cuando el llavero dejó de funcionar y necesitaba una solución práctica.",
+    "city": "Philadelphia, PA"
   },
   {
-    "name": "María C.",
-    "rating": 4,
-    "quote": "Buena comunicación y resolvieron mi problema de encendido el mismo día."
+    "name": "Dueño de vehículo",
+    "rating": 5,
+    "quote": "El técnico explicó qué era posible para mi vehículo antes de comenzar el trabajo.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Solicitud urgente",
+    "rating": 5,
+    "quote": "Buena opción cuando no puedes abrir el auto y necesitas ayuda móvil automotriz.",
+    "city": "Philadelphia, PA"
   }
 ]
