@@ -50,30 +50,44 @@ const ctaLabels: Record<Locale, { request: string; call: string; menu: string }>
   ru: { request: 'Request', call: 'Call', menu: 'Menu' },
 }
 
+function normalizeLogoUrl(value: string) {
+  const url = value.trim()
+  if (!url) return ''
+  if (url.startsWith('http://')) return url.replace('http://', 'https://')
+  return url
+}
+
 export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planetlocksmiths', logoUrl = '', logoAlt }: HeaderProps) {
   const pathname = usePathname()
   const supabase = useMemo(() => getSupabaseClient() as any, [])
   const [open, setOpen] = useState(false)
+  const [logoFailed, setLogoFailed] = useState(false)
   const [brand, setBrand] = useState<HeaderBrandState>({
     brandName,
-    logoUrl: logoUrl.trim(),
+    logoUrl: normalizeLogoUrl(logoUrl),
     logoAlt: logoAlt || brandName,
   })
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const navItems = navConfig[locale]
   const labels = ctaLabels[locale]
   const requestHref = `/${activeLocale}/contact#request-service`
-  const visibleLogoUrl = brand.logoUrl.trim()
+  const visibleLogoUrl = normalizeLogoUrl(brand.logoUrl)
   const visibleBrandName = brand.brandName || brandName
   const visibleLogoAlt = brand.logoAlt || visibleBrandName
+  const shouldShowImageLogo = Boolean(visibleLogoUrl) && !logoFailed
 
   useEffect(() => {
+    setLogoFailed(false)
     setBrand({
       brandName,
-      logoUrl: logoUrl.trim(),
+      logoUrl: normalizeLogoUrl(logoUrl),
       logoAlt: logoAlt || brandName,
     })
   }, [brandName, logoUrl, logoAlt])
+
+  useEffect(() => {
+    setLogoFailed(false)
+  }, [visibleLogoUrl])
 
   useEffect(() => {
     let mounted = true
@@ -92,11 +106,11 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
         const row = result.data
         setBrand((current) => ({
           brandName: String(row.brand_name || current.brandName || brandName).trim() || brandName,
-          logoUrl: String(row.logo_url || current.logoUrl || '').trim(),
+          logoUrl: normalizeLogoUrl(String(row.logo_url || current.logoUrl || '').trim()),
           logoAlt: String(row.logo_alt || row.brand_name || current.logoAlt || brandName).trim() || brandName,
         }))
       } catch {
-        // Keep safe text-only fallback.
+        // Keep safe text + generated mark fallback.
       }
     }
 
@@ -112,8 +126,8 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
       <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
         <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${visibleBrandName} home`}>
-          {visibleLogoUrl ? (
-            <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
+          <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
+            {shouldShowImageLogo ? (
               <img
                 src={visibleLogoUrl}
                 alt={visibleLogoAlt}
@@ -121,10 +135,14 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
                 height="117"
                 decoding="async"
                 fetchPriority="high"
+                referrerPolicy="no-referrer"
+                onError={() => setLogoFailed(true)}
                 className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
               />
-            </span>
-          ) : null}
+            ) : (
+              <FallbackLogoMark />
+            )}
+          </span>
           <span className="min-w-0 leading-none">
             <span className="block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg">{visibleBrandName}</span>
             <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile auto key response</span>
@@ -174,6 +192,19 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
         </div>
       ) : null}
     </header>
+  )
+}
+
+function FallbackLogoMark() {
+  return (
+    <span className="relative flex h-full w-full items-center justify-center" aria-hidden="true">
+      <span className="absolute h-[86%] w-[86%] rounded-full bg-[radial-gradient(circle_at_32%_22%,#DDEBFF_0%,#2D6FA8_38%,#071C3D_100%)] shadow-[0_10px_24px_rgba(11,31,77,0.18)]" />
+      <span className="absolute h-[34%] w-[108%] rotate-[-22deg] rounded-full border-[3px] border-[#7D8897] opacity-90 shadow-[0_5px_10px_rgba(11,31,77,0.15)]" />
+      <span className="relative flex h-[54%] w-[42%] items-center justify-center rounded-b-[0.7rem] rounded-t-[0.25rem] border border-[#C9D3E2] bg-gradient-to-b from-white to-[#D8E0EA] shadow-[0_7px_16px_rgba(11,31,77,0.22)]">
+        <span className="absolute -top-[38%] h-[52%] w-[58%] rounded-t-full border-[4px] border-[#D8E0EA] border-b-0" />
+        <span className="h-[30%] w-[20%] rounded-full bg-[#0B1F4D] shadow-[0_0_0_5px_rgba(11,31,77,0.10)]" />
+      </span>
+    </span>
   )
 }
 
