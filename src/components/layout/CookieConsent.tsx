@@ -76,7 +76,8 @@ function writeConsent(level: ConsentLevel) {
     savedAt: new Date().toISOString(),
   }))
 
-  document.cookie = `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; SameSite=Lax; Secure`
+  const secureFlag = window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${cookieName}=${value}; Max-Age=${maxAge}; Path=/; SameSite=Lax${secureFlag}`
   window.dispatchEvent(new CustomEvent('planetlocksmiths-cookie-consent', {
     detail: { level, analytics: level === 'all' },
   }))
