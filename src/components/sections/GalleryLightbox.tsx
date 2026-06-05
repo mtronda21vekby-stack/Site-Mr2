@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getOptimizedSupabaseImageUrl } from '@/lib/images'
+import ResilientSupabaseImage from '@/components/sections/ResilientSupabaseImage'
 
 type GalleryImage = {
   id: string
@@ -69,8 +69,10 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
             className={`group relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] text-left shadow-2xl outline-none backdrop-blur-xl transition duration-500 hover:-translate-y-1 hover:border-accent-cyan/35 hover:bg-white/[0.055] ${index === 0 ? 'sm:col-span-2 lg:col-span-2' : ''}`}
           >
             <div className={`${index === 0 ? 'h-[24rem]' : 'h-72'} overflow-hidden bg-black/50`}>
-              <img
-                src={getOptimizedSupabaseImageUrl(image.image_url, { width: index === 0 ? 1200 : 760, quality: 68 })}
+              <ResilientSupabaseImage
+                src={image.image_url}
+                widthHint={index === 0 ? 1200 : 760}
+                quality={68}
                 alt={image.alt || image.title || 'Planet Locksmiths service photo'}
                 loading="lazy"
                 decoding="async"
@@ -116,8 +118,11 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
             </button>
 
             <div className="mx-0 max-h-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl md:mx-6">
-              <img
-                src={getOptimizedSupabaseImageUrl(current.image_url, { width: 1800, quality: 78, resize: 'contain' })}
+              <ResilientSupabaseImage
+                src={current.image_url}
+                widthHint={1800}
+                quality={78}
+                resize="contain"
                 alt={current.alt || current.title || 'Planet Locksmiths service photo'}
                 className="max-h-[82vh] w-full object-contain bg-black"
                 decoding="async"

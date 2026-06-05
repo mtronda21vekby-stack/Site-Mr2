@@ -5,6 +5,7 @@ import CinematicBackground from '@/components/layout/CinematicBackground'
 import JsonLd from '@/components/seo/JsonLd'
 import Hero from '@/components/hero/Hero'
 import ServicesGrid from '@/components/sections/ServicesGrid'
+import InsuranceTrustSection from '@/components/sections/InsuranceTrustSection'
 import ReviewsSection from '@/components/sections/ReviewsSection'
 import FaqSection from '@/components/sections/FaqSection'
 import ContactSection from '@/components/sections/ContactSection'
@@ -49,7 +50,7 @@ export default async function LocaleHome({
   const jsonLd = [
     {
       '@context': 'https://schema.org',
-      '@type': 'AutomotiveBusiness',
+      '@type': 'Locksmith',
       '@id': `${pageUrl}#business`,
       name: global.brandName,
       url: pageUrl,
@@ -108,13 +109,14 @@ export default async function LocaleHome({
 
         <SiteGallery />
         <ServicesGrid services={services} locale={locale} />
+        <InsuranceTrustSection locale={locale} />
 
         <AreasShowcase
           locale={locale}
           areas={featuredAreas}
           fallbackEyebrow="Service areas"
-          fallbackTitle="Mobile automotive locksmith coverage"
-          fallbackText="Fast mobile service for drivers across the primary coverage area. Select a city to view local service details."
+          fallbackTitle="Mobile locksmith coverage"
+          fallbackText="Fast mobile service for customers across the primary coverage area. Select a city to view local service details."
           fallbackCta="View service areas"
         />
 

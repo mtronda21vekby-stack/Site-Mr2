@@ -24,9 +24,9 @@ type ActiveLocale = 'en' | 'es'
 
 export const revalidate = 60
 
-const labels: Record<ActiveLocale, { serviceEyebrow: string; overview: string; readiness: string; price: string; authorization: string; process: string; processItems: string[] }> = {
-  en: { serviceEyebrow: 'Automotive locksmith service', overview: 'Service overview', readiness: 'Information customers should prepare', price: 'What affects price and timing', authorization: 'Authorization and safety', process: 'How the request works', processItems: ['Submit service and vehicle details', 'Confirm location, urgency, and phone number', 'Review availability, parts, and programming needs', 'Confirm next step before service begins'] },
-  es: { serviceEyebrow: 'Servicio de cerrajería automotriz', overview: 'Resumen del servicio', readiness: 'Información que el cliente debe preparar', price: 'Qué afecta precio y tiempo', authorization: 'Autorización y seguridad', process: 'Cómo funciona la solicitud', processItems: ['Enviar servicio y datos del vehículo', 'Confirmar ubicación, urgencia y teléfono', 'Revisar disponibilidad, piezas y programación', 'Confirmar el siguiente paso antes del servicio'] },
+const labels: Record<ActiveLocale, { serviceEyebrow: string; overview: string; readiness: string; readinessText: string; price: string; priceText: string; authorization: string; authorizationText: string; process: string; processItems: string[] }> = {
+  en: { serviceEyebrow: 'Locksmith service', overview: 'Service overview', readiness: 'Information customers should prepare', readinessText: 'Service type, exact location, urgency, phone number, and authorization details help make the request actionable. For vehicle work, include year, make, and model.', price: 'What affects price and timing', priceText: 'Final pricing can depend on service type, lock or key system, parts availability, distance, timing, authorization, and job complexity.', authorization: 'Authorization and safety', authorizationText: 'Customers may be asked to confirm authorization to access or service the vehicle, property, door, safe, mailbox, or lock before work begins.', process: 'How the request works', processItems: ['Submit service details and location', 'Confirm urgency, authorization, and phone number', 'Review availability, tools, parts, and compatibility', 'Confirm next step before service begins'] },
+  es: { serviceEyebrow: 'Servicio de cerrajería', overview: 'Resumen del servicio', readiness: 'Información que el cliente debe preparar', readinessText: 'Tipo de servicio, ubicación exacta, urgencia, teléfono y autorización ayudan a orientar la solicitud. Para vehículos, incluye año, marca y modelo.', price: 'Qué afecta precio y tiempo', priceText: 'El precio final puede depender del servicio, sistema de cerradura o llave, piezas, distancia, horario, autorización y complejidad.', authorization: 'Autorización y seguridad', authorizationText: 'Puede pedirse confirmación de autorización para acceder o trabajar en vehículo, propiedad, puerta, caja fuerte, buzón o cerradura.', process: 'Cómo funciona la solicitud', processItems: ['Enviar servicio y ubicación', 'Confirmar urgencia, autorización y teléfono', 'Revisar disponibilidad, herramientas, piezas y compatibilidad', 'Confirmar el siguiente paso antes del servicio'] },
 }
 
 function toActiveLocale(locale: Locale): ActiveLocale {
@@ -125,9 +125,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             </div>
 
             <aside className="grid gap-4">
-              <InfoCard block={readinessBlock} title={copy.readiness} text="Vehicle make, model, year, current location, urgency, and whether all keys are lost help make the request actionable." />
-              <InfoCard block={pricingBlock} title={copy.price} text="Final pricing can depend on vehicle security system, key type, programming requirements, parts availability, distance, timing, and job complexity." />
-              <InfoCard block={authorizationBlock} title={copy.authorization} text="Customers may be asked to confirm authorization to access or service the vehicle before work begins." />
+              <InfoCard block={readinessBlock} title={copy.readiness} text={copy.readinessText} />
+              <InfoCard block={pricingBlock} title={copy.price} text={copy.priceText} />
+              <InfoCard block={authorizationBlock} title={copy.authorization} text={copy.authorizationText} />
             </aside>
           </section>
 

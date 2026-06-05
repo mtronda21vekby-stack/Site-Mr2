@@ -29,28 +29,28 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro: string; call: string; request: string; cardPrefix: string; open: string; empty: string; sideTitle: string; sideText: string; countLabel: string }> = {
   en: {
     eyebrow: 'Planetlocksmiths / services',
-    title: 'Automotive Locksmith Services',
-    intro: 'Mobile automotive locksmith help for lockouts, replacement keys, key fob programming, transponder keys, ignition issues, and broken key situations. Each service page explains what information is needed before booking.',
+    title: 'Locksmith Services',
+    intro: 'Mobile locksmith help for car lockouts, all keys lost, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency service requests.',
     call: 'Call',
     request: 'Request service',
     cardPrefix: 'Service',
     open: 'Open page',
     empty: 'No published services yet.',
     sideTitle: 'Service request ready',
-    sideText: 'Choose a service page, review what details are needed, then call or submit a request with vehicle make, model, year, location, and urgency.',
+    sideText: 'Choose a service page, review what details are needed, then call or submit a request with service type, location, phone number, urgency, and vehicle details when relevant.',
     countLabel: 'Published services',
   },
   es: {
     eyebrow: 'Planetlocksmiths / servicios',
-    title: 'Servicios de cerrajería automotriz',
-    intro: 'Soporte móvil de cerrajería automotriz para autos cerrados, reemplazo de llaves, programación de controles, llaves transponder, ignición y llaves rotas. Cada página explica qué información se necesita antes de reservar.',
+    title: 'Servicios de cerrajería',
+    intro: 'Ayuda móvil de cerrajería para bloqueos de auto, todas las llaves perdidas, programación, rekeys, reparación y reemplazo de cerraduras, residencial, comercial, access control, cajas fuertes y emergencias.',
     call: 'Llamar',
     request: 'Solicitar servicio',
     cardPrefix: 'Servicio',
     open: 'Abrir página',
     empty: 'No hay servicios publicados todavía.',
     sideTitle: 'Solicitud lista',
-    sideText: 'Elija un servicio, revise qué datos se necesitan y luego llame o envíe una solicitud con vehículo, ubicación y urgencia.',
+    sideText: 'Elija un servicio, revise qué datos se necesitan y luego llame o envíe una solicitud con tipo de servicio, ubicación, teléfono, urgencia y datos del vehículo cuando aplique.',
     countLabel: 'Servicios publicados',
   },
 }
@@ -76,7 +76,7 @@ export default async function ServicesIndexPage({ params }: { params: Promise<{ 
   const sideBlock = blockBySlot.get('side')
   const cardsBlock = blockBySlot.get('cards')
   const emptyBlock = blockBySlot.get('empty')
-  const extraBlocks = blocks.filter((block) => !['hero', 'side', 'cards', 'empty'].includes(block.slot))
+  const extraBlocks = blocks.filter((block) => !['hero', 'side', 'cards', 'empty', 'intro'].includes(block.slot))
 
   const heroEyebrow = heroBlock?.eyebrow || fallback.eyebrow
   const heroTitle = heroBlock?.title || fallback.title

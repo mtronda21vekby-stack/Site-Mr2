@@ -10,6 +10,11 @@ import {
   type ReviewItem,
   type FaqItem,
 } from '@/lib/content'
+import {
+  getCatalogServiceBySlug,
+  getCatalogServices,
+  type CatalogService,
+} from '@/lib/services-catalog'
 
 type SiteSettingsRow = {
   id: string
@@ -138,7 +143,7 @@ export type SiteContentBlock = {
   sortOrder: number
 }
 
-const DEMO_PHONE_PATTERN = /555[-\s)]?0?\d{3}/i
+const DEMO_PHONE_PATTERN = /(555[-\s)]?0?\d{3}|000[-\s)]?0{3})/i
 
 function getSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -258,16 +263,33 @@ function mapServiceRow(row: ServiceRow, fallback?: { title: string; excerpt: str
 }
 
 function mapAreaRow(row: AreaRow): AreaContent {
+  const broadText = (value: string | null | undefined) =>
+    normalizeText(value)
+      .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
+      .replace(/Automotive Locksmith/g, 'Locksmith')
+      .replace(/mobile automotive locksmith/gi, 'mobile locksmith')
+      .replace(/automotive locksmith/gi, 'locksmith')
+      .replace(/Mobile car locksmith/gi, 'Mobile locksmith')
+      .replace(/vehicle access/gi, 'access')
+  const highlights = Array.isArray(row.highlights) ? row.highlights.map(broadText).filter(Boolean) : []
+  const supported = Array.isArray(row.supported_services) ? row.supported_services.map(broadText).filter(Boolean) : []
+  const hasBroadService = supported.some((item) => /rekey|commercial|residential|safe|access control/i.test(item))
+  const supportedServices = hasBroadService
+    ? supported
+    : row.locale === 'es'
+      ? ['Cerrajero de emergencia 24/7', 'Auto cerrado', 'Rekey', 'Cerrajero comercial', 'Cerrajero residencial']
+      : ['Emergency locksmith 24/7', 'Car lockout help', 'Rekey service', 'Commercial locksmith', 'Residential locksmith']
+
   return {
     slug: row.slug,
     city: row.city ?? '',
     state: row.state ?? '',
-    title: row.title ?? '',
-    intro: row.intro ?? '',
-    highlights: Array.isArray(row.highlights) ? row.highlights : [],
-    supportedServices: Array.isArray(row.supported_services) ? row.supported_services : [],
-    seoTitle: row.seo_title ?? row.title ?? '',
-    seoDescription: row.seo_description ?? row.intro ?? '',
+    title: broadText(row.title),
+    intro: broadText(row.intro),
+    highlights,
+    supportedServices,
+    seoTitle: broadText(row.seo_title ?? row.title),
+    seoDescription: broadText(row.seo_description ?? row.intro),
   }
 }
 
@@ -280,6 +302,51 @@ function mapFileServiceFallback(item: { slug: string; title: string; excerpt: st
     seoTitle: item.title,
     seoDescription: item.excerpt,
   }
+}
+
+function mapCatalogService(item: CatalogService): ServiceContent {
+  return {
+    slug: item.slug,
+    title: item.title,
+    excerpt: item.excerpt,
+    intro: item.intro,
+    seoTitle: item.seoTitle,
+    seoDescription: item.seoDescription,
+  }
+}
+
+function looksLikeOldAutomotiveOnlyCopy(value: string | null | undefined) {
+  const text = normalizeText(value).toLowerCase()
+  if (!text) return false
+  if (text.includes('residential') || text.includes('commercial') || text.includes('access control') || text.includes('safe opening')) {
+    return false
+  }
+
+  return text.includes('automotive locksmith') || text.includes('vehicle-specific') || text.includes('car lockouts')
+}
+
+function normalizeHomeCopy(locale: Locale, content: HomeContent): HomeContent {
+  const fallback = getFileHomeContent(locale)
+
+  if (!looksLikeOldAutomotiveOnlyCopy(content.heroTitle) && !looksLikeOldAutomotiveOnlyCopy(content.heroSubtitle)) {
+    return content
+  }
+
+  return {
+    ...content,
+    heroTitle: fallback.heroTitle,
+    heroSubtitle: fallback.heroSubtitle,
+    heroBadges: fallback.heroBadges,
+    heroOrbitWords: fallback.heroOrbitWords,
+    emergencyTitle: fallback.emergencyTitle,
+    emergencyText: fallback.emergencyText,
+    contactTitle: fallback.contactTitle,
+    contactText: fallback.contactText,
+  }
+}
+
+function mergeCatalogServices(locale: Locale, _rows: ServiceRow[]): ServiceContent[] {
+  return getCatalogServices(locale).map(mapCatalogService)
 }
 
 export async function getContentBlocksFromSource(
@@ -391,7 +458,7 @@ export async function getHomeContentFromSource(locale: Locale): Promise<HomeCont
   const supabase = getSupabaseServerClient()
 
   if (!supabase) {
-    return fileFallback
+    return normalizeHomeCopy(locale, fileFallback)
   }
 
   try {
@@ -408,10 +475,10 @@ export async function getHomeContentFromSource(locale: Locale): Promise<HomeCont
     const row = (result.data?.[0] ?? null) as HomePageRow | null
 
     if (!row) {
-      return fileFallback
+      return normalizeHomeCopy(locale, fileFallback)
     }
 
-    return {
+    return normalizeHomeCopy(locale, {
       ...fileFallback,
       heroTitle: row.hero_title ?? fileFallback.heroTitle,
       heroSubtitle: row.hero_subtitle ?? fileFallback.heroSubtitle,
@@ -423,10 +490,10 @@ export async function getHomeContentFromSource(locale: Locale): Promise<HomeCont
       faqTitle: row.faq_title ?? fileFallback.faqTitle,
       contactTitle: row.contact_title ?? fileFallback.contactTitle,
       contactText: row.contact_text ?? fileFallback.contactText,
-    }
+    })
   } catch (error) {
     console.error('getHomeContentFromSource failed:', error)
-    return fileFallback
+    return normalizeHomeCopy(locale, fileFallback)
   }
 }
 
@@ -510,10 +577,11 @@ export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
 export async function getServicesListFromSource(locale: Locale): Promise<ServiceContent[]> {
 
   const fileFallback = getFileHomeContent(locale).featuredServices.map(mapFileServiceFallback)
+  const catalogFallback = getCatalogServices(locale).map(mapCatalogService)
   const supabase = getSupabaseServerClient()
 
   if (!supabase) {
-    return fileFallback
+    return catalogFallback.length ? catalogFallback : fileFallback
   }
 
   try {
@@ -531,13 +599,13 @@ export async function getServicesListFromSource(locale: Locale): Promise<Service
     const rows = Array.isArray(result.data) ? (result.data as ServiceRow[]) : []
 
     if (!rows.length) {
-      return fileFallback
+      return catalogFallback.length ? catalogFallback : fileFallback
     }
 
-    return rows.map((row) => mapServiceRow(row))
+    return mergeCatalogServices(locale, rows)
   } catch (error) {
     console.error('getServicesListFromSource failed:', error)
-    return fileFallback
+    return catalogFallback.length ? catalogFallback : fileFallback
   }
 }
 
@@ -577,10 +645,11 @@ export async function getServicePageFromSource(
 
   const fileHome = getFileHomeContent(locale)
   const fileFallback = fileHome.featuredServices.find((item) => item.slug === slug)
+  const catalogFallback = getCatalogServiceBySlug(locale, slug)
   const supabase = getSupabaseServerClient()
 
   if (!supabase) {
-    return fileFallback ? mapFileServiceFallback(fileFallback) : null
+    return catalogFallback ? mapCatalogService(catalogFallback) : fileFallback ? mapFileServiceFallback(fileFallback) : null
   }
 
   try {
@@ -593,19 +662,19 @@ export async function getServicePageFromSource(
 
     if (result.error) {
       console.error('services select error:', result.error)
-      return fileFallback ? mapFileServiceFallback(fileFallback) : null
+      return catalogFallback ? mapCatalogService(catalogFallback) : fileFallback ? mapFileServiceFallback(fileFallback) : null
     }
 
     const row = (result.data?.[0] ?? null) as ServiceRow | null
 
     if (!row) {
-      return fileFallback ? mapFileServiceFallback(fileFallback) : null
+      return catalogFallback ? mapCatalogService(catalogFallback) : fileFallback ? mapFileServiceFallback(fileFallback) : null
     }
 
-    return mapServiceRow(row, fileFallback)
+    return catalogFallback ? mapCatalogService(catalogFallback) : mapServiceRow(row, fileFallback)
   } catch (error) {
     console.error('getServicePageFromSource failed:', error)
-    return fileFallback ? mapFileServiceFallback(fileFallback) : null
+    return catalogFallback ? mapCatalogService(catalogFallback) : fileFallback ? mapFileServiceFallback(fileFallback) : null
   }
 }
 

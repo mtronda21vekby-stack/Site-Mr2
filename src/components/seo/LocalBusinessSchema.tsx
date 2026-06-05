@@ -6,9 +6,9 @@ interface LocalBusinessSchemaProps {
 }
 
 const descriptions: Record<Locale, string> = {
-  en: 'Mobile automotive locksmith service across Philadelphia, including lockout help, key replacement, programming, and urgent mobile response.',
-  es: 'Servicio móvil de cerrajería automotriz en Filadelfia, incluyendo aperturas, reemplazo de llaves, programación y respuesta urgente.',
-  ru: 'Мобильный автомобильный ключной сервис по Филадельфии: вскрытие авто, замена ключей, программирование и срочная выездная помощь.',
+  en: 'Mobile locksmith service across Philadelphia, including emergency lockouts, car keys, rekeys, lock repair, commercial locks, residential locks, access control, safe opening, and urgent mobile response.',
+  es: 'Servicio móvil de cerrajería en Filadelfia, incluyendo bloqueos, llaves de auto, rekeys, reparación, comercial, residencial, access control, cajas fuertes y respuesta urgente.',
+  ru: 'Мобильный locksmith-сервис по Филадельфии: lockout, авто-ключи, rekey, ремонт замков, commercial/residential, access control, safe opening и срочная выездная помощь.',
 }
 
 const languageMap: Record<Locale, string> = {
@@ -42,12 +42,18 @@ export default function LocalBusinessSchema({
     ],
     availableLanguage: global.supportedLocales.map((item) => languageMap[item]),
     serviceType: [
+      'Emergency locksmith service',
       'Automotive locksmith',
       'Car lockout service',
-      'Car key replacement',
+      'Residential locksmith',
+      'Commercial locksmith',
+      'Rekey service',
+      'Lock repair',
+      'Lock replacement',
+      'Access control service',
+      'Safe opening',
       'Key programming',
       'Key fob service',
-      'Emergency mobile locksmith service',
     ],
     image: [`${siteUrl}/opengraph-image`],
   }

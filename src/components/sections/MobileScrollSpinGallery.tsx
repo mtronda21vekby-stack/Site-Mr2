@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { getOptimizedSupabaseImageUrl } from '@/lib/images'
+import ResilientSupabaseImage from '@/components/sections/ResilientSupabaseImage'
 
 type GalleryImage = {
   id: string
@@ -129,8 +129,10 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                   boxShadow: isActive ? '0 30px 80px rgba(11,31,77,0.26)' : '0 18px 45px rgba(11,31,77,0.12)',
                 }}
               >
-                <img
-                  src={getOptimizedSupabaseImageUrl(image.image_url, { width: 760, quality: 66 })}
+                <ResilientSupabaseImage
+                  src={image.image_url}
+                  widthHint={760}
+                  quality={66}
                   alt={image.alt || image.title || 'Service photo'}
                   loading={abs <= 1 ? 'eager' : 'lazy'}
                   decoding="async"
@@ -184,8 +186,11 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
 
           <div className="flex h-full items-center justify-center">
             <div className="max-h-full w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl">
-              <img
-                src={getOptimizedSupabaseImageUrl(current.image_url, { width: 1400, quality: 76, resize: 'contain' })}
+              <ResilientSupabaseImage
+                src={current.image_url}
+                widthHint={1400}
+                quality={76}
+                resize="contain"
                 alt={current.alt || current.title || 'Service photo'}
                 className="max-h-[82vh] w-full bg-black object-contain"
                 decoding="async"

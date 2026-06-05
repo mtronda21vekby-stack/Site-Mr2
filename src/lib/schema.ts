@@ -10,12 +10,12 @@ export function buildAutomotiveBusinessSchema({ locale, global, services, areas,
 
   return {
     '@context': 'https://schema.org',
-    '@type': 'AutomotiveBusiness',
+    '@type': 'Locksmith',
     '@id': `${siteUrl}/${locale}#business`,
     name: global.brandName,
     url: pageUrl,
     telephone: global.phoneDisplay,
-    description: description || 'Mobile automotive locksmith service for car lockouts, replacement keys, key fobs, transponder support, ignition-related help, and broken key situations.',
+    description: description || 'Mobile locksmith service for automotive, residential, commercial, access control, safe opening, rekey, lock repair, lock replacement, and emergency locksmith requests.',
     areaServed: areas?.map((area) => [area.city, area.state].filter(Boolean).join(', ')).filter(Boolean) || ['Philadelphia, Pennsylvania'],
     openingHours: global.serviceHours,
     makesOffer: services?.map((service) => ({
@@ -36,7 +36,7 @@ export function buildServiceCollectionSchema({ locale, services }: { locale: Seo
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     '@id': `${getCanonicalUrl(locale, '/services')}#services`,
-    name: 'Automotive locksmith services',
+    name: 'Locksmith services',
     itemListElement: services.map((service, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -76,7 +76,7 @@ export function buildServiceDetailSchema({ locale, global, service }: { locale: 
     description: service.seoDescription || service.excerpt,
     url,
     provider: {
-      '@type': 'AutomotiveBusiness',
+      '@type': 'Locksmith',
       name: global.brandName,
       telephone: global.phoneDisplay,
       url: `${siteUrl}/${locale}`,
@@ -92,7 +92,7 @@ export function buildAreaDetailBusinessSchema({ locale, global, area, supportedS
 
   return {
     '@context': 'https://schema.org',
-    '@type': 'AutomotiveBusiness',
+    '@type': 'Locksmith',
     '@id': `${url}#business`,
     name: global.brandName,
     url,
@@ -131,7 +131,7 @@ export function buildContactPageSchema({ locale, global, description }: { locale
     name: 'Contact Planetlocksmiths',
     description,
     mainEntity: {
-      '@type': 'AutomotiveBusiness',
+        '@type': 'Locksmith',
       name: global.brandName,
       telephone: global.phoneDisplay,
       url: getCanonicalUrl(locale, '/'),

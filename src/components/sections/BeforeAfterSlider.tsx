@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { getOptimizedSupabaseImageUrl } from '@/lib/images'
+import ResilientSupabaseImage from '@/components/sections/ResilientSupabaseImage'
 
 type BeforeAfterSliderProps = {
   beforeImage: string
@@ -25,9 +25,9 @@ export default function BeforeAfterSlider({
   return (
     <article className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl backdrop-blur-xl">
       <div className="relative h-[28rem] overflow-hidden bg-black md:h-[34rem]">
-        <img src={getOptimizedSupabaseImageUrl(beforeImage, { width: 1200, quality: 70 })} alt={beforeAlt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+        <ResilientSupabaseImage src={beforeImage} widthHint={1200} quality={70} alt={beforeAlt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
         <div className="absolute inset-0 overflow-hidden" style={{ width: `${position}%` }}>
-          <img src={getOptimizedSupabaseImageUrl(afterImage, { width: 1200, quality: 70 })} alt={afterAlt} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+          <ResilientSupabaseImage src={afterImage} widthHint={1200} quality={70} alt={afterAlt} className="h-full w-full object-cover" loading="lazy" decoding="async" />
         </div>
 
         <div className="absolute left-4 top-4 rounded-full border border-white/15 bg-black/45 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-white backdrop-blur-xl">

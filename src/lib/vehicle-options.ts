@@ -1,15 +1,6 @@
-export const SERVICE_OPTIONS = [
-  'Car lockout',
-  'Car key replacement',
-  'Lost all keys',
-  'Key fob programming',
-  'Transponder key programming',
-  'Ignition repair / replacement',
-  'Broken key extraction',
-  'Trunk lockout',
-  'Remote battery / remote issue',
-  'Other automotive locksmith service',
-]
+import { getCatalogServiceOptions } from '@/lib/services-catalog'
+
+export const SERVICE_OPTIONS = getCatalogServiceOptions('en')
 
 export const VEHICLE_MODELS: Record<string, string[]> = {
   Acura: ['ILX', 'Integra', 'TLX', 'RDX', 'MDX', 'Other Acura'],

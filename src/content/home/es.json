@@ -1,63 +1,68 @@
 {
-  "heroTitle": "Cerrajero automotriz móvil 24/7 en Philadelphia",
-  "heroSubtitle": "¿No puedes abrir tu auto, perdiste la llave o necesitas programar un llavero de reemplazo? Planetlocksmiths ofrece ayuda móvil de cerrajería automotriz en Philadelphia para bloqueos urgentes, llaves nuevas, llaveros, programación transponder y problemas de encendido.",
+  "heroTitle": "Servicio móvil de cerrajería 24/7 en Philadelphia",
+  "heroSubtitle": "¿No puedes abrir tu auto, casa, oficina o puerta comercial? ¿Necesitas programación de llave de auto, reparación de cerradura, rekey, smart lock, apertura de caja fuerte o access control? Planetlocksmiths atiende solicitudes móviles de cerrajería en Philadelphia.",
   "heroPrimaryCta": "Llamar ahora",
   "heroSecondaryCta": "Solicitar servicio",
   "heroBadges": [
-    "Servicio móvil 24/7",
-    "Cobertura en Philadelphia",
-    "Llaves, llaveros y programación"
+    "Cerrajero de emergencia 24/7",
+    "Servicio asegurado",
+    "Auto, residencial y comercial"
   ],
   "heroOrbitWords": [
     "Bloqueo",
-    "Llave perdida",
-    "Llavero",
-    "Programación"
+    "Rekey",
+    "Llaves de auto",
+    "Comercial"
   ],
   "featuredServices": [
+    {
+      "title": "Cerrajero de emergencia 24/7",
+      "excerpt": "Atención urgente para bloqueos, llaves perdidas, llaves rotas y problemas de acceso.",
+      "slug": "emergency-locksmith-24-7"
+    },
     {
       "title": "Bloqueo de automóvil",
       "excerpt": "Ayuda móvil cuando las llaves están dentro del vehículo o el auto no abre.",
       "slug": "car-lockout"
     },
     {
-      "title": "Reemplazo de llave perdida",
-      "excerpt": "Soluciones cuando la única llave del auto se perdió, fue robada, se rompió o ya no funciona.",
-      "slug": "lost-car-key-replacement"
+      "title": "Servicio de todas las llaves perdidas",
+      "excerpt": "Ayuda cuando ninguna llave funciona o todas se perdieron, rompieron o fueron robadas.",
+      "slug": "all-keys-lost"
     },
     {
-      "title": "Reemplazo de llave de auto",
-      "excerpt": "Llaves de reemplazo para llaves dañadas, gastadas, rotas o extraviadas.",
-      "slug": "car-key-replacement"
+      "title": "Cerrajero comercial",
+      "excerpt": "Soporte para oficinas, tiendas, puertas de servicio y necesidades de acceso comercial.",
+      "slug": "commercial-locksmith"
     },
     {
-      "title": "Programación de llaveros",
-      "excerpt": "Soporte de programación para muchos controles remotos, smart keys y llaveros push-to-start.",
-      "slug": "key-fob-programming"
+      "title": "Cerrajero residencial",
+      "excerpt": "Ayuda residencial para bloqueos, rekeys, cambios de cerradura, smart locks y reparaciones.",
+      "slug": "residential-locksmith"
     },
     {
-      "title": "Programación de llave transponder",
-      "excerpt": "Programación de llaves con chip para muchos vehículos con sistema inmovilizador antirrobo.",
-      "slug": "transponder-key-programming"
+      "title": "Servicio de access control",
+      "excerpt": "Access control para entradas de negocio, puertas controladas y mejoras de seguridad.",
+      "slug": "access-control"
     },
     {
-      "title": "Problemas con llave de encendido",
-      "excerpt": "Ayuda cuando la llave no gira, se queda atascada o el sistema de encendido causa problemas.",
-      "slug": "ignition-key-issues"
+      "title": "Apertura de cajas fuertes",
+      "excerpt": "Solicitud de apertura para cajas bloqueadas, trabadas o con combinación olvidada.",
+      "slug": "safe-opening"
     }
   ],
   "whyChoose": [
-    "Servicio móvil enfocado en cerrajería automotriz",
+    "Servicio móvil para auto, residencial y comercial",
     "Solicitudes urgentes 24/7",
-    "Bloqueos, llaves perdidas, llaveros y programación",
+    "Bloqueos, llaves perdidas, rekeys, fobs, access control e instalación",
     "Servicio en vecindarios de Philadelphia",
     "Comunicación clara antes del despacho",
-    "Datos del vehículo revisados antes del trabajo"
+    "Detalles del servicio revisados antes del trabajo"
   ],
-  "emergencyTitle": "¿No puedes abrir tu auto o perdiste la llave?",
-  "emergencyText": "Solicita ayuda móvil para bloqueos de auto, llaves perdidas, reemplazo de llaves, programación de llaveros y problemas de encendido en Philadelphia.",
+  "emergencyTitle": "¿No puedes entrar o necesitas cerrajero ahora?",
+  "emergencyText": "Solicita ayuda móvil para bloqueos de auto, todas las llaves perdidas, bloqueos residenciales, cerraduras comerciales, rekeys, key fobs, access control, apertura de cajas fuertes y problemas urgentes en Philadelphia.",
   "reviewsTitle": "Lo que valoran los clientes",
   "faqTitle": "Preguntas de cerrajería",
   "contactTitle": "Solicitar cerrajero móvil",
-  "contactText": "Envía tu nombre, teléfono, detalles del vehículo, ubicación y lo que ocurrió. Para bloqueos urgentes o llaves perdidas, llamar suele ser la opción más rápida."
+  "contactText": "Envía tu nombre, teléfono, tipo de servicio, ubicación y lo que ocurrió. Para trabajos de vehículo, incluye marca, modelo y año. En urgencias, llamar suele ser lo más rápido."
 }

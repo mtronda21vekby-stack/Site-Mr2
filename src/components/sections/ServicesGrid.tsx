@@ -13,8 +13,8 @@ function getCopy(locale: Locale) {
   switch (locale) {
     case 'es':
       return {
-        eyebrow: 'Servicios automotrices',
-        title: 'Servicios de cerrajería automotriz claros y directos',
+        eyebrow: 'Servicios de cerrajería',
+        title: 'Servicios móviles de cerrajería organizados por necesidad',
         intro: 'Pasa el cursor sobre un servicio para ver qué incluye. En móvil, la descripción se muestra directamente.',
         cta: 'Ver detalle',
         all: 'Todos los servicios',
@@ -22,7 +22,7 @@ function getCopy(locale: Locale) {
     case 'ru':
       return {
         eyebrow: 'Услуги',
-        title: 'Автомобильные locksmith-услуги без лишних карточек',
+        title: 'Мобильные locksmith-услуги по реальным запросам',
         intro: 'Наведи на название услуги, чтобы раскрыть описание. На телефоне описание видно сразу.',
         cta: 'Подробнее',
         all: 'Все услуги',
@@ -30,8 +30,8 @@ function getCopy(locale: Locale) {
     case 'en':
     default:
       return {
-        eyebrow: 'Automotive locksmith services',
-        title: 'Fast mobile auto locksmith help, organized by need',
+        eyebrow: 'Locksmith services',
+        title: 'Fast mobile locksmith help, organized by need',
         intro: 'Hover a service to see what is included. On mobile, each description stays visible for quick scanning.',
         cta: 'View details',
         all: 'All services',
