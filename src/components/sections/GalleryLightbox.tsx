@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { getOptimizedSupabaseImageUrl } from '@/lib/images'
 
 type GalleryImage = {
   id: string
@@ -69,9 +70,10 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
           >
             <div className={`${index === 0 ? 'h-[24rem]' : 'h-72'} overflow-hidden bg-black/50`}>
               <img
-                src={image.image_url}
+                src={getOptimizedSupabaseImageUrl(image.image_url, { width: index === 0 ? 1200 : 760, quality: 68 })}
                 alt={image.alt || image.title || 'Planet Locksmiths service photo'}
                 loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
             </div>
@@ -115,9 +117,10 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
 
             <div className="mx-0 max-h-full max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl md:mx-6">
               <img
-                src={current.image_url}
+                src={getOptimizedSupabaseImageUrl(current.image_url, { width: 1800, quality: 78, resize: 'contain' })}
                 alt={current.alt || current.title || 'Planet Locksmiths service photo'}
                 className="max-h-[82vh] w-full object-contain bg-black"
+                decoding="async"
               />
             </div>
 

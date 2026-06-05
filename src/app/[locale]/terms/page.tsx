@@ -11,8 +11,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; sections: Array<{ title: string; body: string }> }> = {
   en: { eyebrow: 'Customer information', title: 'Terms of Service', body: 'These terms explain the basic conditions for using this website and submitting a mobile automotive locksmith service request to Planetlocksmiths.', sections: [{ title: 'Website use', body: 'This website provides information about automotive locksmith services and allows customers to submit service requests. You agree to provide accurate contact, vehicle, and location details when requesting service.' }, { title: 'Service availability', body: 'Submitting a request does not guarantee immediate availability, dispatch, price, or completion of service. Availability depends on location, vehicle type, parts, technician availability, timing, and job complexity.' }, { title: 'Pricing and estimates', body: 'Any estimate may depend on vehicle make, model, year, key type, programming requirements, lock condition, distance, emergency timing, and parts availability. Final pricing should be confirmed before work begins.' }, { title: 'Vehicle ownership and authorization', body: 'Customers may be asked to confirm authorization to access or service a vehicle. Service may be declined if ownership, authorization, safety, or legal concerns cannot be reasonably resolved.' }, { title: 'No misuse', body: 'You may not use this website to submit false requests, interfere with website operation, impersonate others, or request service for a vehicle you are not authorized to access.' }] },
@@ -34,7 +33,14 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
       <main className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
         <section className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10">
           <div className="relative z-10">

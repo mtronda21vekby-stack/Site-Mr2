@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import { unstable_noStore as noStore } from 'next/cache'
 import {
   getGlobalSettings as getFileGlobalSettings,
   getHomeContent as getFileHomeContent,
@@ -21,6 +20,7 @@ type SiteSettingsRow = {
   phone_display: string | null
   email: string | null
   service_hours: string | null
+  updated_at: string | null
 }
 
 type HomePageRow = {
@@ -148,7 +148,9 @@ function getSupabaseServerClient() {
     return null
   }
 
-  return createClient(url, anonKey)
+  return createClient(url, anonKey, {
+    auth: { persistSession: false },
+  })
 }
 
 function normalizeItems(value: unknown): string[] {
@@ -210,6 +212,40 @@ function normalizePhoneDisplay(
   return raw
 }
 
+async function getLatestPublishedLogo(supabase: any) {
+  try {
+    const result = await (supabase.from('site_images') as any)
+      .select('image_url,alt,title,created_at')
+      .eq('is_published', true)
+      .eq('category', 'logo')
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    if (result.error || !result.data?.[0]) {
+      return { logoUrl: '', logoAlt: '', createdAt: '' }
+    }
+
+    const row = result.data[0]
+    return {
+      logoUrl: normalizeText(row.image_url),
+      logoAlt: normalizeText(row.alt) || normalizeText(row.title),
+      createdAt: normalizeText(row.created_at),
+    }
+  } catch {
+    return { logoUrl: '', logoAlt: '', createdAt: '' }
+  }
+}
+
+function isAfterIsoDate(value: string | null | undefined, compareTo: string | null | undefined) {
+  const timestamp = Date.parse(String(value || ''))
+  const compareTimestamp = Date.parse(String(compareTo || ''))
+
+  if (!Number.isFinite(timestamp)) return false
+  if (!Number.isFinite(compareTimestamp)) return true
+
+  return timestamp > compareTimestamp
+}
+
 function mapServiceRow(row: ServiceRow, fallback?: { title: string; excerpt: string }): ServiceContent {
   return {
     slug: row.slug,
@@ -251,7 +287,6 @@ export async function getContentBlocksFromSource(
   pageKey: string,
   slot?: string
 ): Promise<SiteContentBlock[]> {
-  noStore()
 
   const supabase = getSupabaseServerClient()
   if (!supabase) {
@@ -299,7 +334,6 @@ export async function getContentBlocksFromSource(
 }
 
 export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
-  noStore()
 
   const fileFallback = getFileGlobalSettings()
   const supabase = getSupabaseServerClient()
@@ -310,19 +344,30 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
 
   try {
     const result = await (supabase.from('site_settings') as any)
-      .select('id, brand_name, logo_url, logo_alt, phone_primary, phone_display, email, service_hours')
+      .select('id, brand_name, logo_url, logo_alt, phone_primary, phone_display, email, service_hours, updated_at')
+      .order('updated_at', { ascending: false })
       .limit(1)
 
     if (result.error || !result.data?.[0]) {
-      return fileFallback
+      const logoFallback = await getLatestPublishedLogo(supabase)
+      return {
+        ...fileFallback,
+        logoUrl: logoFallback.logoUrl || fileFallback.logoUrl,
+        logoAlt: logoFallback.logoAlt || fileFallback.logoAlt,
+      }
     }
 
     const row = result.data[0] as SiteSettingsRow
     const phonePrimary = normalizePhonePrimary(row.phone_primary, fileFallback.phonePrimary)
     const phoneDisplay = normalizePhoneDisplay(row.phone_display, fileFallback.phoneDisplay, phonePrimary)
     const brandName = row.brand_name ?? fileFallback.brandName
-    const logoUrl = normalizeText(row.logo_url)
-    const logoAlt = normalizeText(row.logo_alt) || brandName
+    const settingsLogoUrl = normalizeText(row.logo_url)
+    const logoFallback = await getLatestPublishedLogo(supabase)
+    const shouldUsePublishedLogo =
+      Boolean(logoFallback.logoUrl) &&
+      (!settingsLogoUrl || isAfterIsoDate(logoFallback.createdAt, row.updated_at))
+    const logoUrl = shouldUsePublishedLogo ? logoFallback.logoUrl : settingsLogoUrl
+    const logoAlt = normalizeText(row.logo_alt) || (shouldUsePublishedLogo ? logoFallback.logoAlt : '') || brandName
 
     return {
       ...fileFallback,
@@ -341,7 +386,6 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
 }
 
 export async function getHomeContentFromSource(locale: Locale): Promise<HomeContent> {
-  noStore()
 
   const fileFallback = getFileHomeContent(locale)
   const supabase = getSupabaseServerClient()
@@ -387,7 +431,6 @@ export async function getHomeContentFromSource(locale: Locale): Promise<HomeCont
 }
 
 export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]> {
-  noStore()
 
   const fileFallback = getFileReviews(locale)
   const supabase = getSupabaseServerClient()
@@ -428,7 +471,6 @@ export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]
 }
 
 export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
-  noStore()
 
   const fileFallback = getFileFaq(locale)
   const supabase = getSupabaseServerClient()
@@ -466,7 +508,6 @@ export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
 }
 
 export async function getServicesListFromSource(locale: Locale): Promise<ServiceContent[]> {
-  noStore()
 
   const fileFallback = getFileHomeContent(locale).featuredServices.map(mapFileServiceFallback)
   const supabase = getSupabaseServerClient()
@@ -501,7 +542,6 @@ export async function getServicesListFromSource(locale: Locale): Promise<Service
 }
 
 export async function getAreasListFromSource(locale: Locale): Promise<AreaContent[]> {
-  noStore()
 
   const supabase = getSupabaseServerClient()
 
@@ -534,7 +574,6 @@ export async function getServicePageFromSource(
   locale: Locale,
   slug: string
 ): Promise<ServiceContent | null> {
-  noStore()
 
   const fileHome = getFileHomeContent(locale)
   const fileFallback = fileHome.featuredServices.find((item) => item.slug === slug)
@@ -574,7 +613,6 @@ export async function getAreaPageFromSource(
   locale: Locale,
   slug: string
 ): Promise<AreaContent | null> {
-  noStore()
 
   const supabase = getSupabaseServerClient()
 

@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 import { isAdminAuthenticated } from '@/lib/adminAuth'
+import {
+  SUPPORTED_UPLOAD_IMAGE_TYPES,
+  hasMatchingImageSignature,
+  isHeicLikeFile,
+} from '@/lib/imageUploadValidation'
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function POST(req: Request) {
@@ -13,7 +18,16 @@ export async function POST(req: Request) {
   const category = String(formData.get('category') || 'gallery').trim() || 'gallery'
 
   if (!file) return NextResponse.json({ error: 'No file' }, { status: 400 })
-  if (!file.type.startsWith('image/')) return NextResponse.json({ error: 'Only images are allowed' }, { status: 400 })
+  if (isHeicLikeFile(file)) {
+    return NextResponse.json({ error: 'HEIC/HEIF images are not supported across all browsers. Upload PNG, WebP, SVG, or JPG.' }, { status: 400 })
+  }
+  if (!SUPPORTED_UPLOAD_IMAGE_TYPES.has(file.type)) {
+    return NextResponse.json({ error: 'Only PNG, WebP, SVG, or JPG images are allowed' }, { status: 400 })
+  }
+
+  if (!(await hasMatchingImageSignature(file))) {
+    return NextResponse.json({ error: 'The uploaded file does not match its image format. Export it as PNG, WebP, SVG, or JPG and upload it again.' }, { status: 400 })
+  }
 
   const supabase = getSupabaseAdmin()
   const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()

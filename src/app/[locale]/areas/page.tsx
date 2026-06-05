@@ -17,8 +17,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params
@@ -58,7 +57,14 @@ export default async function AreasIndexPage({ params }: { params: Promise<{ loc
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
       <JsonLd data={schema} />
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
       <main className="relative text-text">
         <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="premium-panel premium-hairline grid gap-8 rounded-[2.25rem] p-6 sm:p-8 lg:grid-cols-[1fr_23rem] lg:items-end lg:p-10">

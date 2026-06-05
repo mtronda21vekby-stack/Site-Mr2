@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
-import { getSupabaseClient } from '@/lib/supabase/client'
+import { useEffect, useState } from 'react'
 import CallButton from '@/components/ui/CallButton'
+import { isBrowserSupportedImageUrl } from '@/lib/images'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
 export type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
@@ -53,15 +54,26 @@ const ctaLabels: Record<Locale, { request: string; call: string; menu: string }>
 function normalizeLogoUrl(value: string) {
   const url = value.trim()
   if (!url) return ''
+  if (!isBrowserSupportedImageUrl(url)) return ''
   if (url.startsWith('http://')) return url.replace('http://', 'https://')
   return url
 }
 
+function isAfterIsoDate(value: string | null | undefined, compareTo: string | null | undefined) {
+  const timestamp = Date.parse(String(value || ''))
+  const compareTimestamp = Date.parse(String(compareTo || ''))
+
+  if (!Number.isFinite(timestamp)) return false
+  if (!Number.isFinite(compareTimestamp)) return true
+
+  return timestamp > compareTimestamp
+}
+
 export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planetlocksmiths', logoUrl = '', logoAlt }: HeaderProps) {
   const pathname = usePathname()
-  const supabase = useMemo(() => getSupabaseClient() as any, [])
   const [open, setOpen] = useState(false)
   const [logoFailed, setLogoFailed] = useState(false)
+  const [fallbackAttempted, setFallbackAttempted] = useState(false)
   const [brand, setBrand] = useState<HeaderBrandState>({
     brandName,
     logoUrl: normalizeLogoUrl(logoUrl),
@@ -78,6 +90,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
 
   useEffect(() => {
     setLogoFailed(false)
+    setFallbackAttempted(false)
     setBrand({
       brandName,
       logoUrl: normalizeLogoUrl(logoUrl),
@@ -90,36 +103,61 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   }, [visibleLogoUrl])
 
   useEffect(() => {
+    if (visibleLogoUrl && !logoFailed) return
+    if (fallbackAttempted) return
     let mounted = true
 
-    async function loadHeaderBrand() {
-      if (logoUrl.trim()) return
+    async function loadLogoFallback() {
+      setFallbackAttempted(true)
 
       try {
-        const result = await (supabase.from('site_settings') as any)
-          .select('brand_name, logo_url, logo_alt')
+        const supabase = getSupabaseClient() as any
+        const settingsResult = await (supabase.from('site_settings') as any)
+          .select('brand_name, logo_url, logo_alt, updated_at')
+          .order('updated_at', { ascending: false })
           .limit(1)
-          .maybeSingle()
 
-        if (!mounted || result.error || !result.data) return
+        const settings = settingsResult.data?.[0]
+        let nextLogoUrl = normalizeLogoUrl(String(settings?.logo_url || ''))
+        let nextLogoAlt = String(settings?.logo_alt || settings?.brand_name || logoAlt || brandName).trim()
+        const nextBrandName = String(settings?.brand_name || brandName).trim() || brandName
 
-        const row = result.data
-        setBrand((current) => ({
-          brandName: String(row.brand_name || current.brandName || brandName).trim() || brandName,
-          logoUrl: normalizeLogoUrl(String(row.logo_url || current.logoUrl || '').trim()),
-          logoAlt: String(row.logo_alt || row.brand_name || current.logoAlt || brandName).trim() || brandName,
-        }))
+        const logoResult = await (supabase.from('site_images') as any)
+          .select('image_url, alt, title, created_at')
+          .eq('is_published', true)
+          .eq('category', 'logo')
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        const logo = logoResult.data?.[0]
+        const publishedLogoUrl = normalizeLogoUrl(String(logo?.image_url || ''))
+        const shouldUsePublishedLogo =
+          Boolean(publishedLogoUrl) &&
+          (logoFailed || !nextLogoUrl || isAfterIsoDate(String(logo?.created_at || ''), String(settings?.updated_at || '')))
+
+        if (shouldUsePublishedLogo) {
+          nextLogoUrl = publishedLogoUrl
+          nextLogoAlt = String(logo?.alt || logo?.title || nextLogoAlt || nextBrandName).trim()
+        }
+
+        if (!mounted || !nextLogoUrl) return
+        setLogoFailed(false)
+        setBrand({
+          brandName: nextBrandName,
+          logoUrl: nextLogoUrl,
+          logoAlt: nextLogoAlt || nextBrandName,
+        })
       } catch {
-        // Keep safe text + generated mark fallback.
+        // Keep the generated fallback mark.
       }
     }
 
-    loadHeaderBrand()
+    loadLogoFallback()
 
     return () => {
       mounted = false
     }
-  }, [brandName, logoUrl, supabase])
+  }, [brandName, fallbackAttempted, logoAlt, logoFailed, visibleLogoUrl])
 
   return (
     <header translate="no" className="notranslate sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
@@ -134,8 +172,8 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
                 width="160"
                 height="117"
                 decoding="async"
+                loading="eager"
                 fetchPriority="high"
-                referrerPolicy="no-referrer"
                 onError={() => setLogoFailed(true)}
                 className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
               />

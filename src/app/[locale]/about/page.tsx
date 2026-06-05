@@ -14,8 +14,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params
@@ -61,7 +60,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
       <main className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
         <section className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10">
           <div className="relative z-10">

@@ -1,4 +1,3 @@
-import { unstable_noStore as noStore } from 'next/cache'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
@@ -21,8 +20,7 @@ import {
 } from '@/lib/content.server'
 import { ACTIVE_LOCALES } from '@/lib/locales'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 export async function generateStaticParams() {
   return ACTIVE_LOCALES.map((locale) => ({ locale }))
@@ -33,7 +31,6 @@ export default async function LocaleHome({
 }: {
   params: Promise<{ locale: 'en' | 'es' | 'ru' }>
 }) {
-  noStore()
 
   const { locale } = await params
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'

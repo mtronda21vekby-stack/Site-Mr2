@@ -37,9 +37,10 @@ async function getGalleryImages(): Promise<SiteImage[]> {
     const result = await (supabase.from('site_images') as any)
       .select('id,title,alt,category,image_url,sort_order,created_at')
       .eq('is_published', true)
+      .in('category', ['gallery', 'before', 'after'])
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
-      .limit(24)
+      .limit(12)
 
     if (result.error) {
       console.error('site_images select error:', result.error)

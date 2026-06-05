@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { getOptimizedSupabaseImageUrl } from '@/lib/images'
 
 type GalleryImage = {
   id: string
@@ -24,7 +25,7 @@ function shortestOffset(index: number, activeIndex: number, length: number) {
 }
 
 export default function MobileScrollSpinGallery({ images }: { images: GalleryImage[] }) {
-  const visibleImages = images.slice(0, 12)
+  const visibleImages = images.slice(0, 8)
   const [activeIndex, setActiveIndex] = useState(0)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [reduceMotion, setReduceMotion] = useState(false)
@@ -129,9 +130,10 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                 }}
               >
                 <img
-                  src={image.image_url}
+                  src={getOptimizedSupabaseImageUrl(image.image_url, { width: 760, quality: 66 })}
                   alt={image.alt || image.title || 'Service photo'}
                   loading={abs <= 1 ? 'eager' : 'lazy'}
+                  decoding="async"
                   className="h-full w-full object-cover"
                   draggable="false"
                 />
@@ -183,9 +185,10 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
           <div className="flex h-full items-center justify-center">
             <div className="max-h-full w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-2xl">
               <img
-                src={current.image_url}
+                src={getOptimizedSupabaseImageUrl(current.image_url, { width: 1400, quality: 76, resize: 'contain' })}
                 alt={current.alt || current.title || 'Service photo'}
                 className="max-h-[82vh] w-full bg-black object-contain"
+                decoding="async"
                 draggable="false"
               />
             </div>

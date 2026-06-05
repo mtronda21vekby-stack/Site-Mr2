@@ -11,8 +11,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; sections: Array<{ title: string; body: string }> }> = {
   en: { eyebrow: 'Customer information', title: 'Privacy Policy', body: 'This page explains how Planetlocksmiths handles information submitted through this website for mobile automotive locksmith service requests.', sections: [{ title: 'Information we collect', body: 'When you submit a service request, we may collect your name, phone number, email address, requested service, vehicle make/model/year, service location, urgency, preferred time, and message details. This information is used to respond to your request and understand the service needed.' }, { title: 'How we use information', body: 'Submitted information is used to contact you, review your automotive locksmith request, help estimate the required tools or parts, coordinate service availability, and improve customer communication.' }, { title: 'Sharing information', body: 'We do not sell customer request information. Information may be shared only when needed to process a service request, comply with law, protect rights and safety, or operate website infrastructure and customer communication systems.' }, { title: 'Security', body: 'We use reasonable technical and organizational measures to protect submitted information. No website or internet transmission can be guaranteed completely secure.' }, { title: 'Customer choices', body: 'You may contact us to ask about a service request, correct information, or request deletion of submitted request details where legally and operationally appropriate.' }] },
@@ -34,7 +33,14 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
       <main className="mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8">
         <section className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10">
           <div className="relative z-10">

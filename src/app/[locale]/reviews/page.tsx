@@ -16,8 +16,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
   const { locale } = await params
@@ -43,7 +42,14 @@ export default async function ReviewsPage({ params }: { params: Promise<{ locale
   return (
     <div className="cinematic-shell min-h-screen pb-20 text-text md:pb-0">
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
       <main>
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="premium-panel premium-hairline rounded-[2.25rem] p-6 sm:p-8 lg:p-10"><div className="relative z-10"><p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">{hero?.eyebrow || fallback.eyebrow}</p><h1 className="max-w-5xl text-balance text-5xl font-semibold leading-[0.9] tracking-[-0.07em] sm:text-6xl lg:text-7xl">{hero?.title || home.reviewsTitle || fallback.title}</h1><p className="mt-7 max-w-3xl text-base leading-8 text-muted sm:text-lg">{hero?.body || fallback.body}</p></div></div>

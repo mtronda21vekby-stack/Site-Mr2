@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { getOptimizedSupabaseImageUrl, isBrowserSupportedImageUrl } from '@/lib/images'
 
 type DecorImage = {
   id: string
@@ -31,18 +32,10 @@ const desktopSlots: CardSlot[] = [
   { left: '38%', top: '21%', width: '15.8rem', height: '22.8rem', rotate: '3deg', opacity: 0.2, zIndex: 0, driftX: '9px', driftY: '10px', duration: '24s', delay: '-15s' },
 ]
 
-const mobileSlots: CardSlot[] = [
-  { left: '-34%', top: '2%', width: '13.2rem', height: '18.8rem', rotate: '-8deg', opacity: 0.48, zIndex: 1, driftX: '10px', driftY: '-8px', duration: '18s', delay: '0s' },
-  { left: '58%', top: '3%', width: '13.6rem', height: '19.4rem', rotate: '8deg', opacity: 0.5, zIndex: 2, driftX: '-10px', driftY: '9px', duration: '21s', delay: '-5s' },
-  { left: '-20%', top: '40%', width: '11.7rem', height: '16.8rem', rotate: '7deg', opacity: 0.34, zIndex: 1, driftX: '8px', driftY: '10px', duration: '23s', delay: '-9s' },
-  { left: '66%', top: '44%', width: '12rem', height: '17.3rem', rotate: '-7deg', opacity: 0.36, zIndex: 1, driftX: '-9px', driftY: '-8px', duration: '20s', delay: '-12s' },
-  { left: '20%', top: '24%', width: '10rem', height: '14.6rem', rotate: '3deg', opacity: 0.2, zIndex: 0, driftX: '7px', driftY: '8px', duration: '24s', delay: '-15s' },
-]
-
 function uniqueDecorImages(images: DecorImage[]) {
   const seen = new Set<string>()
   return images.filter((image) => {
-    if (!image.imageUrl || seen.has(image.imageUrl)) return false
+    if (!image.imageUrl || !isBrowserSupportedImageUrl(image.imageUrl) || seen.has(image.imageUrl)) return false
     seen.add(image.imageUrl)
     return true
   })
@@ -57,6 +50,7 @@ export default function CinematicBackground() {
   const supabase = useMemo(() => getSupabaseClient() as any, [])
   const [decorImages, setDecorImages] = useState<DecorImage[]>([])
   const [reduceMotion, setReduceMotion] = useState(false)
+  const [loadDecorImages, setLoadDecorImages] = useState(false)
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -67,9 +61,22 @@ export default function CinematicBackground() {
   }, [])
 
   useEffect(() => {
+    const media = window.matchMedia('(min-width: 768px) and (pointer: fine)')
+    const update = () => setLoadDecorImages(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
     let mounted = true
 
     async function loadBackgroundPhotos() {
+      if (!loadDecorImages) {
+        setDecorImages([])
+        return
+      }
+
       try {
         const result = await (supabase.from('site_images') as any)
           .select('id,image_url,alt,category,sort_order,created_at')
@@ -77,7 +84,7 @@ export default function CinematicBackground() {
           .in('category', ['background-decor', 'background-desktop', 'background-mobile'])
           .order('sort_order', { ascending: true })
           .order('created_at', { ascending: false })
-          .limit(16)
+          .limit(6)
 
         if (!mounted || result.error || !Array.isArray(result.data)) return
 
@@ -85,7 +92,7 @@ export default function CinematicBackground() {
           uniqueDecorImages(
             result.data.map((image: any) => ({
               id: String(image.id),
-              imageUrl: String(image.image_url || '').trim(),
+              imageUrl: getOptimizedSupabaseImageUrl(String(image.image_url || '').trim(), { width: 720, quality: 58 }),
               alt: String(image.alt || 'Planetlocksmiths work photo'),
             })),
           ),
@@ -100,7 +107,7 @@ export default function CinematicBackground() {
     return () => {
       mounted = false
     }
-  }, [supabase])
+  }, [loadDecorImages, supabase])
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 overflow-hidden bg-white">
@@ -130,7 +137,7 @@ export default function CinematicBackground() {
 
       {decorImages.length ? (
         <div className="absolute inset-0 hidden md:block">
-          {desktopSlots.map((slot, index) => {
+          {desktopSlots.slice(0, 3).map((slot, index) => {
             const image = imageForSlot(decorImages, index)
             if (!image) return null
 
@@ -153,37 +160,6 @@ export default function CinematicBackground() {
                 }}
               >
                 <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[1.05rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" decoding="async" />
-              </div>
-            )
-          })}
-        </div>
-      ) : null}
-
-      {decorImages.length ? (
-        <div className="absolute inset-0 md:hidden">
-          {mobileSlots.map((slot, index) => {
-            const image = imageForSlot(decorImages, index)
-            if (!image) return null
-
-            return (
-              <div
-                key={`mobile-floating-work-${index}-${image.id}`}
-                className={`planet-work-card ${reduceMotion ? '' : 'planet-work-card-animated'} absolute overflow-hidden rounded-[1.2rem] border border-white/70 bg-white/34 p-1 shadow-[0_18px_48px_rgba(11,31,77,0.18)]`}
-                style={{
-                  left: slot.left,
-                  top: slot.top,
-                  width: slot.width,
-                  zIndex: slot.zIndex,
-                  opacity: slot.opacity,
-                  ['--card-rotate' as string]: slot.rotate,
-                  ['--card-drift-x' as string]: slot.driftX,
-                  ['--card-drift-y' as string]: slot.driftY,
-                  ['--card-duration' as string]: slot.duration,
-                  ['--card-delay' as string]: slot.delay,
-                  willChange: reduceMotion ? undefined : 'transform',
-                }}
-              >
-                <img src={image.imageUrl} alt={image.alt} className="w-full rounded-[0.9rem] object-cover" style={{ height: slot.height }} loading="lazy" draggable="false" decoding="async" />
               </div>
             )
           })}

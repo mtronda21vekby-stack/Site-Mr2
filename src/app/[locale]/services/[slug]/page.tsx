@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { unstable_noStore as noStore } from 'next/cache'
 import { notFound } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -23,8 +22,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 const labels: Record<ActiveLocale, { serviceEyebrow: string; overview: string; readiness: string; price: string; authorization: string; process: string; processItems: string[] }> = {
   en: { serviceEyebrow: 'Automotive locksmith service', overview: 'Service overview', readiness: 'Information customers should prepare', price: 'What affects price and timing', authorization: 'Authorization and safety', process: 'How the request works', processItems: ['Submit service and vehicle details', 'Confirm location, urgency, and phone number', 'Review availability, parts, and programming needs', 'Confirm next step before service begins'] },
@@ -46,7 +44,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 }
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
-  noStore()
 
   const { locale, slug } = await params
   const activeLocale = toActiveLocale(locale)
@@ -88,7 +85,14 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
       <JsonLd data={jsonLd} />
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
 
       <main className="relative text-text">
         <article className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">

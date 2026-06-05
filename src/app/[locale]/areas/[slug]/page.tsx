@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { unstable_noStore as noStore } from 'next/cache'
 import { notFound } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -23,8 +22,7 @@ import {
 type Locale = 'en' | 'es' | 'ru'
 type ActiveLocale = 'en' | 'es'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 const labels: Record<ActiveLocale, { eyebrow: string; overview: string; customerPrep: string; localInfo: string; serviceReady: string; coverageNotes: string; prepItems: string[]; localItems: string[]; defaultServices: string[] }> = {
   en: { eyebrow: 'Local automotive locksmith coverage', overview: 'Area overview', customerPrep: 'What to prepare before service', localInfo: 'Local service information', serviceReady: 'Services commonly requested here', coverageNotes: 'Coverage notes', prepItems: ['Vehicle make, model, and year', 'Exact address, parking lot, or nearby landmark', 'Whether all keys are lost', 'Whether the vehicle is locked, running, or in a garage', 'Phone number for fast confirmation'], localItems: ['Mobile service depends on technician availability and location', 'Response times may vary by traffic, distance, weather, and urgency', 'Final price depends on vehicle details, parts, and job complexity'], defaultServices: ['Car lockout help', 'Replacement car keys', 'Key fob and transponder programming', 'Broken key extraction', 'Ignition-related support'] },
@@ -46,7 +44,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 }
 
 export default async function AreaDetailPage({ params }: { params: Promise<{ locale: Locale; slug: string }> }) {
-  noStore()
 
   const { locale, slug } = await params
   const activeLocale = toActiveLocale(locale)
@@ -89,7 +86,14 @@ export default async function AreaDetailPage({ params }: { params: Promise<{ loc
     <div className="cinematic-shell min-h-screen pb-20 md:pb-0">
       <JsonLd data={jsonLd} />
       <CinematicBackground />
-      <Header locale={activeLocale} phoneDisplay={global.phoneDisplay} phonePrimary={global.phonePrimary} />
+      <Header
+        locale={activeLocale}
+        brandName={global.brandName}
+        logoUrl={global.logoUrl}
+        logoAlt={global.logoAlt}
+        phoneDisplay={global.phoneDisplay}
+        phonePrimary={global.phonePrimary}
+      />
 
       <main className="relative text-text">
         <article className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
