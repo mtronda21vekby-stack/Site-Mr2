@@ -55,6 +55,7 @@ export default async function LocaleHome({
       name: global.brandName,
       url: pageUrl,
       telephone: global.phoneDisplay,
+      email: global.email || undefined,
       description: home.heroSubtitle,
       priceRange: '$$-$$$',
       areaServed: areas.map((area) => [area.city, area.state].filter(Boolean).join(', ')).filter(Boolean),
