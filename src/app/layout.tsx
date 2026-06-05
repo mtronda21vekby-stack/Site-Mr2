@@ -3,25 +3,26 @@ import type { Metadata } from 'next'
 import CookieConsent from '@/components/layout/CookieConsent'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://planetlocksmiths.com'
+const siteName = 'Planet Locksmiths'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Planetlocksmiths',
-    template: '%s | Planetlocksmiths',
+    default: siteName,
+    template: `%s | ${siteName}`,
   },
-  description: 'Mobile automotive locksmith service in Philadelphia. Car lockout help, key replacement, and key programming available 24/7.',
+  description: 'Mobile locksmith service in Philadelphia. Emergency lockouts, car keys, rekeys, commercial locks, residential locks, access control, and safe opening requests available 24/7.',
   openGraph: {
     type: 'website',
-    siteName: 'Planetlocksmiths',
+    siteName,
     url: siteUrl,
-    title: 'Planetlocksmiths',
-    description: 'Mobile automotive locksmith service in Philadelphia. Car lockout help, key replacement, and key programming available 24/7.',
+    title: siteName,
+    description: 'Mobile locksmith service in Philadelphia. Emergency lockouts, car keys, rekeys, commercial locks, residential locks, access control, and safe opening requests available 24/7.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Planetlocksmiths',
-    description: 'Mobile automotive locksmith service in Philadelphia. Car lockout help, key replacement, and key programming available 24/7.',
+    title: siteName,
+    description: 'Mobile locksmith service in Philadelphia. Emergency lockouts, car keys, rekeys, commercial locks, residential locks, access control, and safe opening requests available 24/7.',
   },
 }
 
