@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+const siteName = 'Planet Locksmiths'
+
 export type SeoLocale = 'en' | 'es'
 
 export type PageSeoInput = {
@@ -51,7 +53,7 @@ export function buildPageMetadata(input: PageSeoInput): Metadata {
     },
     openGraph: {
       type: 'website',
-      siteName: 'Planetlocksmiths',
+      siteName,
       url,
       title: input.title,
       description: input.description,
