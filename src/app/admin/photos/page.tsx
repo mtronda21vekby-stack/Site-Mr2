@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  SUPPORTED_UPLOAD_IMAGE_TYPES,
+  hasMatchingImageSignature,
+  isHeicLikeFile,
+} from '@/lib/imageUploadValidation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 type AdminPhoto = {
@@ -18,9 +23,26 @@ type AdminPhoto = {
 type EditState = Record<string, { title: string; alt: string; category: string; sortOrder: number; isPublished: boolean }>
 
 const IMAGE_BUCKET = 'site-images'
+const ACCEPTED_IMAGE_TYPES = 'image/png,image/webp,image/svg+xml,image/jpeg'
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
+}
+
+async function getPhotoUploadError(file: File) {
+  if (isHeicLikeFile(file)) {
+    return 'HEIC/HEIF не грузится стабильно на всех устройствах. Загрузи PNG, WebP, SVG или JPG.'
+  }
+
+  if (!SUPPORTED_UPLOAD_IMAGE_TYPES.has(file.type)) {
+    return 'Поддерживаются только PNG, WebP, SVG или JPG.'
+  }
+
+  if (!(await hasMatchingImageSignature(file))) {
+    return 'Файл не похож на выбранный формат. Экспортируй изображение заново в PNG, WebP, SVG или JPG и загрузи еще раз.'
+  }
+
+  return ''
 }
 
 export default function AdminPhotosPage() {
@@ -96,16 +118,41 @@ export default function AdminPhotosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function onSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
+    const uploadError = await getPhotoUploadError(f)
+    if (uploadError) {
+      e.target.value = ''
+      setStatus(uploadError)
+      setFile(null)
+      setPreview(null)
+      return
+    }
+
+    setStatus('')
     setFile(f)
     setPreview(URL.createObjectURL(f))
   }
 
-  function onPairSelect(type: 'before' | 'after', e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPairSelect(type: 'before' | 'after', e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
+    const uploadError = await getPhotoUploadError(f)
+    if (uploadError) {
+      e.target.value = ''
+      setStatus(uploadError)
+      if (type === 'before') {
+        setBeforeFile(null)
+        setBeforePreview(null)
+      } else {
+        setAfterFile(null)
+        setAfterPreview(null)
+      }
+      return
+    }
+
+    setStatus('')
     if (type === 'before') {
       setBeforeFile(f)
       setBeforePreview(URL.createObjectURL(f))
@@ -116,7 +163,8 @@ export default function AdminPhotosPage() {
   }
 
   async function uploadOne(selectedFile: File, selectedTitle: string, selectedAlt: string, selectedCategory: string) {
-    if (!selectedFile.type.startsWith('image/')) throw new Error('Можно загружать только изображения')
+    const uploadError = await getPhotoUploadError(selectedFile)
+    if (uploadError) throw new Error(uploadError)
 
     const filePath = `${selectedCategory || 'gallery'}/${Date.now()}-${sanitizeFileName(selectedFile.name)}`
     const uploadResult = await supabase.storage.from(IMAGE_BUCKET).upload(filePath, selectedFile, {
@@ -280,7 +328,7 @@ export default function AdminPhotosPage() {
         <div className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl">
             <h2 className="text-xl font-black">Одиночное фото</h2>
-            <input type="file" accept="image/*" onChange={onSelect} className="mt-5 block w-full text-sm text-white/70" />
+            <input type="file" accept={ACCEPTED_IMAGE_TYPES} onChange={onSelect} className="mt-5 block w-full text-sm text-white/70" />
             <input placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <textarea placeholder="Alt текст / описание" value={alt} onChange={(e) => setAlt(e.target.value)} className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <input placeholder="Категория: gallery / services / before / after / logo" value={category} onChange={(e) => setCategory(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
@@ -293,8 +341,8 @@ export default function AdminPhotosPage() {
             <input placeholder="Название кейса" value={caseTitle} onChange={(e) => setCaseTitle(e.target.value)} className="mt-4 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <textarea placeholder="Описание кейса" value={caseAlt} onChange={(e) => setCaseAlt(e.target.value)} className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">До</span><input type="file" accept="image/*" onChange={(e) => onPairSelect('before', e)} className="mt-3 block w-full text-xs" />{beforePreview && <img src={beforePreview} alt="До" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
-              <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">После</span><input type="file" accept="image/*" onChange={(e) => onPairSelect('after', e)} className="mt-3 block w-full text-xs" />{afterPreview && <img src={afterPreview} alt="После" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
+              <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">До</span><input type="file" accept={ACCEPTED_IMAGE_TYPES} onChange={(e) => onPairSelect('before', e)} className="mt-3 block w-full text-xs" />{beforePreview && <img src={beforePreview} alt="До" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
+              <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">После</span><input type="file" accept={ACCEPTED_IMAGE_TYPES} onChange={(e) => onPairSelect('after', e)} className="mt-3 block w-full text-xs" />{afterPreview && <img src={afterPreview} alt="После" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
             </div>
             <button onClick={uploadPair} disabled={!beforeFile || !afterFile || loading} className="mt-5 rounded-full border border-accent-cyan/45 bg-accent-cyan/15 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">Загрузить кейс</button>
           </section>
