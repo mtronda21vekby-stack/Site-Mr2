@@ -6,25 +6,25 @@ type InsuranceTrustSectionProps = {
 
 const copy = {
   en: {
-    eyebrow: 'Proof & readiness',
-    title: 'Insured locksmith service with clear job details',
-    intro: 'Proof of liability insurance is available for verification. Every request is routed by service type, location, urgency, and authorization details before work begins.',
+    eyebrow: 'Insurance & business details',
+    title: 'Planet Locksmiths business information',
+    intro: 'Business details from the provided screenshots are shown as text on the site instead of using screenshots as public images.',
     items: [
-      ['Insurance proof', 'Certificate documentation can be provided for verification when needed.'],
-      ['Full service list', 'Auto, residential, commercial, access control, safe, mailbox, rekey, and emergency locksmith requests.'],
-      ['Direct business line', '+1 (267) 612-2555 is the primary phone number for urgent calls and callbacks.'],
-      ['Clear authorization', 'Customers may be asked to confirm access rights before lock, key, safe, or vehicle work starts.'],
+      ['Certificate of Liability Insurance', 'Certificate date shown: 05/16/2026. General liability coverage period shown: 05/16/2026 to 05/16/2027.'],
+      ['Insurance carrier', 'Next Insurance US Company is listed on the certificate documentation provided for verification.'],
+      ['Primary contact', 'Business phone: +1 (267) 612-2555. Email: planetlocksmits@gmail.com.'],
+      ['Service scope', 'Automotive, residential, commercial, emergency 24/7, safe, access control, master key, panic bar, and high-security lock services.'],
     ],
   },
   es: {
-    eyebrow: 'Prueba y preparación',
-    title: 'Servicio de cerrajería asegurado con detalles claros',
-    intro: 'La prueba de seguro de responsabilidad está disponible para verificación. Cada solicitud se orienta por tipo de servicio, ubicación, urgencia y autorización antes de comenzar.',
+    eyebrow: 'Seguro y datos del negocio',
+    title: 'Información comercial de Planet Locksmiths',
+    intro: 'Los datos de los screenshots proporcionados se muestran como texto en el sitio en lugar de usar screenshots como imágenes públicas.',
     items: [
-      ['Prueba de seguro', 'La documentación del certificado puede proporcionarse para verificación cuando sea necesario.'],
-      ['Lista completa', 'Auto, residencial, comercial, access control, cajas fuertes, buzones, rekey y emergencias.'],
-      ['Línea directa', '+1 (267) 612-2555 es el teléfono principal para urgencias y callbacks.'],
-      ['Autorización clara', 'Puede pedirse confirmación de derecho de acceso antes de trabajar en cerraduras, llaves, cajas fuertes o vehículos.'],
+      ['Certificate of Liability Insurance', 'Fecha mostrada del certificado: 05/16/2026. Periodo de cobertura mostrado: 05/16/2026 a 05/16/2027.'],
+      ['Compañía de seguro', 'Next Insurance US Company aparece en la documentación del certificado proporcionada para verificación.'],
+      ['Contacto principal', 'Teléfono: +1 (267) 612-2555. Email: planetlocksmits@gmail.com.'],
+      ['Servicios', 'Automotriz, residencial, comercial, emergencia 24/7, cajas fuertes, access control, master key, panic bar y high-security locks.'],
     ],
   },
 } as const
