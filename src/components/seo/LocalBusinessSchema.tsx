@@ -29,6 +29,7 @@ export default function LocalBusinessSchema({
     name: global.brandName,
     url: siteUrl,
     telephone: global.phonePrimary,
+    email: global.email || undefined,
     description: descriptions[locale],
     areaServed: [
       {
