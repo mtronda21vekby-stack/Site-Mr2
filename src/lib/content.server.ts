@@ -170,6 +170,26 @@ function normalizeText(value: string | null | undefined): string {
   return String(value || '').trim()
 }
 
+function normalizeBrandName(value: string | null | undefined, fallback: string): string {
+  const text = normalizeText(value)
+  if (!text) return fallback
+  if (text.toLowerCase() === 'planetlocksmiths') return fallback
+  return text
+}
+
+function normalizeEmail(value: string | null | undefined, fallback?: string): string | undefined {
+  const text = normalizeText(value).toLowerCase()
+  if (!text) return fallback
+  if (text === 'hello@planetlocksmiths.com') return fallback
+  return text
+}
+
+function normalizeLogoAlt(value: string | null | undefined, brandName: string): string {
+  const text = normalizeText(value)
+  if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
+  return text
+}
+
 function normalizePhonePrimary(value: string | null | undefined, fallback: string): string {
   const raw = String(value || '').trim()
   const digits = raw.replace(/[^0-9+]/g, '')
@@ -427,14 +447,14 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
     const row = result.data[0] as SiteSettingsRow
     const phonePrimary = normalizePhonePrimary(row.phone_primary, fileFallback.phonePrimary)
     const phoneDisplay = normalizePhoneDisplay(row.phone_display, fileFallback.phoneDisplay, phonePrimary)
-    const brandName = row.brand_name ?? fileFallback.brandName
+    const brandName = normalizeBrandName(row.brand_name, fileFallback.brandName)
     const settingsLogoUrl = normalizeText(row.logo_url)
     const logoFallback = await getLatestPublishedLogo(supabase)
     const shouldUsePublishedLogo =
       Boolean(logoFallback.logoUrl) &&
       (!settingsLogoUrl || isAfterIsoDate(logoFallback.createdAt, row.updated_at))
     const logoUrl = shouldUsePublishedLogo ? logoFallback.logoUrl : settingsLogoUrl
-    const logoAlt = normalizeText(row.logo_alt) || (shouldUsePublishedLogo ? logoFallback.logoAlt : '') || brandName
+    const logoAlt = normalizeLogoAlt(row.logo_alt, (shouldUsePublishedLogo ? logoFallback.logoAlt : '') || brandName)
 
     return {
       ...fileFallback,
@@ -443,7 +463,7 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
       logoAlt,
       phonePrimary,
       phoneDisplay,
-      email: row.email ?? fileFallback.email,
+      email: normalizeEmail(row.email, fileFallback.email),
       serviceHours: row.service_hours ?? fileFallback.serviceHours,
     }
   } catch (error) {
