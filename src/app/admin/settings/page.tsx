@@ -4,6 +4,11 @@ import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
+import {
+  SUPPORTED_UPLOAD_IMAGE_TYPES,
+  hasMatchingImageSignature,
+  isHeicLikeFile,
+} from '@/lib/imageUploadValidation'
 
 type SettingsState = {
   id: string
@@ -34,6 +39,22 @@ function sanitizeFileName(name: string) {
   return name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
 }
 
+async function getLogoUploadError(file: File) {
+  if (isHeicLikeFile(file)) {
+    return 'HEIC/HEIF не грузится стабильно на всех устройствах. Загрузи логотип в PNG, WebP, SVG или JPG.'
+  }
+
+  if (!SUPPORTED_UPLOAD_IMAGE_TYPES.has(file.type)) {
+    return 'Поддерживаются только PNG, WebP, SVG или JPG для логотипа.'
+  }
+
+  if (!(await hasMatchingImageSignature(file))) {
+    return 'Файл не похож на выбранный формат. Экспортируй логотип заново в PNG, WebP, SVG или JPG и загрузи еще раз.'
+  }
+
+  return ''
+}
+
 export default function AdminSettingsPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
@@ -60,7 +81,10 @@ export default function AdminSettingsPage() {
           return
         }
 
-        const result = await (supabase.from('site_settings') as any).select('*').limit(1)
+        const result = await (supabase.from('site_settings') as any)
+          .select('*')
+          .order('updated_at', { ascending: false })
+          .limit(1)
         if (result.error) throw new Error(result.error.message)
 
         const row = Array.isArray(result.data) ? result.data[0] : null
@@ -101,8 +125,9 @@ export default function AdminSettingsPage() {
     event.target.value = ''
 
     if (!file) return
-    if (!file.type.startsWith('image/')) {
-      setErrorMessage('Можно загрузить только изображение логотипа')
+    const uploadError = await getLogoUploadError(file)
+    if (uploadError) {
+      setErrorMessage(uploadError)
       return
     }
 
