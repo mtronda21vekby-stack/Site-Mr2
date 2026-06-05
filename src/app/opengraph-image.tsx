@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Planetlocksmiths'
+export const alt = 'Planet Locksmiths'
 export const size = {
   width: 1200,
   height: 630,
@@ -101,7 +101,7 @@ export default function OpenGraphImage() {
               marginBottom: 28,
             }}
           >
-            Mobile automotive locksmith
+            Mobile locksmith service
           </div>
 
           <div
@@ -113,7 +113,7 @@ export default function OpenGraphImage() {
               letterSpacing: '-0.04em',
             }}
           >
-            Planetlocksmiths
+            Planet Locksmiths
           </div>
 
           <div
