@@ -1,4 +1,4 @@
--- Planetlocksmiths CMS foundation
+-- Planet Locksmiths CMS foundation
 -- Apply this in Supabase SQL Editor before using the admin panel in production.
 
 create extension if not exists pgcrypto;
@@ -28,7 +28,7 @@ alter table public.site_settings
   add column if not exists updated_at timestamptz not null default now();
 
 insert into public.site_settings (brand_name, logo_alt, phone_primary, phone_display, email, service_hours)
-select 'Planetlocksmiths', 'Planetlocksmiths', '+12155550100', '+1 (215) 555-0100', 'info@planetlocksmiths.com', '24/7'
+select 'Planet Locksmiths', 'Planet Locksmiths logo', '+12676122555', '+1 (267) 612-2555', 'planetlocksmits@gmail.com', '24/7 Emergency Locksmith Service'
 where not exists (select 1 from public.site_settings);
 
 create table if not exists public.home_pages (

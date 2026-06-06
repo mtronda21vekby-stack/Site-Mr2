@@ -10,7 +10,7 @@ alter table public.site_settings
 
 update public.site_settings
 set
-  background_alt = coalesce(nullif(background_alt, ''), brand_name, 'Planetlocksmiths background'),
+  background_alt = coalesce(nullif(background_alt, ''), brand_name, 'Planet Locksmiths background'),
   background_opacity = coalesce(background_opacity, 0.16),
   background_position = coalesce(nullif(background_position, ''), 'center center'),
   background_mobile_position = coalesce(nullif(background_mobile_position, ''), 'center center')
