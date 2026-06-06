@@ -1,68 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
-import {
-  getGlobalSettings as getFileGlobalSettings,
-  getHomeContent as getFileHomeContent,
-  getReviews as getFileReviews,
-  getFaq as getFileFaq,
-  type Locale,
-  type GlobalSettings,
-  type HomeContent,
-  type ReviewItem,
-  type FaqItem,
-} from '@/lib/content'
+import { getHomeContent as getFileHomeContent, type Locale } from '@/lib/content'
 import {
   getCatalogServiceBySlug,
   getCatalogServices,
+  isHiddenLegacyServiceSlug,
   type CatalogService,
 } from '@/lib/services-catalog'
+import type { ServiceContent } from './content.server.base'
 
-type SiteSettingsRow = {
-  id: string
-  brand_name: string | null
-  logo_url: string | null
-  logo_alt: string | null
-  phone_primary: string | null
-  phone_display: string | null
-  email: string | null
-  service_hours: string | null
-  updated_at: string | null
-}
-
-type HomePageRow = {
-  id: string
-  locale: string
-  hero_title: string | null
-  hero_subtitle: string | null
-  hero_primary_cta: string | null
-  hero_secondary_cta: string | null
-  emergency_title: string | null
-  emergency_text: string | null
-  reviews_title: string | null
-  faq_title: string | null
-  contact_title: string | null
-  contact_text: string | null
-}
-
-type ReviewRow = {
-  id: string
-  locale: string
-  name: string | null
-  rating: number | null
-  quote: string | null
-  date: string | null
-  city: string | null
-  sort_order: number | null
-  is_published: boolean | null
-}
-
-type FaqRow = {
-  id: string
-  locale: string
-  question: string | null
-  answer: string | null
-  sort_order: number | null
-  is_published: boolean | null
-}
+export * from './content.server.base'
 
 type ServiceRow = {
   id: string
@@ -77,73 +23,13 @@ type ServiceRow = {
   is_published: boolean | null
 }
 
-type AreaRow = {
-  id: string
-  locale: string
-  slug: string
-  city: string | null
-  state: string | null
-  title: string | null
-  intro: string | null
-  highlights: string[] | null
-  supported_services: string[] | null
-  seo_title: string | null
-  seo_description: string | null
-  sort_order: number | null
-  is_published: boolean | null
-}
-
-type SiteContentBlockRow = {
-  id: string
-  locale: string
-  page_key: string
-  slot: string
-  eyebrow: string | null
-  title: string | null
-  body: string | null
-  items: unknown
-  cta_label: string | null
-  cta_href: string | null
-  sort_order: number | null
-  is_published: boolean | null
-}
-
-export type ServiceContent = {
-  slug: string
+type ServiceFallback = {
   title: string
   excerpt: string
-  intro: string
-  seoTitle: string
-  seoDescription: string
+  intro?: string
+  seoTitle?: string
+  seoDescription?: string
 }
-
-export type AreaContent = {
-  slug: string
-  city: string
-  state: string
-  title: string
-  intro: string
-  highlights: string[]
-  supportedServices: string[]
-  seoTitle: string
-  seoDescription: string
-}
-
-export type SiteContentBlock = {
-  id: string
-  locale: Locale
-  pageKey: string
-  slot: string
-  eyebrow: string
-  title: string
-  body: string
-  items: string[]
-  ctaLabel: string
-  ctaHref: string
-  sortOrder: number
-}
-
-const DEMO_PHONE_PATTERN = /(555[-\s)]?0?\d{3}|000[-\s)]?0{3})/i
 
 function getSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -158,178 +44,27 @@ function getSupabaseServerClient() {
   })
 }
 
-function normalizeItems(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return []
-  }
-
-  return value.map((item) => String(item).trim()).filter(Boolean)
-}
-
 function normalizeText(value: string | null | undefined): string {
   return String(value || '').trim()
 }
 
-function isLegacyBrandName(value: string | null | undefined): boolean {
-  const compact = normalizeText(value).replace(/[^a-z0-9]/gi, '').toLowerCase()
-  return compact === 'planetlocksmith' || compact === 'planetlocksmiths'
-}
-
-function normalizeBrandName(value: string | null | undefined, fallback: string): string {
-  const text = normalizeText(value)
-  if (!text) return fallback
-  if (isLegacyBrandName(text)) return fallback
-  return text
-}
-
-function normalizeEmail(value: string | null | undefined, fallback?: string): string | undefined {
-  const text = normalizeText(value).toLowerCase()
-  if (!text) return fallback
-  if (text === 'hello@planetlocksmiths.com') return fallback
-  return text
-}
-
-function normalizeServiceHours(value: string | null | undefined, fallback: string): string {
-  const text = normalizeText(value)
-  if (!text) return fallback
-  if (text.toLowerCase() === '24/7 mobile service') return fallback
-  return text
-}
-
-function normalizeLogoAlt(value: string | null | undefined, brandName: string): string {
-  const text = normalizeText(value)
-  if (!text || isLegacyBrandName(text)) return brandName
-  return text
-}
-
-function normalizePhonePrimary(value: string | null | undefined, fallback: string): string {
-  const raw = String(value || '').trim()
-  const digits = raw.replace(/[^0-9+]/g, '')
-
-  if (!digits || DEMO_PHONE_PATTERN.test(raw)) {
-    return fallback
-  }
-
-  if (digits.startsWith('+')) {
-    return digits
-  }
-
-  if (digits.length === 10) {
-    return `+1${digits}`
-  }
-
-  if (digits.length === 11 && digits.startsWith('1')) {
-    return `+${digits}`
-  }
-
-  return fallback
-}
-
-function normalizePhoneDisplay(
-  value: string | null | undefined,
-  fallback: string,
-  normalizedPrimary: string
-): string {
-  const raw = String(value || '').trim()
-
-  if (!raw || DEMO_PHONE_PATTERN.test(raw)) {
-    return fallback
-  }
-
-  const digits = normalizedPrimary.replace(/\D/g, '')
-
-  if (digits.length === 11 && digits.startsWith('1')) {
-    return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`
-  }
-
-  if (digits.length === 10) {
-    return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
-  }
-
-  return raw
-}
-
-async function getLatestPublishedLogo(supabase: any) {
-  try {
-    const result = await (supabase.from('site_images') as any)
-      .select('image_url,alt,title,created_at')
-      .eq('is_published', true)
-      .eq('category', 'logo')
-      .order('created_at', { ascending: false })
-      .limit(1)
-
-    if (result.error || !result.data?.[0]) {
-      return { logoUrl: '', logoAlt: '', createdAt: '' }
-    }
-
-    const row = result.data[0]
-    return {
-      logoUrl: normalizeText(row.image_url),
-      logoAlt: normalizeText(row.alt) || normalizeText(row.title),
-      createdAt: normalizeText(row.created_at),
-    }
-  } catch {
-    return { logoUrl: '', logoAlt: '', createdAt: '' }
-  }
-}
-
-function isAfterIsoDate(value: string | null | undefined, compareTo: string | null | undefined) {
-  const timestamp = Date.parse(String(value || ''))
-  const compareTimestamp = Date.parse(String(compareTo || ''))
-
-  if (!Number.isFinite(timestamp)) return false
-  if (!Number.isFinite(compareTimestamp)) return true
-
-  return timestamp > compareTimestamp
-}
-
-function mapServiceRow(row: ServiceRow, fallback?: { title: string; excerpt: string }): ServiceContent {
-  return {
-    slug: row.slug,
-    title: row.title ?? fallback?.title ?? '',
-    excerpt: row.excerpt ?? fallback?.excerpt ?? '',
-    intro: row.intro ?? row.excerpt ?? fallback?.excerpt ?? '',
-    seoTitle: row.seo_title ?? row.title ?? fallback?.title ?? '',
-    seoDescription: row.seo_description ?? row.excerpt ?? fallback?.excerpt ?? '',
-  }
-}
-
-function mapAreaRow(row: AreaRow): AreaContent {
-  const broadText = (value: string | null | undefined) =>
-    normalizeText(value)
-      .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
-      .replace(/Automotive Locksmith/g, 'Locksmith')
-      .replace(/mobile automotive locksmith/gi, 'mobile locksmith')
-      .replace(/automotive locksmith/gi, 'locksmith')
-      .replace(/Mobile car locksmith/gi, 'Mobile locksmith')
-      .replace(/vehicle access/gi, 'access')
-  const highlights = Array.isArray(row.highlights) ? row.highlights.map(broadText).filter(Boolean) : []
-  const supported = Array.isArray(row.supported_services) ? row.supported_services.map(broadText).filter(Boolean) : []
-  const hasBroadService = supported.some((item) => /rekey|commercial|residential|safe|access control/i.test(item))
-  const supportedServices = hasBroadService
-    ? supported
-    : row.locale === 'es'
-      ? ['Cerrajero de emergencia 24/7', 'Auto cerrado', 'Rekey', 'Cerrajero comercial', 'Cerrajero residencial']
-      : ['Emergency locksmith 24/7', 'Car lockout help', 'Rekey service', 'Commercial locksmith', 'Residential locksmith']
-  const intro = broadText(row.intro)
-  const areaText = [intro, ...highlights, ...supportedServices].join(' ').toLowerCase()
-  const hasFullAreaScope = /residential|commercial|house|home|business|rekey|smart lock|access control|safe|mailbox|master key|panic bar/.test(areaText)
-  const locationName = [row.city, row.state].map(normalizeText).filter(Boolean).join(', ')
-  const fallbackIntro = row.locale === 'es'
-    ? `Servicio móvil de cerrajería en ${locationName || 'Philadelphia'} para autos, hogares, negocios, emergencias, rekeys, cajas fuertes y access control.`
-    : `Mobile locksmith service in ${locationName || 'Philadelphia'} for automotive, residential, commercial, emergency, rekey, safe, and access-control needs.`
-
-  return {
-    slug: row.slug,
-    city: row.city ?? '',
-    state: row.state ?? '',
-    title: broadText(row.title),
-    intro: hasFullAreaScope ? intro : fallbackIntro,
-    highlights,
-    supportedServices,
-    seoTitle: broadText(row.seo_title ?? row.title),
-    seoDescription: hasFullAreaScope ? broadText(row.seo_description ?? row.intro) : fallbackIntro,
-  }
+function normalizeLegacyPublicText(value: string | null | undefined): string {
+  return normalizeText(value)
+    .replace(/\bstarter copy\b/gi, 'service information')
+    .replace(/\bbeta\b/gi, '')
+    .replace(/No published services yet\./gi, 'Call for the current service list.')
+    .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
+    .replace(/Automotive Locksmith Services/g, 'Locksmith Services')
+    .replace(/Automotive locksmith service areas/g, 'Locksmith service areas')
+    .replace(/automotive locksmith coverage/gi, 'locksmith coverage')
+    .replace(/mobile automotive locksmith/gi, 'mobile locksmith')
+    .replace(/automotive locksmith/gi, 'locksmith')
+    .replace(/vehicle-specific requests/gi, 'locksmith service requests')
+    .replace(/vehicle details/gi, 'service details')
+    .replace(/vehicle information/gi, 'service information')
+    .replace(/vehicle requirements/gi, 'service requirements')
+    .replace(/vehicle make, model, and year/gi, 'service type, lock details, and vehicle info when relevant')
+    .replace(/vehicle security system/gi, 'lock, key, or security system')
 }
 
 function mapFileServiceFallback(item: { slug: string; title: string; excerpt: string }): ServiceContent {
@@ -354,356 +89,78 @@ function mapCatalogService(item: CatalogService): ServiceContent {
   }
 }
 
-function looksLikeOldAutomotiveOnlyCopy(value: string | null | undefined) {
-  const text = normalizeText(value).toLowerCase()
-  if (!text) return false
-  if (text.includes('residential') || text.includes('commercial') || text.includes('access control') || text.includes('safe opening')) {
-    return false
-  }
-
-  return text.includes('automotive locksmith') || text.includes('vehicle-specific') || text.includes('car lockouts')
-}
-
-function normalizeHomeCopy(locale: Locale, content: HomeContent): HomeContent {
-  const fallback = getFileHomeContent(locale)
-
-  if (!looksLikeOldAutomotiveOnlyCopy(content.heroTitle) && !looksLikeOldAutomotiveOnlyCopy(content.heroSubtitle)) {
-    return content
-  }
+function mapServiceRow(row: ServiceRow, fallback?: ServiceFallback): ServiceContent {
+  const title = normalizeLegacyPublicText(row.title) || fallback?.title || ''
+  const excerpt = normalizeLegacyPublicText(row.excerpt) || fallback?.excerpt || ''
+  const intro = normalizeLegacyPublicText(row.intro) || excerpt || fallback?.intro || fallback?.excerpt || ''
+  const seoTitle = normalizeLegacyPublicText(row.seo_title) || title || fallback?.seoTitle || fallback?.title || ''
+  const seoDescription = normalizeLegacyPublicText(row.seo_description) || excerpt || fallback?.seoDescription || fallback?.excerpt || ''
 
   return {
-    ...content,
-    heroTitle: fallback.heroTitle,
-    heroSubtitle: fallback.heroSubtitle,
-    heroBadges: fallback.heroBadges,
-    heroOrbitWords: fallback.heroOrbitWords,
-    emergencyTitle: fallback.emergencyTitle,
-    emergencyText: fallback.emergencyText,
-    contactTitle: fallback.contactTitle,
-    contactText: fallback.contactText,
+    slug: row.slug,
+    title,
+    excerpt,
+    intro,
+    seoTitle,
+    seoDescription,
   }
 }
 
-function normalizeLegacyPublicText(value: string | null | undefined): string {
-  return normalizeText(value)
-    .replace(/Business details from the provided screenshots are shown as text on the site instead of using screenshots as public images\./gi, 'Customer reference details for insurance, service scope, and direct contact before booking locksmith service.')
-    .replace(/Los datos de los screenshots proporcionados se muestran como texto en el sitio en lugar de usar screenshots como imágenes públicas\./gi, 'Información de referencia para clientes sobre seguro, servicios y contacto directo antes de solicitar cerrajería.')
-    .replace(/\bprovided screenshots?\b/gi, 'business records')
-    .replace(/\bscreenshots?\b/gi, 'business records')
-    .replace(/\bstarter copy\b/gi, 'service information')
-    .replace(/\bbeta\b/gi, '')
-    .replace(/No published FAQ items yet\./gi, 'Call Planet Locksmiths for current service questions.')
-    .replace(/No published reviews yet\./gi, 'Call Planet Locksmiths to discuss the service you need.')
-    .replace(/No published services yet\./gi, 'Call for the current service list.')
-    .replace(/No published areas yet\./gi, 'Call to confirm current service coverage.')
-    .replace(/Use this section to explain the main service categories customers can request, including lockouts, replacement keys, key fobs, transponder programming, broken key extraction, and ignition-related help\./gi, 'Full-service locksmith help includes emergency lockouts, car keys, rekeys, residential locks, commercial locks, safe opening, access control, and urgent service calls.')
-    .replace(/Use this section to explain what customers should send before service: vehicle make, model, year, location, urgency, key situation, and contact phone number\./gi, 'Send the service type, location, urgency, authorization details, contact phone number, and vehicle information when relevant.')
-    .replace(/Use this section to explain your coverage area and how mobile automotive locksmith requests are handled across Philadelphia and nearby locations\./gi, 'Mobile locksmith service is available across Philadelphia and nearby coverage areas for automotive, residential, commercial, and emergency needs.')
-    .replace(/Use this block for general service-page explanation\. The specific service title, intro, excerpt, and SEO fields still come from Services admin\./gi, 'Service details, preparation steps, and timing factors are confirmed before work begins.')
-    .replace(/Use this block for general area-page explanation\. The specific city, title, intro, supported services, and SEO fields still come from Areas admin\./gi, 'Local service details, common locksmith needs, and preparation notes are listed for this coverage area.')
-    .replace(/Use this block to explain/gi, 'This section explains')
-    .replace(/Services admin/gi, 'the service list')
-    .replace(/Areas admin/gi, 'the coverage list')
-    .replace(/Published services/gi, 'Available services')
-    .replace(/Published areas/gi, 'Coverage areas')
-    .replace(/mobile locksmith request support/gi, 'mobile locksmith service')
-    .replace(/locksmith request support/gi, 'locksmith service')
-    .replace(/mobile locksmith support built for clear, fast service requests\./gi, 'Full-service mobile locksmith help for cars, homes, and businesses.')
-    .replace(/Mobile locksmith support built for clear, fast service requests\./g, 'Full-service mobile locksmith help for cars, homes, and businesses.')
-    .replace(/Read customer feedback for mobile locksmith requests/gi, 'Read customer feedback for mobile locksmith service')
-    .replace(/Answers to common questions about mobile locksmith requests/gi, 'Answers to common questions about mobile locksmith service')
-    .replace(/The site is designed around auto, residential, commercial, rekey, installation, safe opening, access control, and emergency service requests\./gi, 'Service is available for automotive, residential, commercial, rekey, installation, safe opening, access control, and emergency locksmith needs.')
-    .replace(/The site is designed around/gi, 'Planet Locksmiths provides')
-    .replace(/Planet\s*Lock\s*Smiths/gi, 'Planet Locksmiths')
-    .replace(/Planet\s+locksmiths/gi, 'Planet Locksmiths')
-    .replace(/Planetlocksmiths/gi, 'Planet Locksmiths')
-    .replace(/Planetlocksmith\b/gi, 'Planet Locksmiths')
-    .replace(/Planetlocksmiths/g, 'Planet Locksmiths')
-    .replace(/Planet Locksmiths provides mobile automotive locksmith request support for car lockouts, replacement keys, key fob programming, transponder keys, broken key extraction, and ignition-related help\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
-    .replace(/Planet Locksmiths provides mobile locksmith service for car lockouts, replacement keys, key fob programming, transponder keys, broken key extraction, and ignition-related help\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
-    .replace(/Planet Locksmiths ofrece soporte móvil de cerrajería automotriz para autos cerrados, reemplazo de llaves, programación de controles, llaves transponder, extracción de llave rota e ignición\./gi, 'Planet Locksmiths ofrece cerrajería móvil 24/7 para bloqueos, programación de llaves, rekeys, reparación, reemplazo, residencial, comercial, access control, cajas fuertes y emergencias.')
-    .replace(/Planet Locksmiths ayuda con solicitudes móviles de cerrajería automotriz: apertura de auto, reemplazo de llaves, programación de fobs, transponder keys, broken keys e ignition\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
-    .replace(/Planet Locksmiths помогает с мобильными автомобильными locksmith-заявками: открытие авто, замена ключей, программирование брелков, transponder-ключи, сломанные ключи и зажигание\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
-    .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
-    .replace(/Automotive Locksmith Services/g, 'Locksmith Services')
-    .replace(/Automotive locksmith service areas/g, 'Locksmith service areas')
-    .replace(/automotive locksmith coverage/gi, 'locksmith coverage')
-    .replace(/mobile automotive locksmith/gi, 'mobile locksmith')
-    .replace(/automotive locksmith/gi, 'locksmith')
-    .replace(/vehicle-specific requests/gi, 'locksmith service requests')
-    .replace(/vehicle details/gi, 'service details')
-    .replace(/vehicle information/gi, 'service information')
-    .replace(/vehicle requirements/gi, 'service requirements')
-    .replace(/vehicle make, model, and year/gi, 'service type, lock details, and vehicle info when relevant')
-    .replace(/vehicle security system/gi, 'lock, key, or security system')
+function isPublishedServiceRow(row: ServiceRow): boolean {
+  return Boolean(row.is_published ?? true)
 }
 
-function usesLegacyFaqCopy(rows: FaqRow[]): boolean {
-  const text = rows.map((row) => `${row.question || ''} ${row.answer || ''}`).join(' ').toLowerCase()
-  const hasAutomotiveScope = /automotive|vehicle|car key|car lockout|key fob|transponder|ignition/.test(text)
-  const hasFullScope = /residential|commercial|house|home|office|business|rekey|smart lock|access control|safe|mailbox|master key|panic bar/.test(text)
-
-  return (
-    text.includes('do you provide 24/7 automotive locksmith service') ||
-    text.includes('focused on mobile automotive locksmith service') ||
-    text.includes('if residential or commercial service is added later') ||
-    (hasAutomotiveScope && !hasFullScope)
-  )
+function getServiceSortOrder(row: ServiceRow | undefined, fallback: number): number {
+  const value = Number(row?.sort_order)
+  return Number.isFinite(value) ? value : fallback
 }
 
-function usesLegacyReviewCopy(rows: ReviewRow[]): boolean {
-  const text = rows.map((row) => `${row.name || ''} ${row.quote || ''}`).join(' ').toLowerCase()
-  const hasAutomotiveScope = /automotive|vehicle|driver|car|key fob|ignition/.test(text)
-  const hasFullScope = /residential|commercial|house|home|business|office|rekey|smart lock|access control|emergency|lock repair|after hours/.test(text)
+function mergeCatalogServices(locale: Locale, rows: ServiceRow[]): ServiceContent[] {
+  const catalog = getCatalogServices(locale)
+  const catalogBySlug = new Map(catalog.map((service) => [service.slug, service]))
+  const rowsBySlug = new Map<string, ServiceRow>()
 
-  return (
-    text.includes('mobile automotive locksmith') ||
-    text.includes('local vehicle owner') ||
-    text.includes('possible for my vehicle') ||
-    (hasAutomotiveScope && !hasFullScope)
-  )
-}
-
-function mergeCatalogServices(locale: Locale, _rows: ServiceRow[]): ServiceContent[] {
-  return getCatalogServices(locale).map(mapCatalogService)
-}
-
-export async function getContentBlocksFromSource(
-  locale: Locale,
-  pageKey: string,
-  slot?: string
-): Promise<SiteContentBlock[]> {
-
-  const supabase = getSupabaseServerClient()
-  if (!supabase) {
-    return []
+  for (const row of rows) {
+    const slug = normalizeText(row.slug)
+    if (!slug || rowsBySlug.has(slug)) continue
+    rowsBySlug.set(slug, { ...row, slug })
   }
 
-  try {
-    let query = (supabase.from('site_content_blocks') as any)
-      .select('id, locale, page_key, slot, eyebrow, title, body, items, cta_label, cta_href, sort_order, is_published')
-      .eq('locale', locale)
-      .eq('page_key', pageKey)
-      .eq('is_published', true)
-      .order('sort_order', { ascending: true })
+  const merged: Array<{ service: ServiceContent; sortOrder: number; fallbackOrder: number }> = []
 
-    if (slot) {
-      query = query.eq('slot', slot)
-    }
+  catalog.forEach((catalogService, index) => {
+    const row = rowsBySlug.get(catalogService.slug)
+    if (row && !isPublishedServiceRow(row)) return
 
-    const result = await query
-
-    if (result.error) {
-      console.error('site_content_blocks select error:', result.error)
-      return []
-    }
-
-    const rows = Array.isArray(result.data) ? (result.data as SiteContentBlockRow[]) : []
-
-    return rows.map((row) => ({
-      id: row.id,
-      locale: row.locale as Locale,
-      pageKey: row.page_key,
-      slot: row.slot,
-      eyebrow: normalizeLegacyPublicText(row.eyebrow),
-      title: normalizeLegacyPublicText(row.title),
-      body: normalizeLegacyPublicText(row.body),
-      items: normalizeItems(row.items).map(normalizeLegacyPublicText),
-      ctaLabel: normalizeLegacyPublicText(row.cta_label),
-      ctaHref: row.cta_href ?? '',
-      sortOrder: Number(row.sort_order ?? 0),
-    }))
-  } catch (error) {
-    console.error('getContentBlocksFromSource failed:', error)
-    return []
-  }
-}
-
-export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
-
-  const fileFallback = getFileGlobalSettings()
-  const supabase = getSupabaseServerClient()
-
-  if (!supabase) {
-    return fileFallback
-  }
-
-  try {
-    const result = await (supabase.from('site_settings') as any)
-      .select('id, brand_name, logo_url, logo_alt, phone_primary, phone_display, email, service_hours, updated_at')
-      .order('updated_at', { ascending: false })
-      .limit(1)
-
-    if (result.error || !result.data?.[0]) {
-      const logoFallback = await getLatestPublishedLogo(supabase)
-      return {
-        ...fileFallback,
-        logoUrl: logoFallback.logoUrl || fileFallback.logoUrl,
-        logoAlt: logoFallback.logoAlt || fileFallback.logoAlt,
-      }
-    }
-
-    const row = result.data[0] as SiteSettingsRow
-    const phonePrimary = normalizePhonePrimary(row.phone_primary, fileFallback.phonePrimary)
-    const phoneDisplay = normalizePhoneDisplay(row.phone_display, fileFallback.phoneDisplay, phonePrimary)
-    const brandName = normalizeBrandName(row.brand_name, fileFallback.brandName)
-    const settingsLogoUrl = normalizeText(row.logo_url)
-    const logoFallback = await getLatestPublishedLogo(supabase)
-    const publishedLogoAlt = normalizeLogoAlt(logoFallback.logoAlt, brandName)
-    const shouldUsePublishedLogo =
-      Boolean(logoFallback.logoUrl) &&
-      (!settingsLogoUrl || isAfterIsoDate(logoFallback.createdAt, row.updated_at))
-    const logoUrl = shouldUsePublishedLogo ? logoFallback.logoUrl : settingsLogoUrl
-    const logoAlt = normalizeLogoAlt(row.logo_alt, (shouldUsePublishedLogo ? publishedLogoAlt : '') || brandName)
-
-    return {
-      ...fileFallback,
-      brandName,
-      logoUrl,
-      logoAlt,
-      phonePrimary,
-      phoneDisplay,
-      email: normalizeEmail(row.email, fileFallback.email),
-      serviceHours: normalizeServiceHours(row.service_hours, fileFallback.serviceHours),
-    }
-  } catch (error) {
-    console.error('getGlobalSettingsFromSource failed:', error)
-    return fileFallback
-  }
-}
-
-export async function getHomeContentFromSource(locale: Locale): Promise<HomeContent> {
-
-  const fileFallback = getFileHomeContent(locale)
-  const supabase = getSupabaseServerClient()
-
-  if (!supabase) {
-    return normalizeHomeCopy(locale, fileFallback)
-  }
-
-  try {
-    const result = await (supabase.from('home_pages') as any)
-      .select('id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, emergency_title, emergency_text, reviews_title, faq_title, contact_title, contact_text')
-      .eq('locale', locale)
-      .limit(1)
-
-    if (result.error) {
-      console.error('home_pages select error:', result.error)
-      return fileFallback
-    }
-
-    const row = (result.data?.[0] ?? null) as HomePageRow | null
-
-    if (!row) {
-      return normalizeHomeCopy(locale, fileFallback)
-    }
-
-    return normalizeHomeCopy(locale, {
-      ...fileFallback,
-      heroTitle: row.hero_title ?? fileFallback.heroTitle,
-      heroSubtitle: row.hero_subtitle ?? fileFallback.heroSubtitle,
-      heroPrimaryCta: row.hero_primary_cta ?? fileFallback.heroPrimaryCta,
-      heroSecondaryCta: row.hero_secondary_cta ?? fileFallback.heroSecondaryCta,
-      emergencyTitle: row.emergency_title ?? fileFallback.emergencyTitle,
-      emergencyText: row.emergency_text ?? fileFallback.emergencyText,
-      reviewsTitle: row.reviews_title ?? fileFallback.reviewsTitle,
-      faqTitle: row.faq_title ?? fileFallback.faqTitle,
-      contactTitle: row.contact_title ?? fileFallback.contactTitle,
-      contactText: row.contact_text ?? fileFallback.contactText,
+    merged.push({
+      service: row ? mapServiceRow(row, catalogService) : mapCatalogService(catalogService),
+      sortOrder: getServiceSortOrder(row, index),
+      fallbackOrder: index,
     })
-  } catch (error) {
-    console.error('getHomeContentFromSource failed:', error)
-    return normalizeHomeCopy(locale, fileFallback)
-  }
-}
+  })
 
-export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]> {
+  let customIndex = catalog.length
+  for (const row of rows) {
+    const slug = normalizeText(row.slug)
+    if (!slug || catalogBySlug.has(slug) || isHiddenLegacyServiceSlug(slug) || !isPublishedServiceRow(row)) continue
 
-  const fileFallback = getFileReviews(locale)
-  const supabase = getSupabaseServerClient()
+    const service = mapServiceRow({ ...row, slug })
+    if (!service.title && !service.excerpt) continue
 
-  if (!supabase) {
-    return fileFallback
-  }
-
-  try {
-    const result = await (supabase.from('reviews') as any)
-      .select('id, locale, name, rating, quote, date, city, sort_order, is_published')
-      .eq('locale', locale)
-      .eq('is_published', true)
-      .order('sort_order', { ascending: true })
-
-    if (result.error) {
-      console.error('reviews select error:', result.error)
-      return fileFallback
-    }
-
-    const rows = Array.isArray(result.data) ? (result.data as ReviewRow[]) : []
-
-    if (!rows.length) {
-      return fileFallback
-    }
-
-    if (usesLegacyReviewCopy(rows)) {
-      return fileFallback
-    }
-
-    return rows.map((row) => ({
-      name: normalizeLegacyPublicText(row.name),
-      rating: row.rating ?? 5,
-      quote: normalizeLegacyPublicText(row.quote),
-      date: row.date ?? undefined,
-      city: normalizeLegacyPublicText(row.city) || undefined,
-    }))
-  } catch (error) {
-    console.error('getReviewsFromSource failed:', error)
-    return fileFallback
-  }
-}
-
-export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
-
-  const fileFallback = getFileFaq(locale)
-  const supabase = getSupabaseServerClient()
-
-  if (!supabase) {
-    return fileFallback
+    merged.push({
+      service,
+      sortOrder: getServiceSortOrder(row, customIndex),
+      fallbackOrder: customIndex,
+    })
+    customIndex += 1
   }
 
-  try {
-    const result = await (supabase.from('faq_items') as any)
-      .select('id, locale, question, answer, sort_order, is_published')
-      .eq('locale', locale)
-      .eq('is_published', true)
-      .order('sort_order', { ascending: true })
-
-    if (result.error) {
-      console.error('faq_items select error:', result.error)
-      return fileFallback
-    }
-
-    const rows = Array.isArray(result.data) ? (result.data as FaqRow[]) : []
-
-    if (!rows.length) {
-      return fileFallback
-    }
-
-    if (usesLegacyFaqCopy(rows)) {
-      return fileFallback
-    }
-
-    return rows.map((row) => ({
-      question: normalizeLegacyPublicText(row.question),
-      answer: normalizeLegacyPublicText(row.answer),
-    }))
-  } catch (error) {
-    console.error('getFaqFromSource failed:', error)
-    return fileFallback
-  }
+  return merged
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.fallbackOrder - b.fallbackOrder)
+    .map((item) => item.service)
 }
 
 export async function getServicesListFromSource(locale: Locale): Promise<ServiceContent[]> {
-
   const fileFallback = getFileHomeContent(locale).featuredServices.map(mapFileServiceFallback)
   const catalogFallback = getCatalogServices(locale).map(mapCatalogService)
   const supabase = getSupabaseServerClient()
@@ -716,12 +173,11 @@ export async function getServicesListFromSource(locale: Locale): Promise<Service
     const result = await (supabase.from('services') as any)
       .select('id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published')
       .eq('locale', locale)
-      .eq('is_published', true)
       .order('sort_order', { ascending: true })
 
     if (result.error) {
       console.error('services list select error:', result.error)
-      return fileFallback
+      return catalogFallback.length ? catalogFallback : fileFallback
     }
 
     const rows = Array.isArray(result.data) ? (result.data as ServiceRow[]) : []
@@ -737,40 +193,10 @@ export async function getServicesListFromSource(locale: Locale): Promise<Service
   }
 }
 
-export async function getAreasListFromSource(locale: Locale): Promise<AreaContent[]> {
-
-  const supabase = getSupabaseServerClient()
-
-  if (!supabase) {
-    return []
-  }
-
-  try {
-    const result = await (supabase.from('areas') as any)
-      .select('id, locale, slug, city, state, title, intro, highlights, supported_services, seo_title, seo_description, sort_order, is_published')
-      .eq('locale', locale)
-      .eq('is_published', true)
-      .order('sort_order', { ascending: true })
-
-    if (result.error) {
-      console.error('areas list select error:', result.error)
-      return []
-    }
-
-    const rows = Array.isArray(result.data) ? (result.data as AreaRow[]) : []
-
-    return rows.map(mapAreaRow)
-  } catch (error) {
-    console.error('getAreasListFromSource failed:', error)
-    return []
-  }
-}
-
 export async function getServicePageFromSource(
   locale: Locale,
   slug: string
 ): Promise<ServiceContent | null> {
-
   const fileHome = getFileHomeContent(locale)
   const fileFallback = fileHome.featuredServices.find((item) => item.slug === slug)
   const catalogFallback = getCatalogServiceBySlug(locale, slug)
@@ -785,7 +211,6 @@ export async function getServicePageFromSource(
       .select('id, locale, slug, title, excerpt, intro, seo_title, seo_description, sort_order, is_published')
       .eq('locale', locale)
       .eq('slug', slug)
-      .eq('is_published', true)
       .limit(1)
 
     if (result.error) {
@@ -799,46 +224,14 @@ export async function getServicePageFromSource(
       return catalogFallback ? mapCatalogService(catalogFallback) : fileFallback ? mapFileServiceFallback(fileFallback) : null
     }
 
-    return catalogFallback ? mapCatalogService(catalogFallback) : mapServiceRow(row, fileFallback)
+    if (!isPublishedServiceRow(row)) {
+      return null
+    }
+
+    const service = mapServiceRow(row, catalogFallback ?? fileFallback)
+    return service.title || service.excerpt ? service : null
   } catch (error) {
     console.error('getServicePageFromSource failed:', error)
     return catalogFallback ? mapCatalogService(catalogFallback) : fileFallback ? mapFileServiceFallback(fileFallback) : null
-  }
-}
-
-export async function getAreaPageFromSource(
-  locale: Locale,
-  slug: string
-): Promise<AreaContent | null> {
-
-  const supabase = getSupabaseServerClient()
-
-  if (!supabase) {
-    return null
-  }
-
-  try {
-    const result = await (supabase.from('areas') as any)
-      .select('id, locale, slug, city, state, title, intro, highlights, supported_services, seo_title, seo_description, sort_order, is_published')
-      .eq('locale', locale)
-      .eq('slug', slug)
-      .eq('is_published', true)
-      .limit(1)
-
-    if (result.error) {
-      console.error('areas select error:', result.error)
-      return null
-    }
-
-    const row = (result.data?.[0] ?? null) as AreaRow | null
-
-    if (!row) {
-      return null
-    }
-
-    return mapAreaRow(row)
-  } catch (error) {
-    console.error('getAreaPageFromSource failed:', error)
-    return null
   }
 }

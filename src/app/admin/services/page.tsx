@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { getCatalogServices } from '@/lib/services-catalog'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -43,6 +44,40 @@ function createEmptyRow(locale: Locale, sortOrder = 0): ServiceFormRow {
     sortOrder,
     isPublished: true,
   }
+}
+
+function createCatalogRow(locale: Locale, service: ReturnType<typeof getCatalogServices>[number], sortOrder: number): ServiceFormRow {
+  return {
+    id: '',
+    locale,
+    slug: service.slug,
+    title: service.title,
+    excerpt: service.excerpt,
+    intro: service.intro,
+    seoTitle: service.seoTitle,
+    seoDescription: service.seoDescription,
+    sortOrder,
+    isPublished: true,
+  }
+}
+
+function isCatalogSlug(locale: Locale, slug: string) {
+  return getCatalogServices(locale).some((service) => service.slug === slug.trim())
+}
+
+function mergeRowsWithCatalog(locale: Locale, rows: ServiceFormRow[]) {
+  const rowsBySlug = new Map<string, ServiceFormRow>()
+  for (const row of rows) {
+    const slug = row.slug.trim()
+    if (slug && !rowsBySlug.has(slug)) rowsBySlug.set(slug, row)
+  }
+
+  const catalog = getCatalogServices(locale)
+  const catalogSlugs = new Set(catalog.map((service) => service.slug))
+  const merged = catalog.map((service, index) => rowsBySlug.get(service.slug) ?? createCatalogRow(locale, service, index))
+  const customRows = rows.filter((row) => row.slug.trim() && !catalogSlugs.has(row.slug.trim()))
+
+  return [...merged, ...customRows].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
 export default function AdminServicesPage() {
@@ -96,6 +131,10 @@ export default function AdminServicesPage() {
           })
         }
 
+        for (const locale of locales) {
+          nextRows[locale] = mergeRowsWithCatalog(locale, nextRows[locale])
+        }
+
         if (!mounted) return
         setRowsByLocale(nextRows)
       } catch (error) {
@@ -133,6 +172,12 @@ export default function AdminServicesPage() {
     if (!row) return
 
     if (!row.id) {
+      if (isCatalogSlug(row.locale, row.slug)) {
+        updateRow(index, { isPublished: false })
+        setSuccessMessage('Каталожная услуга переведена в черновик. Нажми “Сохранить услуги”, чтобы скрыть её на сайте.')
+        return
+      }
+
       setRowsByLocale((prev) => {
         const copy = [...prev[activeLocale]]
         copy.splice(index, 1)
@@ -243,7 +288,7 @@ export default function AdminServicesPage() {
 
       <section style={guideStyle}>
         <p style={eyebrowStyle}>Подсказка</p>
-        <p style={mutedStyle}>Slug нужен для ссылки страницы. Остальные поля можно оставлять короткими или длинными — система больше не блокирует сохранение по длине текста.</p>
+        <p style={mutedStyle}>Стандартный locksmith-каталог уже подставлен в форму. Сохрани страницу, чтобы записать недостающие услуги в Supabase; правки названий, описаний, SEO и черновики сразу будут учитываться публичным сайтом.</p>
       </section>
 
       <section style={filtersStyle}>
