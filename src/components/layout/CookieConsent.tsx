@@ -69,6 +69,20 @@ function getCookie(name: string) {
     ?.slice(name.length + 1) || ''
 }
 
+function getSavedConsent() {
+  const raw = getCookie(cookieName)
+  if (!raw) return null
+
+  try {
+    const parsed = JSON.parse(decodeURIComponent(raw)) as { analytics?: boolean; level?: ConsentLevel }
+    return {
+      analytics: Boolean(parsed.analytics || parsed.level === 'all'),
+    }
+  } catch {
+    return null
+  }
+}
+
 function writeConsent(level: ConsentLevel) {
   const value = encodeURIComponent(JSON.stringify({
     level,
@@ -97,6 +111,18 @@ export default function CookieConsent() {
   const [visible, setVisible] = useState(false)
   const [customizing, setCustomizing] = useState(false)
   const [analytics, setAnalytics] = useState(false)
+
+  useEffect(() => {
+    function openPreferences() {
+      const saved = getSavedConsent()
+      setAnalytics(Boolean(saved?.analytics))
+      setCustomizing(true)
+      setVisible(true)
+    }
+
+    window.addEventListener('planetlocksmiths-open-cookie-preferences', openPreferences)
+    return () => window.removeEventListener('planetlocksmiths-open-cookie-preferences', openPreferences)
+  }, [])
 
   useEffect(() => {
     const isAdmin = pathname?.startsWith('/admin')

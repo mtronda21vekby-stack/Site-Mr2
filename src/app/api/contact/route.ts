@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+type ContactRequest = {
+  name: string
+  phone: string
+  email: string
+  serviceNeeded: string
+  vehicleMakeModel: string
+  vehicleYear: string
+  location: string
+  urgency: string
+  preferredTime: string
+  message: string
+}
+
+const defaultContactEmail = 'planetlocksmits@gmail.com'
+const defaultFromEmail = 'Planet Locksmiths <onboarding@resend.dev>'
+const resendEndpoint = 'https://api.resend.com/emails'
+
 function getSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -10,6 +27,105 @@ function getSupabaseServerClient() {
   }
 
   return createClient(url, anonKey)
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function clean(value: string) {
+  return value.trim() || '-'
+}
+
+function isLikelyEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
+
+function buildEmailRows(contact: ContactRequest) {
+  return [
+    ['Name', contact.name],
+    ['Phone', contact.phone],
+    ['Email', contact.email],
+    ['Service', contact.serviceNeeded],
+    ['Urgency', contact.urgency],
+    ['Location', contact.location],
+    ['Preferred time', contact.preferredTime],
+    ['Vehicle', contact.vehicleMakeModel],
+    ['Vehicle year', contact.vehicleYear],
+    ['Message', contact.message],
+  ] as const
+}
+
+function buildEmailText(contact: ContactRequest) {
+  return buildEmailRows(contact)
+    .map(([label, value]) => `${label}: ${clean(value)}`)
+    .join('\n')
+}
+
+function buildEmailHtml(contact: ContactRequest) {
+  const rows = buildEmailRows(contact)
+    .map(([label, value]) => `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;color:#42526e;font-weight:700;">${escapeHtml(label)}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;color:#0b1f4d;">${escapeHtml(clean(value)).replace(/\n/g, '<br>')}</td>
+      </tr>
+    `)
+    .join('')
+
+  return `
+    <div style="font-family:Arial,sans-serif;color:#0b1f4d;">
+      <h1 style="margin:0 0 12px;font-size:22px;">New Planet Locksmiths service request</h1>
+      <p style="margin:0 0 18px;color:#42526e;">A customer submitted the website request form.</p>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">${rows}</table>
+    </div>
+  `
+}
+
+async function sendContactNotification(contact: ContactRequest) {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    return { sent: false, reason: 'missing_resend_api_key' }
+  }
+
+  const to = (process.env.CONTACT_TO_EMAIL || process.env.ADMIN_EMAIL || defaultContactEmail).trim()
+  const from = (process.env.CONTACT_FROM_EMAIL || defaultFromEmail).trim()
+  const subjectParts = ['New locksmith request', contact.serviceNeeded, contact.urgency === 'asap' ? 'ASAP' : '']
+  const subject = subjectParts.filter(Boolean).join(' - ')
+  const payload: Record<string, unknown> = {
+    from,
+    to: [to],
+    subject,
+    text: buildEmailText(contact),
+    html: buildEmailHtml(contact),
+  }
+
+  if (contact.email && isLikelyEmail(contact.email)) {
+    payload.reply_to = contact.email
+  }
+
+  try {
+    const response = await fetch(resendEndpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      return { sent: false, reason: `resend_${response.status}` }
+    }
+
+    return { sent: true, reason: '' }
+  } catch {
+    return { sent: false, reason: 'resend_network_error' }
+  }
 }
 
 export async function POST(request: Request) {
@@ -72,19 +188,32 @@ export async function POST(request: Request) {
       )
     }
 
+    const contactRequest: ContactRequest = {
+      name,
+      phone,
+      email,
+      serviceNeeded,
+      vehicleMakeModel,
+      vehicleYear,
+      location,
+      urgency,
+      preferredTime,
+      message,
+    }
+
     const supabase = getSupabaseServerClient()
 
     const { error } = await (supabase.from('orders') as any).insert({
-      name,
-      phone,
+      name: contactRequest.name,
+      phone: contactRequest.phone,
       email: email || null,
-      service_needed: serviceNeeded,
-      vehicle_make_model: vehicleMakeModel || null,
-      vehicle_year: vehicleYear || null,
-      location,
-      urgency,
-      preferred_time: preferredTime || null,
-      message: message || null,
+      service_needed: contactRequest.serviceNeeded,
+      vehicle_make_model: contactRequest.vehicleMakeModel || null,
+      vehicle_year: contactRequest.vehicleYear || null,
+      location: contactRequest.location,
+      urgency: contactRequest.urgency,
+      preferred_time: contactRequest.preferredTime || null,
+      message: contactRequest.message || null,
       status: 'new',
     })
 
@@ -95,7 +224,9 @@ export async function POST(request: Request) {
       )
     }
 
-    return NextResponse.json({ success: true })
+    const notification = await sendContactNotification(contactRequest)
+
+    return NextResponse.json({ success: true, notificationSent: notification.sent })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create order.'
 

@@ -1,4 +1,4 @@
-# Planetlocksmiths — OpenNext / Cloudflare Workers build
+# Planet Locksmiths — OpenNext / Cloudflare Workers build
 
 This package is migrated away from `@cloudflare/next-on-pages` and prepared for `@opennextjs/cloudflare`.
 
@@ -21,6 +21,20 @@ npm run deploy
 - `open-next.config.ts` is included.
 - `.open-next` is ignored in `.gitignore`.
 - `runtime = 'edge'` should not be used in route/page files with OpenNext.
+
+## Contact form email notifications
+
+The contact form always writes service requests to Supabase `orders`. Email notifications are optional and use Resend through the server route.
+
+Set these Cloudflare Worker environment variables/secrets:
+
+```bash
+RESEND_API_KEY=...
+CONTACT_TO_EMAIL=planetlocksmits@gmail.com
+CONTACT_FROM_EMAIL="Planet Locksmiths <mail@your-verified-domain.com>"
+```
+
+`CONTACT_FROM_EMAIL` should use a Resend-verified sender/domain. If `RESEND_API_KEY` is missing, the form still succeeds and the request remains available in the admin orders page.
 
 ## Notes
 
