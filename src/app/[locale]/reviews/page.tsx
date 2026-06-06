@@ -26,8 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 }
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; empty: string }> = {
-  en: { eyebrow: 'Customer feedback', title: 'Customer Reviews', body: 'Read customer feedback for mobile locksmith requests including lockouts, replacement keys, fobs, rekeys, lock repair, commercial access, and residential service situations.', empty: 'No published reviews yet.' },
-  es: { eyebrow: 'Opiniones de clientes', title: 'Reseñas de clientes', body: 'Lea opiniones de clientes sobre cerrajería móvil: bloqueos, llaves, controles, rekeys, reparación, acceso comercial y servicio residencial.', empty: 'No hay reseñas publicadas todavía.' },
+  en: { eyebrow: 'Customer feedback', title: 'Customer Reviews', body: 'Read customer feedback for mobile locksmith service including lockouts, replacement keys, fobs, rekeys, lock repair, commercial access, and residential service situations.', empty: 'Call Planet Locksmiths to discuss the service you need.' },
+  es: { eyebrow: 'Opiniones de clientes', title: 'Reseñas de clientes', body: 'Lea opiniones de clientes sobre cerrajería móvil: bloqueos, llaves, controles, rekeys, reparación, acceso comercial y servicio residencial.', empty: 'Llama a Planet Locksmiths para hablar del servicio que necesitas.' },
 }
 
 export default async function ReviewsPage({ params }: { params: Promise<{ locale: Locale }> }) {

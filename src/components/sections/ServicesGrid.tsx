@@ -15,15 +15,15 @@ function getCopy(locale: Locale) {
       return {
         eyebrow: 'Servicios de cerrajería',
         title: 'Servicios móviles de cerrajería organizados por necesidad',
-        intro: 'Pasa el cursor sobre un servicio para ver qué incluye. En móvil, la descripción se muestra directamente.',
+        intro: 'Servicio para bloqueos, llaves, rekeys, reparación de cerraduras, negocios, hogares, cajas fuertes y acceso comercial.',
         cta: 'Ver detalle',
         all: 'Todos los servicios',
       }
     case 'ru':
       return {
         eyebrow: 'Услуги',
-        title: 'Мобильные locksmith-услуги по реальным запросам',
-        intro: 'Наведи на название услуги, чтобы раскрыть описание. На телефоне описание видно сразу.',
+        title: 'Мобильные locksmith-услуги для авто, дома и бизнеса',
+        intro: 'Помощь при lockout, потерянных ключах, rekey, ремонте замков, коммерческом доступе, сейфах и срочных ситуациях.',
         cta: 'Подробнее',
         all: 'Все услуги',
       }
@@ -31,8 +31,8 @@ function getCopy(locale: Locale) {
     default:
       return {
         eyebrow: 'Locksmith services',
-        title: 'Fast mobile locksmith help, organized by need',
-        intro: 'Hover a service to see what is included. On mobile, each description stays visible for quick scanning.',
+        title: 'Mobile locksmith service for cars, homes, and businesses',
+        intro: 'Help for lockouts, lost keys, rekeys, lock repair, commercial access, safe opening, smart locks, and urgent service calls.',
         cta: 'View details',
         all: 'All services',
       }

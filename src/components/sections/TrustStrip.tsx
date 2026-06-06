@@ -6,11 +6,11 @@ interface TrustStripProps {
 
 const copy = {
   en: {
-    title: 'Clear mobile locksmith support',
+    title: 'Reliable mobile locksmith service',
     items: [
       {
-        title: '24/7 request intake',
-        text: 'Urgent requests can be submitted any time. Same-day help depends on availability.',
+        title: '24/7 emergency service',
+        text: 'Call any time for urgent lockouts, lost keys, broken keys, and access problems.',
       },
       {
         title: 'Full locksmith scope',
@@ -21,8 +21,8 @@ const copy = {
         text: 'Primary service area is Philadelphia with a mobile dispatch model.',
       },
       {
-        title: 'Straight intake flow',
-        text: 'Call directly or send service, location, access, and issue details through the request form.',
+        title: 'Straight service flow',
+        text: 'Call directly or send service, location, access, and issue details through the contact form.',
       },
     ],
   },
@@ -30,8 +30,8 @@ const copy = {
     title: 'Soporte móvil de cerrajería claro',
     items: [
       {
-        title: 'Solicitudes 24/7',
-        text: 'Las solicitudes urgentes pueden enviarse en cualquier momento. La ayuda el mismo día depende de disponibilidad.',
+        title: 'Servicio de emergencia 24/7',
+        text: 'Llama en cualquier momento para bloqueos urgentes, llaves perdidas, llaves rotas y problemas de acceso.',
       },
       {
         title: 'Servicios completos',
@@ -63,7 +63,7 @@ const copy = {
         text: 'Основная зона обслуживания — Филадельфия с мобильным форматом выезда.',
       },
       {
-        title: 'Простой intake flow',
+        title: 'Простой сервисный процесс',
         text: 'Можно позвонить сразу или отправить услугу, локацию, доступ и проблему через форму.',
       },
     ],
@@ -78,7 +78,7 @@ export default function TrustStrip({ locale }: TrustStripProps) {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
           <p className="text-xs uppercase tracking-[0.24em] text-accent-cyan">
-            Trust layer
+            Why customers call
           </p>
           <h2 className="mt-2 text-2xl font-heading font-semibold text-text">
             {t.title}

@@ -1,11 +1,11 @@
 [
   {
     "question": "Do you offer 24/7 emergency locksmith service?",
-    "answer": "Yes. Planet Locksmiths handles 24/7 emergency locksmith requests for lockouts, lost keys, broken keys, rekeys, lock repair, and access problems. Availability can depend on location, timing, authorization, parts, and job complexity."
+    "answer": "Yes. Planet Locksmiths provides 24/7 emergency locksmith service for lockouts, lost keys, broken keys, rekeys, lock repair, and access problems. Availability can depend on location, timing, authorization, parts, and job complexity."
   },
   {
     "question": "Can you help with house lockouts?",
-    "answer": "Yes. House lockout requests are part of the residential locksmith scope. Send the exact address, lock type if known, and authorization details so the request can be reviewed correctly."
+    "answer": "Yes. House lockouts are part of the residential locksmith scope. Send the exact address, lock type if known, and authorization details so the service can be prepared correctly."
   },
   {
     "question": "Do you program car keys and key fobs?",
@@ -17,7 +17,7 @@
   },
   {
     "question": "Do you work with commercial locks and access control?",
-    "answer": "Yes. Commercial locksmith requests can include office locks, storefront doors, lock repair, master key systems, panic bars, high-security locks, and access-control service."
+    "answer": "Yes. Commercial locksmith service can include office locks, storefront doors, lock repair, master key systems, panic bars, high-security locks, and access-control service."
   },
   {
     "question": "Can you install smart locks?",
@@ -25,7 +25,7 @@
   },
   {
     "question": "Can you open safes?",
-    "answer": "Safe opening requests can be reviewed. The next step depends on the safe type, lock condition, access authorization, and whether the safe is locked, jammed, or has a forgotten combination."
+    "answer": "Safe opening service is available for many locked, jammed, or forgotten-combination situations. The next step depends on the safe type, lock condition, and access authorization."
   },
   {
     "question": "Can you replace mailbox locks?",
@@ -37,6 +37,6 @@
   },
   {
     "question": "Do you repair broken or stuck keys?",
-    "answer": "Yes. Broken key extraction and stuck-key situations can be reviewed for doors, ignitions, trunks, and lock cylinders. Repair or replacement depends on the damage and lock condition."
+    "answer": "Yes. Broken key extraction and stuck-key help is available for doors, ignitions, trunks, and lock cylinders. Repair or replacement depends on the damage and lock condition."
   }
 ]

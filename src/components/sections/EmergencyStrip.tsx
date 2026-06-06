@@ -11,9 +11,9 @@ interface EmergencyStripProps {
 }
 
 const requestLabels: Record<Locale, { eyebrow: string; request: string; callPrefix: string }> = {
-  en: { eyebrow: 'Emergency service request', request: 'Request service', callPrefix: 'Call' },
-  es: { eyebrow: 'Solicitud de emergencia', request: 'Solicitar servicio', callPrefix: 'Llamar' },
-  ru: { eyebrow: 'Emergency service request', request: 'Request service', callPrefix: 'Call' },
+  en: { eyebrow: 'Emergency locksmith service', request: 'Request service', callPrefix: 'Call' },
+  es: { eyebrow: 'Servicio de emergencia', request: 'Solicitar servicio', callPrefix: 'Llamar' },
+  ru: { eyebrow: 'Emergency locksmith service', request: 'Request service', callPrefix: 'Call' },
 }
 
 export default function EmergencyStrip({ title, text, phoneNumber, phoneDisplay, locale }: EmergencyStripProps) {

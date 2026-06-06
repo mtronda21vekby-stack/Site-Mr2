@@ -6,25 +6,25 @@ type InsuranceTrustSectionProps = {
 
 const copy = {
   en: {
-    eyebrow: 'Insurance & business details',
-    title: 'Planet Locksmiths business information',
-    intro: 'Business details from the provided screenshots are shown as text on the site instead of using screenshots as public images.',
+    eyebrow: 'Verified business details',
+    title: 'Planet Locksmiths credentials and contact information',
+    intro: 'Customer reference details for insurance, service scope, and direct contact before booking locksmith service.',
     items: [
-      ['Certificate of Liability Insurance', 'Certificate date shown: 05/16/2026. General liability coverage period shown: 05/16/2026 to 05/16/2027.'],
-      ['Insurance carrier', 'Next Insurance US Company is listed on the certificate documentation provided for verification.'],
-      ['Primary contact', 'Business phone: +1 (267) 612-2555. Email: planetlocksmits@gmail.com.'],
-      ['Service scope', 'Automotive, residential, commercial, emergency 24/7, safe, access control, master key, panic bar, and high-security lock services.'],
+      ['Certificate of Liability Insurance', 'Certificate date: May 16, 2026. General liability coverage period: May 16, 2026 through May 16, 2027.'],
+      ['Insurance carrier', 'Next Insurance US Company is listed as the insurance carrier on the certificate.'],
+      ['Direct contact', 'Call +1 (267) 612-2555 or email planetlocksmits@gmail.com for locksmith service.'],
+      ['Service scope', '24/7 emergency, automotive, residential, commercial, smart lock, access control, safe, mailbox, master key, panic bar, and high-security lock service.'],
     ],
   },
   es: {
-    eyebrow: 'Seguro y datos del negocio',
-    title: 'Información comercial de Planet Locksmiths',
-    intro: 'Los datos de los screenshots proporcionados se muestran como texto en el sitio en lugar de usar screenshots como imágenes públicas.',
+    eyebrow: 'Datos verificados del negocio',
+    title: 'Credenciales y contacto de Planet Locksmiths',
+    intro: 'Información de referencia para clientes sobre seguro, servicios y contacto directo antes de solicitar cerrajería.',
     items: [
-      ['Certificate of Liability Insurance', 'Fecha mostrada del certificado: 05/16/2026. Periodo de cobertura mostrado: 05/16/2026 a 05/16/2027.'],
-      ['Compañía de seguro', 'Next Insurance US Company aparece en la documentación del certificado proporcionada para verificación.'],
-      ['Contacto principal', 'Teléfono: +1 (267) 612-2555. Email: planetlocksmits@gmail.com.'],
-      ['Servicios', 'Automotriz, residencial, comercial, emergencia 24/7, cajas fuertes, access control, master key, panic bar y high-security locks.'],
+      ['Certificate of Liability Insurance', 'Fecha del certificado: 16 de mayo de 2026. Periodo de cobertura: 16 de mayo de 2026 a 16 de mayo de 2027.'],
+      ['Compañía de seguro', 'Next Insurance US Company figura como compañía de seguro en el certificado.'],
+      ['Contacto directo', 'Llama al +1 (267) 612-2555 o escribe a planetlocksmits@gmail.com para servicio de cerrajería.'],
+      ['Servicios', 'Emergencia 24/7, automotriz, residencial, comercial, smart locks, access control, cajas fuertes, buzones, master key, panic bar y high-security locks.'],
     ],
   },
 } as const

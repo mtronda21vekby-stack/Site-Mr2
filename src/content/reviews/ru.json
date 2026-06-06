@@ -1,18 +1,18 @@
 [
   {
-    "name": "Car lockout и fob request",
+    "name": "Автомобильный lockout и программирование брелока",
     "rating": 5,
-    "quote": "Хорошая коммуникация по car lockout, и варианты key fob programming объяснили до начала работы.",
+    "quote": "Хорошая коммуникация по автомобильному lockout, и варианты программирования брелока объяснили до начала работы.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "House lockout customer",
+    "name": "Домашний lockout",
     "rating": 5,
-    "quote": "Запрос обработали понятно: я описал house lockout, отправил адрес и заранее понимал следующий шаг.",
+    "quote": "Я описал ситуацию с домашним lockout, отправил адрес и заранее понимал следующий шаг перед сервисом.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Rekey service request",
+    "name": "Rekey service",
     "rating": 5,
     "quote": "Полезный rekey service после переезда. Существующие замки можно было оставить, а старые ключи перестали работать.",
     "city": "Philadelphia, PA"
@@ -24,15 +24,15 @@
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Commercial access request",
+    "name": "Коммерческий доступ",
     "rating": 5,
-    "quote": "По business door issue объяснили варианты lock repair и access control без давления на решение.",
+    "quote": "По проблеме с коммерческой дверью объяснили варианты ремонта замка и access control без давления на решение.",
     "city": "Philadelphia, PA"
   },
   {
     "name": "Emergency locksmith call",
     "rating": 5,
-    "quote": "Удобный вариант 24/7, когда нужна была mobile locksmith help after hours. По телефону всё объяснили прямо и по делу.",
+    "quote": "Удобный вариант 24/7, когда нужна была мобильная locksmith-помощь после рабочего времени. По телефону всё объяснили прямо и по делу.",
     "city": "Philadelphia, PA"
   }
 ]

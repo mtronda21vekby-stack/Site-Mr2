@@ -311,17 +311,24 @@ function mapAreaRow(row: AreaRow): AreaContent {
     : row.locale === 'es'
       ? ['Cerrajero de emergencia 24/7', 'Auto cerrado', 'Rekey', 'Cerrajero comercial', 'Cerrajero residencial']
       : ['Emergency locksmith 24/7', 'Car lockout help', 'Rekey service', 'Commercial locksmith', 'Residential locksmith']
+  const intro = broadText(row.intro)
+  const areaText = [intro, ...highlights, ...supportedServices].join(' ').toLowerCase()
+  const hasFullAreaScope = /residential|commercial|house|home|business|rekey|smart lock|access control|safe|mailbox|master key|panic bar/.test(areaText)
+  const locationName = [row.city, row.state].map(normalizeText).filter(Boolean).join(', ')
+  const fallbackIntro = row.locale === 'es'
+    ? `Servicio móvil de cerrajería en ${locationName || 'Philadelphia'} para autos, hogares, negocios, emergencias, rekeys, cajas fuertes y access control.`
+    : `Mobile locksmith service in ${locationName || 'Philadelphia'} for automotive, residential, commercial, emergency, rekey, safe, and access-control needs.`
 
   return {
     slug: row.slug,
     city: row.city ?? '',
     state: row.state ?? '',
     title: broadText(row.title),
-    intro: broadText(row.intro),
+    intro: hasFullAreaScope ? intro : fallbackIntro,
     highlights,
     supportedServices,
     seoTitle: broadText(row.seo_title ?? row.title),
-    seoDescription: broadText(row.seo_description ?? row.intro),
+    seoDescription: hasFullAreaScope ? broadText(row.seo_description ?? row.intro) : fallbackIntro,
   }
 }
 
@@ -379,11 +386,44 @@ function normalizeHomeCopy(locale: Locale, content: HomeContent): HomeContent {
 
 function normalizeLegacyPublicText(value: string | null | undefined): string {
   return normalizeText(value)
+    .replace(/Business details from the provided screenshots are shown as text on the site instead of using screenshots as public images\./gi, 'Customer reference details for insurance, service scope, and direct contact before booking locksmith service.')
+    .replace(/Los datos de los screenshots proporcionados se muestran como texto en el sitio en lugar de usar screenshots como imágenes públicas\./gi, 'Información de referencia para clientes sobre seguro, servicios y contacto directo antes de solicitar cerrajería.')
+    .replace(/\bprovided screenshots?\b/gi, 'business records')
+    .replace(/\bscreenshots?\b/gi, 'business records')
+    .replace(/\bstarter copy\b/gi, 'service information')
+    .replace(/\bbeta\b/gi, '')
+    .replace(/No published FAQ items yet\./gi, 'Call Planet Locksmiths for current service questions.')
+    .replace(/No published reviews yet\./gi, 'Call Planet Locksmiths to discuss the service you need.')
+    .replace(/No published services yet\./gi, 'Call for the current service list.')
+    .replace(/No published areas yet\./gi, 'Call to confirm current service coverage.')
+    .replace(/Use this section to explain the main service categories customers can request, including lockouts, replacement keys, key fobs, transponder programming, broken key extraction, and ignition-related help\./gi, 'Full-service locksmith help includes emergency lockouts, car keys, rekeys, residential locks, commercial locks, safe opening, access control, and urgent service calls.')
+    .replace(/Use this section to explain what customers should send before service: vehicle make, model, year, location, urgency, key situation, and contact phone number\./gi, 'Send the service type, location, urgency, authorization details, contact phone number, and vehicle information when relevant.')
+    .replace(/Use this section to explain your coverage area and how mobile automotive locksmith requests are handled across Philadelphia and nearby locations\./gi, 'Mobile locksmith service is available across Philadelphia and nearby coverage areas for automotive, residential, commercial, and emergency needs.')
+    .replace(/Use this block for general service-page explanation\. The specific service title, intro, excerpt, and SEO fields still come from Services admin\./gi, 'Service details, preparation steps, and timing factors are confirmed before work begins.')
+    .replace(/Use this block for general area-page explanation\. The specific city, title, intro, supported services, and SEO fields still come from Areas admin\./gi, 'Local service details, common locksmith needs, and preparation notes are listed for this coverage area.')
+    .replace(/Use this block to explain/gi, 'This section explains')
+    .replace(/Services admin/gi, 'the service list')
+    .replace(/Areas admin/gi, 'the coverage list')
+    .replace(/Published services/gi, 'Available services')
+    .replace(/Published areas/gi, 'Coverage areas')
+    .replace(/mobile locksmith request support/gi, 'mobile locksmith service')
+    .replace(/locksmith request support/gi, 'locksmith service')
+    .replace(/mobile locksmith support built for clear, fast service requests\./gi, 'Full-service mobile locksmith help for cars, homes, and businesses.')
+    .replace(/Mobile locksmith support built for clear, fast service requests\./g, 'Full-service mobile locksmith help for cars, homes, and businesses.')
+    .replace(/Read customer feedback for mobile locksmith requests/gi, 'Read customer feedback for mobile locksmith service')
+    .replace(/Answers to common questions about mobile locksmith requests/gi, 'Answers to common questions about mobile locksmith service')
+    .replace(/The site is designed around auto, residential, commercial, rekey, installation, safe opening, access control, and emergency service requests\./gi, 'Service is available for automotive, residential, commercial, rekey, installation, safe opening, access control, and emergency locksmith needs.')
+    .replace(/The site is designed around/gi, 'Planet Locksmiths provides')
     .replace(/Planet\s*Lock\s*Smiths/gi, 'Planet Locksmiths')
     .replace(/Planet\s+locksmiths/gi, 'Planet Locksmiths')
     .replace(/Planetlocksmiths/gi, 'Planet Locksmiths')
     .replace(/Planetlocksmith\b/gi, 'Planet Locksmiths')
     .replace(/Planetlocksmiths/g, 'Planet Locksmiths')
+    .replace(/Planet Locksmiths provides mobile automotive locksmith request support for car lockouts, replacement keys, key fob programming, transponder keys, broken key extraction, and ignition-related help\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
+    .replace(/Planet Locksmiths provides mobile locksmith service for car lockouts, replacement keys, key fob programming, transponder keys, broken key extraction, and ignition-related help\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
+    .replace(/Planet Locksmiths ofrece soporte móvil de cerrajería automotriz para autos cerrados, reemplazo de llaves, programación de controles, llaves transponder, extracción de llave rota e ignición\./gi, 'Planet Locksmiths ofrece cerrajería móvil 24/7 para bloqueos, programación de llaves, rekeys, reparación, reemplazo, residencial, comercial, access control, cajas fuertes y emergencias.')
+    .replace(/Planet Locksmiths ayuda con solicitudes móviles de cerrajería automotriz: apertura de auto, reemplazo de llaves, programación de fobs, transponder keys, broken keys e ignition\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
+    .replace(/Planet Locksmiths помогает с мобильными автомобильными locksmith-заявками: открытие авто, замена ключей, программирование брелков, transponder-ключи, сломанные ключи и зажигание\./gi, 'Planet Locksmiths provides 24/7 mobile locksmith service for car lockouts, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency locksmith needs.')
     .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
     .replace(/Automotive Locksmith Services/g, 'Locksmith Services')
     .replace(/Automotive locksmith service areas/g, 'Locksmith service areas')

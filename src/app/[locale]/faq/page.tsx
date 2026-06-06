@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 }
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; empty: string }> = {
-  en: { eyebrow: 'Customer questions', title: 'Frequently Asked Questions', body: 'Answers to common questions about mobile locksmith requests, service timing, car keys, rekeys, commercial locks, residential locks, access control, safe opening, and availability.', empty: 'No published FAQ items yet.' },
-  es: { eyebrow: 'Preguntas de clientes', title: 'Preguntas frecuentes', body: 'Respuestas a preguntas comunes sobre cerrajería móvil, tiempos, llaves de auto, rekeys, cerraduras comerciales, residenciales, access control, cajas fuertes y disponibilidad.', empty: 'No hay preguntas frecuentes publicadas todavía.' },
+  en: { eyebrow: 'Customer questions', title: 'Frequently Asked Questions', body: 'Answers to common questions about mobile locksmith service, timing, car keys, rekeys, commercial locks, residential locks, access control, safe opening, and availability.', empty: 'Call Planet Locksmiths for current service questions.' },
+  es: { eyebrow: 'Preguntas de clientes', title: 'Preguntas frecuentes', body: 'Respuestas a preguntas comunes sobre cerrajería móvil, tiempos, llaves de auto, rekeys, cerraduras comerciales, residenciales, access control, cajas fuertes y disponibilidad.', empty: 'Llama a Planet Locksmiths para preguntas actuales sobre servicio.' },
 }
 
 export default async function FAQPage({ params }: { params: Promise<{ locale: Locale }> }) {

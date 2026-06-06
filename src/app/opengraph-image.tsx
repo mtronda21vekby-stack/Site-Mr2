@@ -125,7 +125,7 @@ export default function OpenGraphImage() {
               maxWidth: 760,
             }}
           >
-            Mobile locksmith support across Philadelphia — lockouts, key replacement,
+            Mobile locksmith service across Philadelphia — lockouts, key replacement,
             programming, and urgent response.
           </div>
 
@@ -136,7 +136,7 @@ export default function OpenGraphImage() {
               marginTop: 34,
             }}
           >
-            {['24/7 intake', 'Philadelphia', 'Mobile service'].map((item) => (
+            {['24/7 service', 'Philadelphia', 'Mobile locksmith'].map((item) => (
               <div
                 key={item}
                 style={{

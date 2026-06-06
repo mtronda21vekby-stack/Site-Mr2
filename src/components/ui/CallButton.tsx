@@ -20,7 +20,9 @@ export default function CallButton({ phoneNumber, phoneDisplay, label = 'Call', 
 
   return (
     <a {...props} href={`tel:${phoneNumber}`} className={`${baseClass} ${variantClass[variant]} ${className}`.trim()} translate="no" aria-label={ariaLabel} title={ariaLabel}>
-      <span aria-hidden="true" className="block transition duration-300 group-hover:-rotate-12 group-hover:scale-110">📞</span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 transition duration-300 group-hover:-rotate-12 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.91.33 1.8.62 2.65a2 2 0 0 1-.45 2.11L8.01 9.75a16 16 0 0 0 6.24 6.24l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.74.5 2.65.62A2 2 0 0 1 22 16.92z" />
+      </svg>
       <span className="sr-only">{ariaLabel}</span>
     </a>
   )

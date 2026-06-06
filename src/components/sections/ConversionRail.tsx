@@ -14,19 +14,19 @@ const labels: Record<Locale, { eyebrow: string; call: string; request: string; f
     eyebrow: 'Fast service path',
     call: 'Call',
     request: 'Start request',
-    fallbackText: 'For urgent vehicle lockouts, calling is usually fastest. For keys, fobs, or scheduled help, submit the request form with vehicle details.',
+    fallbackText: 'For urgent lockouts, calling is usually fastest. For keys, fobs, rekeys, lock repair, safe opening, or scheduled help, send clear service details.',
   },
   es: {
     eyebrow: 'Ruta rápida de servicio',
     call: 'Llamar',
     request: 'Iniciar solicitud',
-    fallbackText: 'Para autos cerrados urgentes, llamar suele ser más rápido. Para llaves, controles o citas, envíe el formulario con datos del vehículo.',
+    fallbackText: 'Para bloqueos urgentes, llamar suele ser más rápido. Para llaves, controles, rekeys, cerraduras, cajas fuertes o citas, envíe detalles claros del servicio.',
   },
   ru: {
     eyebrow: 'Fast service path',
     call: 'Call',
     request: 'Start request',
-    fallbackText: 'For urgent vehicle lockouts, calling is usually fastest. For keys, fobs, or scheduled help, submit the request form with vehicle details.',
+    fallbackText: 'For urgent lockouts, calling is usually fastest. For keys, fobs, rekeys, lock repair, safe opening, or scheduled help, send clear service details.',
   },
 }
 

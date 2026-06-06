@@ -76,15 +76,15 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(11,31,77,0.055),transparent_32rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_100%)]" />
       <div className="relative mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.76fr_1.24fr] lg:px-8">
         <div>
-          <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Request mobile locksmith service</p>
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Book mobile locksmith service</p>
           <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-[#0B1F4D] sm:text-5xl lg:text-6xl">{title}</h2>
           <p className="mt-5 max-w-xl text-base leading-8 text-[#42526E]">{text}</p>
 
           <div className="premium-panel mt-7 rounded-[1.35rem] p-5">
             <div className="relative z-10 flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-[#123A73]">Request readiness</p>
-                <p className="mt-2 text-sm leading-7 text-[#42526E]">Phone, service, location, urgency, and job details help speed up the callback.</p>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-[#123A73]">Service details</p>
+                <p className="mt-2 text-sm leading-7 text-[#42526E]">Phone, service, location, urgency, and job details help confirm the right next step.</p>
               </div>
               <span className="rounded-full border border-[#0B1F4D]/18 bg-white px-3 py-1 text-sm font-black text-[#0B1F4D] shadow-[0_10px_26px_rgba(11,31,77,0.06)]">{completionScore}/5</span>
             </div>
@@ -111,7 +111,7 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
 
         <form onSubmit={handleSubmit} className="premium-panel rounded-[1.75rem] p-5 sm:p-7">
           <div className="relative z-10 mb-6 border-b border-[#0B1F4D]/10 pb-6">
-            <p className="text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Service request form</p>
+            <p className="text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Service form</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D]">Service details</h3>
             <p className="mt-3 text-sm leading-7 text-[#42526E]">Required: phone and service. Vehicle fields are optional; for home, business, safe, or access-control work, use Extra Details.</p>
           </div>
@@ -131,11 +131,11 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             <div className="flex flex-col sm:col-span-2"><label htmlFor="message" className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#42526E]">Extra Details</label><textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className={`${glassControlClass} min-h-28 resize-y`} placeholder="Example: keys lost, house lockout, office rekey, safe opening, access control issue, car is running, parking lot name, etc." /></div>
 
             <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
-              <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_42px_rgba(11,31,77,0.22)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.28)] disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>
+              <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_42px_rgba(11,31,77,0.22)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.28)] disabled:opacity-50">{status === 'submitting' ? 'Submitting...' : 'Send Service Details'}</button>
               <CallButton phoneNumber={phoneNumber} phoneDisplay={phoneDisplay} label="Call" variant="secondary" />
             </div>
 
-            {status === 'success' ? <p className="sm:col-span-2 rounded-2xl border border-[#0B1F4D]/18 bg-[#F3F7FF] px-4 py-3 text-sm text-[#0B1F4D]">Thank you. Your request has been received.</p> : null}
+            {status === 'success' ? <p className="sm:col-span-2 rounded-2xl border border-[#0B1F4D]/18 bg-[#F3F7FF] px-4 py-3 text-sm text-[#0B1F4D]">Thank you. We received your service details.</p> : null}
             {errorMessage ? <p className="sm:col-span-2 rounded-2xl border border-danger-soft/25 bg-danger-soft/10 px-4 py-3 text-sm text-danger-soft">{errorMessage}</p> : null}
           </div>
         </form>

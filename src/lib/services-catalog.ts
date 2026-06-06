@@ -38,10 +38,10 @@ const englishSeeds: ServiceSeed[] = [
   service('rekey-service', 'Rekey Service', 'Rekey existing locks so old keys stop working while hardware can stay in place.'),
   service('broken-key-extraction', 'Broken Key Extraction', 'Removal support when a key breaks in a door, ignition, trunk, or lock cylinder.'),
   service('commercial-locksmith', 'Commercial Locksmith Service', 'Locksmith support for offices, storefronts, service doors, and business access needs.'),
-  service('emergency-locksmith-24-7', 'Emergency Locksmith Service 24/7', 'Urgent locksmith intake for lockouts, lost keys, broken keys, and access problems.'),
+  service('emergency-locksmith-24-7', 'Emergency Locksmith Service 24/7', 'Urgent locksmith service for lockouts, lost keys, broken keys, and access problems.'),
   service('smart-lock-installation', 'Smart Lock Installation', 'Smart lock installation support for compatible residential and commercial doors.'),
   service('mailbox-lock-service', 'Mailbox Lock Service', 'Mailbox lock replacement and access support when keys are lost or locks fail.'),
-  service('safe-opening', 'Safe Opening', 'Safe opening request intake for locked, jammed, or forgotten-combination situations.'),
+  service('safe-opening', 'Safe Opening', 'Safe opening help for locked, jammed, or forgotten-combination situations.'),
   service('house-lockout', 'House Lockout Service', 'Residential lockout help when you cannot access your home, apartment, or room.'),
   service('key-fob-programming', 'FOB Programming', 'Programming support for many key fobs, remotes, smart keys, and push-to-start keys.'),
   service('remote-start-diagnostics', 'Remote Start Diagnostics', 'Diagnostics for remote start, remote key, and vehicle start-control issues.'),
@@ -74,7 +74,7 @@ const spanishSeeds: ServiceSeed[] = [
   service('emergency-locksmith-24-7', 'Cerrajero de emergencia 24/7', 'Atención urgente para bloqueos, llaves perdidas, llaves rotas y problemas de acceso.'),
   service('smart-lock-installation', 'Instalación de smart locks', 'Instalación de smart locks compatibles para puertas residenciales y comerciales.'),
   service('mailbox-lock-service', 'Servicio de cerradura de buzón', 'Reemplazo y acceso para buzones cuando la llave se pierde o la cerradura falla.'),
-  service('safe-opening', 'Apertura de cajas fuertes', 'Solicitud de apertura para cajas bloqueadas, trabadas o con combinación olvidada.'),
+  service('safe-opening', 'Apertura de cajas fuertes', 'Ayuda para cajas fuertes bloqueadas, trabadas o con combinación olvidada.'),
   service('house-lockout', 'Bloqueo de casa', 'Ayuda residencial cuando no puedes entrar a casa, apartamento o habitación.'),
   service('key-fob-programming', 'Programación de FOB', 'Programación para muchos key fobs, controles, smart keys y push-to-start.'),
   service('remote-start-diagnostics', 'Diagnóstico de remote start', 'Diagnóstico para remote start, control remoto y fallas de arranque remoto.'),
@@ -112,7 +112,7 @@ const serviceCategoryCopy: Record<ActiveLocale, Record<ServiceCategoryKey, { tit
   en: {
     emergency: {
       title: 'Emergency Locksmith',
-      description: 'Urgent mobile help for lockouts, lost keys, broken keys, and access problems that need fast intake.',
+      description: 'Urgent mobile help for lockouts, lost keys, broken keys, and access problems that need fast attention.',
     },
     automotive: {
       title: 'Automotive Locksmith',

@@ -1,7 +1,7 @@
 [
   {
     "question": "Оказываете ли вы emergency locksmith service 24/7?",
-    "answer": "Да. Planet Locksmiths принимает срочные locksmith-запросы 24/7: lockout, lost keys, broken keys, rekey, lock repair и проблемы с доступом. Доступность зависит от локации, времени, авторизации, деталей и сложности работы."
+    "answer": "Да. Planet Locksmiths оказывает emergency locksmith service 24/7: lockout, lost keys, broken keys, rekey, lock repair и проблемы с доступом. Доступность зависит от локации, времени, авторизации, деталей и сложности работы."
   },
   {
     "question": "Помогаете ли вы, если человек не может попасть домой?",
@@ -17,7 +17,7 @@
   },
   {
     "question": "Работаете ли вы с commercial locks и access control?",
-    "answer": "Да. Commercial locksmith requests могут включать офисные замки, storefront doors, lock repair, master key systems, panic bars, high-security locks и access control service."
+    "answer": "Да. Commercial locksmith service может включать офисные замки, storefront doors, lock repair, master key systems, panic bars, high-security locks и access control service."
   },
   {
     "question": "Устанавливаете ли вы smart locks?",
@@ -25,7 +25,7 @@
   },
   {
     "question": "Можете ли вы открыть safe?",
-    "answer": "Safe opening requests можно рассмотреть. Следующий шаг зависит от типа сейфа, состояния замка, подтверждения доступа и того, сейф закрыт, заклинил или забыта комбинация."
+    "answer": "Safe opening service доступен для многих ситуаций, когда сейф закрыт, заклинил или забыта комбинация. Следующий шаг зависит от типа сейфа, состояния замка и подтверждения доступа."
   },
   {
     "question": "Можете ли вы заменить mailbox lock?",

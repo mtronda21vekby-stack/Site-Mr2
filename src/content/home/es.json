@@ -1,6 +1,6 @@
 {
   "heroTitle": "Cerrajería 24/7 de emergencia, residencial, comercial y automotriz",
-  "heroSubtitle": "¿No puedes abrir tu auto, casa, oficina o puerta comercial? ¿Necesitas programación de llave de auto, reparación de cerradura, rekey, smart lock, apertura de caja fuerte o access control? Planet Locksmiths atiende solicitudes móviles de cerrajería en Philadelphia.",
+  "heroSubtitle": "¿No puedes abrir tu auto, casa, oficina o puerta comercial? ¿Necesitas programación de llave de auto, reparación de cerradura, rekey, smart lock, apertura de caja fuerte o access control? Planet Locksmiths ofrece servicio móvil de cerrajería en Philadelphia.",
   "heroPrimaryCta": "Llamar ahora",
   "heroSecondaryCta": "Solicitar servicio",
   "heroBadges": [
@@ -47,7 +47,7 @@
     },
     {
       "title": "Apertura de cajas fuertes",
-      "excerpt": "Solicitud de apertura para cajas bloqueadas, trabadas o con combinación olvidada.",
+      "excerpt": "Ayuda para cajas fuertes bloqueadas, trabadas o con combinación olvidada.",
       "slug": "safe-opening"
     }
   ],
@@ -64,5 +64,5 @@
   "reviewsTitle": "Lo que valoran los clientes",
   "faqTitle": "Preguntas de cerrajería",
   "contactTitle": "Solicitar cerrajero móvil",
-  "contactText": "Envía tu nombre, teléfono, tipo de servicio, ubicación y lo que ocurrió. Para trabajos de vehículo, incluye marca, modelo y año. En urgencias, llamar suele ser lo más rápido."
+  "contactText": "Envía tu nombre, teléfono, tipo de servicio, ubicación y lo que ocurrió. Para auto, casa, negocio, caja fuerte, buzón o access control, agrega detalles para confirmar el próximo paso."
 }
