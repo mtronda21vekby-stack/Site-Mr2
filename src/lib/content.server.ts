@@ -170,10 +170,15 @@ function normalizeText(value: string | null | undefined): string {
   return String(value || '').trim()
 }
 
+function isLegacyBrandName(value: string | null | undefined): boolean {
+  const compact = normalizeText(value).replace(/[^a-z0-9]/gi, '').toLowerCase()
+  return compact === 'planetlocksmith' || compact === 'planetlocksmiths'
+}
+
 function normalizeBrandName(value: string | null | undefined, fallback: string): string {
   const text = normalizeText(value)
   if (!text) return fallback
-  if (text.toLowerCase() === 'planetlocksmiths') return fallback
+  if (isLegacyBrandName(text)) return fallback
   return text
 }
 
@@ -193,7 +198,7 @@ function normalizeServiceHours(value: string | null | undefined, fallback: strin
 
 function normalizeLogoAlt(value: string | null | undefined, brandName: string): string {
   const text = normalizeText(value)
-  if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
+  if (!text || isLegacyBrandName(text)) return brandName
   return text
 }
 
@@ -374,6 +379,10 @@ function normalizeHomeCopy(locale: Locale, content: HomeContent): HomeContent {
 
 function normalizeLegacyPublicText(value: string | null | undefined): string {
   return normalizeText(value)
+    .replace(/Planet\s*Lock\s*Smiths/gi, 'Planet Locksmiths')
+    .replace(/Planet\s+locksmiths/gi, 'Planet Locksmiths')
+    .replace(/Planetlocksmiths/gi, 'Planet Locksmiths')
+    .replace(/Planetlocksmith\b/gi, 'Planet Locksmiths')
     .replace(/Planetlocksmiths/g, 'Planet Locksmiths')
     .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
     .replace(/Automotive Locksmith Services/g, 'Locksmith Services')
@@ -391,19 +400,27 @@ function normalizeLegacyPublicText(value: string | null | undefined): string {
 
 function usesLegacyFaqCopy(rows: FaqRow[]): boolean {
   const text = rows.map((row) => `${row.question || ''} ${row.answer || ''}`).join(' ').toLowerCase()
+  const hasAutomotiveScope = /automotive|vehicle|car key|car lockout|key fob|transponder|ignition/.test(text)
+  const hasFullScope = /residential|commercial|house|home|office|business|rekey|smart lock|access control|safe|mailbox|master key|panic bar/.test(text)
+
   return (
     text.includes('do you provide 24/7 automotive locksmith service') ||
     text.includes('focused on mobile automotive locksmith service') ||
-    text.includes('if residential or commercial service is added later')
+    text.includes('if residential or commercial service is added later') ||
+    (hasAutomotiveScope && !hasFullScope)
   )
 }
 
 function usesLegacyReviewCopy(rows: ReviewRow[]): boolean {
   const text = rows.map((row) => `${row.name || ''} ${row.quote || ''}`).join(' ').toLowerCase()
+  const hasAutomotiveScope = /automotive|vehicle|driver|car|key fob|ignition/.test(text)
+  const hasFullScope = /residential|commercial|house|home|business|office|rekey|smart lock|access control|emergency|lock repair|after hours/.test(text)
+
   return (
     text.includes('mobile automotive locksmith') ||
     text.includes('local vehicle owner') ||
-    text.includes('possible for my vehicle')
+    text.includes('possible for my vehicle') ||
+    (hasAutomotiveScope && !hasFullScope)
   )
 }
 

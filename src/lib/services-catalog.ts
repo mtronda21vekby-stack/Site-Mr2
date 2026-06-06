@@ -2,6 +2,14 @@ import type { Locale } from '@/lib/content'
 
 type ActiveLocale = 'en' | 'es'
 
+export type ServiceCategoryKey =
+  | 'emergency'
+  | 'automotive'
+  | 'residential'
+  | 'commercial'
+  | 'smart-access'
+  | 'specialty'
+
 export type CatalogService = {
   slug: string
   title: string
@@ -22,7 +30,7 @@ const englishSeeds: ServiceSeed[] = [
   service('car-lockout', 'Car Lockout Service', 'Mobile help when keys are locked inside the vehicle or the vehicle will not open.'),
   service('key-duplication', 'Key Duplication', 'Duplicate key support for automotive, residential, and commercial key situations.'),
   service('car-key-programming', 'Car Key Programming', 'Programming support for many vehicle keys, chip keys, remotes, and smart keys.'),
-  service('all-keys-lost', 'All Keys Lost', 'Help when every working key is lost, stolen, broken, or no longer usable.'),
+  service('all-keys-lost', 'All Keys Lost Service', 'Help when every working key is lost, stolen, broken, or no longer usable.'),
   service('ignition-repair', 'Ignition Repair', 'Assistance when the ignition is stuck, worn, damaged, or the key will not turn.'),
   service('ignition-replacement', 'Ignition Replacement', 'Ignition replacement help when repair is not the practical next step.'),
   service('lock-repair', 'Lock Repair', 'Repair help for damaged, sticking, loose, or unreliable locks.'),
@@ -41,7 +49,7 @@ const englishSeeds: ServiceSeed[] = [
   service('key-fob-repair', 'Key Fob Repair', 'Help with damaged, unreliable, or non-responding key fobs when repair is practical.'),
   service('push-to-start-key-programming', 'Push To Start Key Programming', 'Programming support for many smart keys used with push-to-start vehicles.'),
   service('oem-key-replacement', 'OEM Key Replacement', 'OEM-style replacement key options when the correct key type is available.'),
-  service('aftermarket-key-fob-programming', 'Aftermarket Key Fob Programming', 'Programming support for compatible aftermarket key fobs and remotes.'),
+  service('aftermarket-key-fob-programming', 'Aftermarket Key Programming', 'Programming support for compatible aftermarket keys, key fobs, and remotes.'),
   service('door-lock-installation', 'Door Lock Installation', 'Door lock installation for homes, apartments, offices, storefronts, and service doors.'),
   service('access-control', 'Access Control Service', 'Access control service for business entry, controlled doors, and security upgrades.'),
   service('master-key-system', 'Master Key System', 'Master key planning and setup for businesses, properties, and managed doors.'),
@@ -55,7 +63,7 @@ const spanishSeeds: ServiceSeed[] = [
   service('car-lockout', 'Bloqueo de automóvil', 'Ayuda móvil cuando las llaves están dentro del vehículo o el auto no abre.'),
   service('key-duplication', 'Duplicación de llaves', 'Soporte para copias de llaves automotrices, residenciales y comerciales.'),
   service('car-key-programming', 'Programación de llave de auto', 'Programación para muchas llaves de vehículo, chip keys, controles y smart keys.'),
-  service('all-keys-lost', 'Todas las llaves perdidas', 'Ayuda cuando ninguna llave funciona o todas se perdieron, rompieron o fueron robadas.'),
+  service('all-keys-lost', 'Servicio de todas las llaves perdidas', 'Ayuda cuando ninguna llave funciona o todas se perdieron, rompieron o fueron robadas.'),
   service('ignition-repair', 'Reparación de ignición', 'Ayuda cuando la ignición está trabada, gastada, dañada o la llave no gira.'),
   service('ignition-replacement', 'Reemplazo de ignición', 'Ayuda con reemplazo de ignición cuando la reparación no es práctica.'),
   service('lock-repair', 'Reparación de cerraduras', 'Reparación para cerraduras dañadas, flojas, trabadas o poco confiables.'),
@@ -74,7 +82,7 @@ const spanishSeeds: ServiceSeed[] = [
   service('key-fob-repair', 'Reparación de key fob', 'Ayuda con controles dañados, inestables o que no responden cuando reparar es práctico.'),
   service('push-to-start-key-programming', 'Programación push to start', 'Programación para muchas smart keys de vehículos push-to-start.'),
   service('oem-key-replacement', 'Reemplazo de llave OEM', 'Opciones de llave estilo OEM cuando el tipo correcto está disponible.'),
-  service('aftermarket-key-fob-programming', 'Programación de key fob aftermarket', 'Programación de controles aftermarket compatibles.'),
+  service('aftermarket-key-fob-programming', 'Programación de llave aftermarket', 'Programación de llaves, controles y fobs aftermarket compatibles.'),
   service('door-lock-installation', 'Instalación de cerraduras de puerta', 'Instalación para casas, apartamentos, oficinas, tiendas y puertas de servicio.'),
   service('access-control', 'Servicio de access control', 'Access control para entradas de negocio, puertas controladas y mejoras de seguridad.'),
   service('master-key-system', 'Sistema master key', 'Planeación y configuración de master key para negocios, propiedades y puertas administradas.'),
@@ -89,6 +97,103 @@ const legacyServiceAliases: Record<string, string> = {
   'emergency-mobile-service': 'emergency-locksmith-24-7',
   'ignition-key-issues': 'ignition-repair',
   'motorcycle-key-service': 'automotive-locksmith',
+}
+
+const serviceCategoryOrder: ServiceCategoryKey[] = [
+  'emergency',
+  'automotive',
+  'residential',
+  'commercial',
+  'smart-access',
+  'specialty',
+]
+
+const serviceCategoryCopy: Record<ActiveLocale, Record<ServiceCategoryKey, { title: string; description: string }>> = {
+  en: {
+    emergency: {
+      title: 'Emergency Locksmith',
+      description: 'Urgent mobile help for lockouts, lost keys, broken keys, and access problems that need fast intake.',
+    },
+    automotive: {
+      title: 'Automotive Locksmith',
+      description: 'Vehicle locksmith support for keys, fobs, programming, ignition issues, and car access requests.',
+    },
+    residential: {
+      title: 'Residential Locksmith',
+      description: 'Home, apartment, mailbox, and door lock services for lockouts, rekeys, repairs, and replacements.',
+    },
+    commercial: {
+      title: 'Commercial Locksmith',
+      description: 'Business locksmith support for offices, storefronts, service doors, master keys, and exit hardware.',
+    },
+    'smart-access': {
+      title: 'Smart Locks & Access Control',
+      description: 'Smart lock and controlled-entry service for compatible homes, rental properties, and businesses.',
+    },
+    specialty: {
+      title: 'Specialty Services',
+      description: 'Additional locksmith requests including key duplication, safe opening, and less common lock needs.',
+    },
+  },
+  es: {
+    emergency: {
+      title: 'Cerrajero de emergencia',
+      description: 'Ayuda móvil urgente para bloqueos, llaves perdidas, llaves rotas y problemas de acceso.',
+    },
+    automotive: {
+      title: 'Cerrajero automotriz',
+      description: 'Soporte para llaves, fobs, programación, ignición y solicitudes de acceso de vehículos.',
+    },
+    residential: {
+      title: 'Cerrajero residencial',
+      description: 'Servicios para casas, apartamentos, buzones y cerraduras de puertas: bloqueos, rekeys, reparaciones y reemplazos.',
+    },
+    commercial: {
+      title: 'Cerrajero comercial',
+      description: 'Soporte para oficinas, tiendas, puertas de servicio, master keys y hardware de salida.',
+    },
+    'smart-access': {
+      title: 'Smart Locks & Access Control',
+      description: 'Servicio de smart locks y acceso controlado para casas, propiedades y negocios compatibles.',
+    },
+    specialty: {
+      title: 'Servicios especiales',
+      description: 'Solicitudes adicionales como duplicación de llaves, apertura de cajas fuertes y necesidades menos comunes.',
+    },
+  },
+}
+
+const serviceCategoryBySlug: Record<string, ServiceCategoryKey> = {
+  'emergency-locksmith-24-7': 'emergency',
+  'car-lockout': 'emergency',
+  'house-lockout': 'emergency',
+  'broken-key-extraction': 'emergency',
+  'all-keys-lost': 'emergency',
+  'automotive-locksmith': 'automotive',
+  'car-key-programming': 'automotive',
+  'ignition-repair': 'automotive',
+  'ignition-replacement': 'automotive',
+  'key-fob-programming': 'automotive',
+  'remote-start-diagnostics': 'automotive',
+  'transponder-key-programming': 'automotive',
+  'key-fob-repair': 'automotive',
+  'push-to-start-key-programming': 'automotive',
+  'oem-key-replacement': 'automotive',
+  'aftermarket-key-fob-programming': 'automotive',
+  'residential-locksmith': 'residential',
+  'rekey-service': 'residential',
+  'lock-repair': 'residential',
+  'lock-replacement': 'residential',
+  'door-lock-installation': 'residential',
+  'mailbox-lock-service': 'residential',
+  'commercial-locksmith': 'commercial',
+  'master-key-system': 'commercial',
+  'panic-bar-installation': 'commercial',
+  'high-security-lock-installation': 'commercial',
+  'smart-lock-installation': 'smart-access',
+  'access-control': 'smart-access',
+  'key-duplication': 'specialty',
+  'safe-opening': 'specialty',
 }
 
 const hiddenLegacySlugs = new Set(Object.keys(legacyServiceAliases))
@@ -117,6 +222,20 @@ export function getCatalogServices(locale: Locale): CatalogService[] {
   return seeds.map(makeCatalog)
 }
 
+export function getServiceCategories<T extends { slug: string }>(locale: Locale, services?: T[]) {
+  const copy = serviceCategoryCopy[activeLocale(locale)]
+  const source = services ?? (getCatalogServices(locale) as unknown as T[])
+
+  return serviceCategoryOrder
+    .map((key) => ({
+      key,
+      title: copy[key].title,
+      description: copy[key].description,
+      services: source.filter((service) => getServiceCategoryKey(service.slug) === key),
+    }))
+    .filter((category) => category.services.length)
+}
+
 export function getCatalogServiceBySlug(locale: Locale, slug: string): CatalogService | null {
   const services = getCatalogServices(locale)
   const targetSlug = legacyServiceAliases[slug] || slug
@@ -125,6 +244,11 @@ export function getCatalogServiceBySlug(locale: Locale, slug: string): CatalogSe
 
 export function isHiddenLegacyServiceSlug(slug: string) {
   return hiddenLegacySlugs.has(slug)
+}
+
+function getServiceCategoryKey(slug: string): ServiceCategoryKey {
+  const targetSlug = legacyServiceAliases[slug] || slug
+  return serviceCategoryBySlug[targetSlug] || 'specialty'
 }
 
 export function getCatalogServiceOptions(locale: Locale = 'en') {

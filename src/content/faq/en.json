@@ -1,34 +1,42 @@
 [
   {
-    "question": "Do you provide 24/7 locksmith service?",
-    "answer": "Yes. Planet Locksmiths handles 24/7 mobile locksmith requests across Philadelphia. Availability can depend on technician schedule, service type, location, authorization, parts, and job complexity."
+    "question": "Do you offer 24/7 emergency locksmith service?",
+    "answer": "Yes. Planet Locksmiths handles 24/7 emergency locksmith requests for lockouts, lost keys, broken keys, rekeys, lock repair, and access problems. Availability can depend on location, timing, authorization, parts, and job complexity."
   },
   {
-    "question": "Can you help if I am locked out?",
-    "answer": "Yes. Lockout requests can include cars, homes, offices, business doors, and other access situations. Send the exact location and the lockout type so the request can be reviewed correctly."
+    "question": "Can you help with house lockouts?",
+    "answer": "Yes. House lockout requests are part of the residential locksmith scope. Send the exact address, lock type if known, and authorization details so the request can be reviewed correctly."
   },
   {
-    "question": "Can you help with all keys lost?",
-    "answer": "In many cases, yes. For vehicles, the process depends on year, make, model, key type, and security system. For property locks, the next step depends on authorization, lock type, and access conditions."
+    "question": "Do you program car keys and key fobs?",
+    "answer": "Yes. Programming support is available for many car keys, key fobs, transponder keys, smart keys, and push-to-start keys. Compatibility depends on year, make, model, key type, and vehicle security system."
   },
   {
-    "question": "Do you program key fobs and transponder keys?",
-    "answer": "Yes, programming support is available for many remote keys, smart keys, push-to-start fobs, and transponder keys. Some vehicles require dealer-level procedures or special authorization."
+    "question": "Can you rekey locks instead of replacing them?",
+    "answer": "Often, yes. Rekeying can keep the existing hardware while making old keys stop working. Replacement may be recommended when the lock is damaged, worn out, or not a good security fit."
   },
   {
-    "question": "Do I need to bring anything somewhere?",
-    "answer": "No. The service is mobile. A technician comes to the service location when the job is accepted and scheduled."
+    "question": "Do you work with commercial locks and access control?",
+    "answer": "Yes. Commercial locksmith requests can include office locks, storefront doors, lock repair, master key systems, panic bars, high-security locks, and access-control service."
   },
   {
-    "question": "What information should I send before service?",
-    "answer": "Send your name, phone number, exact location, service type, urgency, authorization details, and any vehicle, lock, door, safe, mailbox, or access-control details that apply."
+    "question": "Can you install smart locks?",
+    "answer": "Yes. Smart lock installation is available for compatible residential and commercial doors. The correct setup depends on the door, existing hardware, power requirements, and lock model."
   },
   {
-    "question": "Can you give an exact price online?",
-    "answer": "A final quote depends on service type, lock or key system, parts, programming requirements, time, location, authorization, and job complexity. The request form helps prepare a cleaner estimate."
+    "question": "Can you open safes?",
+    "answer": "Safe opening requests can be reviewed. The next step depends on the safe type, lock condition, access authorization, and whether the safe is locked, jammed, or has a forgotten combination."
   },
   {
-    "question": "Do you work on house locks?",
-    "answer": "Yes. Residential and commercial locksmith requests are part of the listed service scope, including lockouts, rekeys, lock repair, lock replacement, smart locks, access control, and related work."
+    "question": "Can you replace mailbox locks?",
+    "answer": "Yes. Mailbox lock service can include replacement or access help when keys are lost, the lock fails, or a property needs a new working key setup."
+  },
+  {
+    "question": "What should I do if all car keys are lost?",
+    "answer": "Call or send a request with the vehicle year, make, model, location, proof of authorization, and whether the vehicle is locked. The available solution depends on the vehicle and key system."
+  },
+  {
+    "question": "Do you repair broken or stuck keys?",
+    "answer": "Yes. Broken key extraction and stuck-key situations can be reviewed for doors, ignitions, trunks, and lock cylinders. Repair or replacement depends on the damage and lock condition."
   }
 ]

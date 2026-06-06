@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import PremiumReveal from '@/components/motion/PremiumReveal'
 
 interface HeroProps {
@@ -16,11 +17,15 @@ function isInvalidContent(value: string) {
 }
 
 export default function Hero(props: HeroProps) {
-  const { title, subtitle, badges } = props
+  const { title, subtitle, badges, primaryCtaHref, secondaryCtaHref } = props
   const hasTitle = !isInvalidContent(title)
   const hasSubtitle = !isInvalidContent(subtitle)
   const visibleBadges = badges.slice(0, 3)
   const fallbackBadges = ['24/7 Emergency Locksmith', 'Philadelphia Coverage', 'Auto, Residential & Commercial']
+  const primaryCtaLabel = isInvalidContent(props.primaryCtaLabel) ? 'Call Now' : props.primaryCtaLabel
+  const secondaryCtaLabel = isInvalidContent(props.secondaryCtaLabel) ? 'Request Service' : props.secondaryCtaLabel
+  const primaryHref = primaryCtaHref || '#request-service'
+  const secondaryHref = secondaryCtaHref || '#request-service'
 
   return (
     <section className="relative overflow-hidden bg-transparent px-4 pb-10 pt-8 sm:px-6 md:pb-14 md:pt-12 lg:px-8">
@@ -28,7 +33,7 @@ export default function Hero(props: HeroProps) {
         <PremiumReveal className="relative z-10 flex min-h-[15rem] flex-col justify-center text-center lg:min-h-[22rem] lg:text-left">
           <div className="mb-5 inline-flex max-w-full items-center self-center gap-3 rounded-full border border-[#0B1F4D]/16 bg-white px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#123A73] shadow-[0_12px_34px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:text-[0.68rem] sm:tracking-[0.24em] lg:self-start">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#0B1F4D] shadow-[0_0_16px_rgba(11,31,77,0.24)]" />
-            <span className="truncate">24/7 Mobile Locksmith Service</span>
+            <span className="truncate">24/7 Emergency Locksmith Service</span>
           </div>
 
           {hasTitle ? (
@@ -49,6 +54,22 @@ export default function Hero(props: HeroProps) {
                 {badge}
               </span>
             ))}
+          </div>
+
+          <div className="mt-7 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row lg:justify-start">
+            <a
+              href={primaryHref}
+              className="notranslate inline-flex min-h-12 w-full min-w-0 items-center justify-center rounded-full bg-[#0B1F4D] px-7 py-3 text-center text-sm font-black uppercase tracking-[0.12em] text-white shadow-[0_18px_42px_rgba(11,31,77,0.20)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#123A73] active:scale-[0.985] sm:w-auto"
+              translate="no"
+            >
+              <span className="break-words">{primaryCtaLabel}</span>
+            </a>
+            <Link
+              href={secondaryHref}
+              className="inline-flex min-h-12 w-full min-w-0 items-center justify-center rounded-full border border-[#0B1F4D]/22 bg-white px-7 py-3 text-center text-sm font-black uppercase tracking-[0.12em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition duration-300 hover:-translate-y-0.5 hover:border-[#0B1F4D]/42 hover:bg-[#F3F7FF] active:scale-[0.985] sm:w-auto"
+            >
+              <span className="break-words">{secondaryCtaLabel}</span>
+            </Link>
           </div>
         </PremiumReveal>
 

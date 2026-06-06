@@ -1,26 +1,38 @@
 [
   {
-    "name": "Solicitud reciente",
+    "name": "Bloqueo de auto y fob",
     "rating": 5,
-    "quote": "Comunicación rápida, llegada móvil y explicación clara antes de empezar el trabajo.",
+    "quote": "Buena comunicación en un bloqueo de auto, y explicaron las opciones de programación del key fob antes de empezar.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Conductor local",
+    "name": "Cliente residencial",
     "rating": 5,
-    "quote": "Buen servicio cuando el llavero dejó de funcionar y necesitaba una solución práctica.",
+    "quote": "La solicitud fue clara. Expliqué el bloqueo de casa, envié la dirección y supe qué esperar antes del servicio.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Solicitud de rekey",
+    "rating": 5,
+    "quote": "Buen servicio de rekey después de mudarme. Las cerraduras existentes pudieron quedarse y las llaves antiguas dejaron de funcionar.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Instalación de smart lock",
+    "rating": 5,
+    "quote": "Explicaron qué funcionaría con la puerta antes de instalar el smart lock. La configuración fue clara.",
     "city": "Philadelphia, PA"
   },
   {
     "name": "Solicitud comercial",
     "rating": 5,
-    "quote": "El técnico explicó el problema de acceso y revisó el siguiente paso antes de comenzar.",
+    "quote": "Revisaron el problema de la puerta del negocio y explicaron opciones de reparación y access control sin apurar la decisión.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Solicitud urgente",
+    "name": "Llamada de emergencia",
     "rating": 5,
-    "quote": "Buena opción cuando estás bloqueado afuera y necesitas ayuda móvil de cerrajería.",
+    "quote": "Opción útil 24/7 cuando necesitamos ayuda móvil de cerrajería fuera de horario. La comunicación por teléfono fue directa.",
     "city": "Philadelphia, PA"
   }
 ]

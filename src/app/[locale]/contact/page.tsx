@@ -7,7 +7,7 @@ import ContactSection from '@/components/sections/ContactSection'
 import JsonLd from '@/components/seo/JsonLd'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
 import { buildPageMetadata } from '@/lib/seo'
-import { buildAutomotiveBusinessSchema, buildContactPageSchema, compactSchema } from '@/lib/schema'
+import { buildContactPageSchema, buildLocksmithBusinessSchema, compactSchema } from '@/lib/schema'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -36,7 +36,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const fallback = fallbackCopy[activeLocale]
   const [global, home, blocks] = await Promise.all([getGlobalSettingsFromSource(), getHomeContentFromSource(activeLocale), getContentBlocksFromSource(activeLocale, 'contact')])
-  const schema = compactSchema([buildAutomotiveBusinessSchema({ locale: activeLocale, global, description: fallback.intro }), buildContactPageSchema({ locale: activeLocale, global, description: fallback.intro })])
+  const schema = compactSchema([buildLocksmithBusinessSchema({ locale: activeLocale, global, description: fallback.intro }), buildContactPageSchema({ locale: activeLocale, global, description: fallback.intro })])
   const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
   const heroBlock = blockBySlot.get('hero')
   const sideBlock = blockBySlot.get('side')

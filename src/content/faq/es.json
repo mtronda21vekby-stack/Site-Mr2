@@ -1,34 +1,42 @@
 [
   {
-    "question": "¿Ofrecen servicio de cerrajería 24/7?",
-    "answer": "Sí. Planet Locksmiths atiende solicitudes móviles de cerrajería 24/7 en Philadelphia. La disponibilidad puede depender del horario, tipo de servicio, ubicación, autorización, piezas y complejidad."
+    "question": "¿Ofrecen servicio de cerrajería de emergencia 24/7?",
+    "answer": "Sí. Planet Locksmiths atiende solicitudes de emergencia 24/7 para bloqueos, llaves perdidas, llaves rotas, rekeys, reparación de cerraduras y problemas de acceso. La disponibilidad depende de ubicación, horario, autorización, piezas y complejidad."
   },
   {
-    "question": "¿Pueden ayudar si estoy bloqueado afuera?",
-    "answer": "Sí. Las solicitudes pueden incluir autos, casas, oficinas, puertas comerciales y otros problemas de acceso. Envía la ubicación exacta y el tipo de bloqueo."
+    "question": "¿Pueden ayudar con bloqueos de casa?",
+    "answer": "Sí. Los bloqueos de casa son parte del servicio residencial. Envía la dirección exacta, tipo de cerradura si lo sabes y detalles de autorización."
   },
   {
-    "question": "¿Pueden ayudar si perdí todas las llaves?",
-    "answer": "En muchos casos, sí. Para vehículos depende de año, marca, modelo, tipo de llave y sistema de seguridad. Para propiedades depende de autorización, tipo de cerradura y condiciones de acceso."
+    "question": "¿Programan llaves de auto y key fobs?",
+    "answer": "Sí. Hay soporte para muchas llaves de auto, key fobs, llaves transponder, smart keys y push-to-start. La compatibilidad depende de año, marca, modelo, tipo de llave y sistema de seguridad."
   },
   {
-    "question": "¿Programan llaveros y llaves transponder?",
-    "answer": "Sí, hay soporte de programación para muchos controles, smart keys, llaveros push-to-start y llaves transponder. Algunos vehículos requieren procedimientos de concesionario o autorización especial."
+    "question": "¿Pueden hacer rekey en vez de reemplazar cerraduras?",
+    "answer": "A menudo, sí. El rekey permite conservar el hardware existente y hacer que las llaves antiguas dejen de funcionar. El reemplazo puede ser mejor si la cerradura está dañada, gastada o no es adecuada."
   },
   {
-    "question": "¿Tengo que llevar algo a algún lugar?",
-    "answer": "No. El servicio es móvil. El técnico va a la ubicación del servicio cuando el trabajo se acepta y se programa."
+    "question": "¿Trabajan con cerraduras comerciales y access control?",
+    "answer": "Sí. Las solicitudes comerciales pueden incluir cerraduras de oficina, puertas de tienda, reparación, master key systems, panic bars, cerraduras de alta seguridad y access control."
   },
   {
-    "question": "¿Qué información debo enviar antes del servicio?",
-    "answer": "Envía tu nombre, teléfono, ubicación exacta, tipo de servicio, urgencia, autorización y detalles de vehículo, cerradura, puerta, caja fuerte, buzón o access control cuando aplique."
+    "question": "¿Pueden instalar smart locks?",
+    "answer": "Sí. La instalación de smart locks está disponible para puertas residenciales y comerciales compatibles. La configuración depende de la puerta, hardware existente, energía y modelo de cerradura."
   },
   {
-    "question": "¿Pueden dar un precio exacto en línea?",
-    "answer": "La cotización final depende del servicio, sistema de cerradura o llave, piezas, programación, horario, ubicación, autorización y complejidad. El formulario ayuda a preparar una estimación más clara."
+    "question": "¿Pueden abrir cajas fuertes?",
+    "answer": "Las solicitudes de apertura de caja fuerte se pueden revisar. El siguiente paso depende del tipo de caja, condición de la cerradura, autorización y si está bloqueada, trabada o con combinación olvidada."
   },
   {
-    "question": "¿Trabajan con cerraduras de casas?",
-    "answer": "Sí. Las solicitudes residenciales y comerciales son parte del alcance listado, incluyendo bloqueos, rekeys, reparación, reemplazo, smart locks, access control y trabajos relacionados."
+    "question": "¿Pueden reemplazar cerraduras de buzón?",
+    "answer": "Sí. El servicio de cerradura de buzón puede incluir reemplazo o ayuda de acceso cuando se pierden las llaves, falla la cerradura o la propiedad necesita una nueva llave funcional."
+  },
+  {
+    "question": "¿Qué hago si perdí todas las llaves del auto?",
+    "answer": "Llama o envía una solicitud con año, marca, modelo, ubicación, prueba de autorización y si el vehículo está bloqueado. La solución depende del vehículo y su sistema de llave."
+  },
+  {
+    "question": "¿Reparan llaves rotas o atoradas?",
+    "answer": "Sí. La extracción de llaves rotas y situaciones de llave atorada se pueden revisar para puertas, igniciones, baúles y cilindros. Reparación o reemplazo depende del daño y condición."
   }
 ]

@@ -1,26 +1,38 @@
 [
   {
-    "name": "Recent lockout request",
+    "name": "Car lockout and fob request",
     "rating": 5,
-    "quote": "Fast communication, mobile arrival, and a clear explanation before the work started.",
+    "quote": "Good communication on a car lockout, and the key fob programming options were explained before the work started.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Philadelphia driver",
+    "name": "House lockout customer",
     "rating": 5,
-    "quote": "Helpful service when the key fob stopped working and I needed a practical next step.",
+    "quote": "The request was handled clearly. I explained the house lockout, sent the address, and knew what to expect before service.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Local business request",
+    "name": "Rekey service request",
     "rating": 5,
-    "quote": "The technician explained the access issue clearly and reviewed the next step before starting.",
+    "quote": "Helpful rekey service after moving into a new place. The existing locks could stay, and the old keys no longer worked.",
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Emergency request",
+    "name": "Smart lock installation",
     "rating": 5,
-    "quote": "Good option when you are locked out and need mobile locksmith help.",
+    "quote": "Clear explanation of what would work with the door before installing the smart lock. The setup felt straightforward.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Commercial access request",
+    "rating": 5,
+    "quote": "They reviewed the business door issue and explained the lock repair and access-control options without rushing the decision.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Emergency locksmith call",
+    "rating": 5,
+    "quote": "Useful 24/7 option when we needed mobile locksmith help after hours. The phone communication was direct and practical.",
     "city": "Philadelphia, PA"
   }
 ]

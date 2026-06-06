@@ -4,7 +4,7 @@ import type { FaqItem, GlobalSettings } from '@/lib/content'
 
 type SchemaNode = Record<string, unknown>
 
-export function buildAutomotiveBusinessSchema({ locale, global, services, areas, description }: { locale: SeoLocale; global: GlobalSettings; services?: ServiceContent[]; areas?: AreaContent[]; description?: string }): SchemaNode {
+export function buildLocksmithBusinessSchema({ locale, global, services, areas, description }: { locale: SeoLocale; global: GlobalSettings; services?: ServiceContent[]; areas?: AreaContent[]; description?: string }): SchemaNode {
   const siteUrl = getSiteUrl()
   const pageUrl = getCanonicalUrl(locale, '/')
 

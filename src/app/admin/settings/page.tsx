@@ -41,15 +41,20 @@ function sanitizeFileName(name: string) {
 
 const DEMO_PHONE_PATTERN = /(555[-\s)]?0?\d{3}|000[-\s)]?0{3})/i
 
+function isLegacyBrandName(value: string | null | undefined) {
+  const compact = String(value || '').trim().replace(/[^a-z0-9]/gi, '').toLowerCase()
+  return compact === 'planetlocksmith' || compact === 'planetlocksmiths'
+}
+
 function normalizeBrandName(value: string | null | undefined) {
   const text = String(value || '').trim()
-  if (!text || text.toLowerCase() === 'planetlocksmiths') return initialState.brandName
+  if (!text || isLegacyBrandName(text)) return initialState.brandName
   return text
 }
 
 function normalizeLogoAlt(value: string | null | undefined, brandName: string) {
   const text = String(value || '').trim()
-  if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
+  if (!text || isLegacyBrandName(text)) return brandName
   return text
 }
 

@@ -69,16 +69,21 @@ function isAfterIsoDate(value: string | null | undefined, compareTo: string | nu
   return timestamp > compareTimestamp
 }
 
+function isLegacyBrandName(value: string | null | undefined) {
+  const compact = String(value || '').trim().replace(/[^a-z0-9]/gi, '').toLowerCase()
+  return compact === 'planetlocksmith' || compact === 'planetlocksmiths'
+}
+
 function normalizeBrandName(value: string | null | undefined, fallback: string) {
   const text = String(value || '').trim()
   if (!text) return fallback
-  if (text.toLowerCase() === 'planetlocksmiths') return fallback
+  if (isLegacyBrandName(text)) return fallback
   return text
 }
 
 function normalizeLogoAlt(value: string | null | undefined, brandName: string) {
   const text = String(value || '').trim()
-  if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
+  if (!text || isLegacyBrandName(text)) return brandName
   return text
 }
 
@@ -88,26 +93,27 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   const [logoFailed, setLogoFailed] = useState(false)
   const [fallbackAttempted, setFallbackAttempted] = useState(false)
   const [brand, setBrand] = useState<HeaderBrandState>({
-    brandName,
+    brandName: normalizeBrandName(brandName, 'Planet Locksmiths'),
     logoUrl: normalizeLogoUrl(logoUrl),
-    logoAlt: logoAlt || brandName,
+    logoAlt: normalizeLogoAlt(logoAlt, normalizeBrandName(brandName, 'Planet Locksmiths')),
   })
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const navItems = navConfig[locale]
   const labels = ctaLabels[locale]
   const requestHref = `/${activeLocale}/contact#request-service`
   const visibleLogoUrl = normalizeLogoUrl(brand.logoUrl)
-  const visibleBrandName = brand.brandName || brandName
-  const visibleLogoAlt = brand.logoAlt || visibleBrandName
+  const visibleBrandName = normalizeBrandName(brand.brandName, normalizeBrandName(brandName, 'Planet Locksmiths'))
+  const visibleLogoAlt = normalizeLogoAlt(brand.logoAlt, visibleBrandName)
   const shouldShowImageLogo = Boolean(visibleLogoUrl) && !logoFailed
 
   useEffect(() => {
     setLogoFailed(false)
     setFallbackAttempted(false)
+    const nextBrandName = normalizeBrandName(brandName, 'Planet Locksmiths')
     setBrand({
-      brandName,
+      brandName: nextBrandName,
       logoUrl: normalizeLogoUrl(logoUrl),
-      logoAlt: logoAlt || brandName,
+      logoAlt: normalizeLogoAlt(logoAlt, nextBrandName),
     })
   }, [brandName, logoUrl, logoAlt])
 

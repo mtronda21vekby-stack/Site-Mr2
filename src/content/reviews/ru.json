@@ -1,17 +1,38 @@
 [
   {
-    "name": "Иван С.",
+    "name": "Car lockout и fob request",
     "rating": 5,
-    "quote": "Закрыл машину, но Planet Locksmiths быстро помогли открыть дверь."
+    "quote": "Хорошая коммуникация по car lockout, и варианты key fob programming объяснили до начала работы.",
+    "city": "Philadelphia, PA"
   },
   {
-    "name": "Ольга П.",
+    "name": "House lockout customer",
     "rating": 5,
-    "quote": "Быстро и профессионально запрограммировали новый ключ."
+    "quote": "Запрос обработали понятно: я описал house lockout, отправил адрес и заранее понимал следующий шаг.",
+    "city": "Philadelphia, PA"
   },
   {
-    "name": "Сергей К.",
-    "rating": 4,
-    "quote": "Хорошая коммуникация и решили проблему с зажиганием в тот же день."
+    "name": "Rekey service request",
+    "rating": 5,
+    "quote": "Полезный rekey service после переезда. Существующие замки можно было оставить, а старые ключи перестали работать.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Smart lock installation",
+    "rating": 5,
+    "quote": "Сначала объяснили, что подойдёт для двери, потом установили smart lock. Настройка была понятной.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Commercial access request",
+    "rating": 5,
+    "quote": "По business door issue объяснили варианты lock repair и access control без давления на решение.",
+    "city": "Philadelphia, PA"
+  },
+  {
+    "name": "Emergency locksmith call",
+    "rating": 5,
+    "quote": "Удобный вариант 24/7, когда нужна была mobile locksmith help after hours. По телефону всё объяснили прямо и по делу.",
+    "city": "Philadelphia, PA"
   }
 ]

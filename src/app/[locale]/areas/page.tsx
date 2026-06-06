@@ -7,7 +7,7 @@ import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import JsonLd from '@/components/seo/JsonLd'
 import ContentBlockModule from '@/components/site/ContentBlockModule'
 import { buildPageMetadata } from '@/lib/seo'
-import { buildAreaCollectionSchema, buildAutomotiveBusinessSchema, compactSchema } from '@/lib/schema'
+import { buildAreaCollectionSchema, buildLocksmithBusinessSchema, compactSchema } from '@/lib/schema'
 import {
   getAreasListFromSource,
   getContentBlocksFromSource,
@@ -36,7 +36,7 @@ export default async function AreasIndexPage({ params }: { params: Promise<{ loc
   const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
   const fallback = fallbackCopy[activeLocale]
   const [global, areas, blocks] = await Promise.all([getGlobalSettingsFromSource(), getAreasListFromSource(activeLocale), getContentBlocksFromSource(activeLocale, 'areas')])
-  const schema = compactSchema([buildAutomotiveBusinessSchema({ locale: activeLocale, global, areas, description: fallback.intro }), buildAreaCollectionSchema({ locale: activeLocale, areas })])
+  const schema = compactSchema([buildLocksmithBusinessSchema({ locale: activeLocale, global, areas, description: fallback.intro }), buildAreaCollectionSchema({ locale: activeLocale, areas })])
   const blockBySlot = new Map(blocks.map((block) => [block.slot, block]))
   const heroBlock = blockBySlot.get('hero')
   const sideBlock = blockBySlot.get('side')

@@ -1,63 +1,68 @@
 {
-  "heroTitle": "Автомобильный ключной сервис по Филадельфии — 24/7",
-  "heroSubtitle": "Если машина закрыта, ключ потерян или нужен новый ключ с программированием, Planet Locksmiths выезжает по Филадельфии и помогает с автомобильными ключами и замками в срочном и same-day формате.",
+  "heroTitle": "24/7 emergency, residential, commercial & automotive locksmith services",
+  "heroSubtitle": "Planet Locksmiths handles mobile locksmith requests across Philadelphia: car, home, and business lockouts, car key programming, rekey service, lock repair, lock replacement, smart locks, access control, safe opening, and mailbox locks.",
   "heroPrimaryCta": "Позвонить сейчас",
   "heroSecondaryCta": "Заказать услугу",
   "heroBadges": [
-    "Мобильный сервис 24/7",
-    "Обслуживание Филадельфия",
-    "Ключи и программирование"
+    "Emergency locksmith 24/7",
+    "Residential, commercial & auto",
+    "Keys, rekeys, smart locks"
   ],
   "heroOrbitWords": [
-    "Блокировка",
-    "Замена",
-    "Программирование",
-    "Брелоки"
+    "Lockout",
+    "Rekey",
+    "Car keys",
+    "Commercial"
   ],
   "featuredServices": [
     {
-      "title": "Разблокировка автомобиля",
-      "excerpt": "Быстрая мобильная помощь, когда ваш автомобиль заблокирован и доступ к ключу невозможен.",
+      "title": "Emergency Locksmith Service 24/7",
+      "excerpt": "Urgent locksmith intake for lockouts, lost keys, broken keys, and access problems.",
+      "slug": "emergency-locksmith-24-7"
+    },
+    {
+      "title": "Car Lockout Service",
+      "excerpt": "Mobile help when keys are locked inside the vehicle or the vehicle will not open.",
       "slug": "car-lockout"
     },
     {
-      "title": "Замена ключа автомобиля",
-      "excerpt": "Решения для замены утерянных, сломанных или поврежденных автомобильных ключей.",
-      "slug": "car-key-replacement"
+      "title": "All Keys Lost Service",
+      "excerpt": "Help when every working key is lost, stolen, broken, or no longer usable.",
+      "slug": "all-keys-lost"
     },
     {
-      "title": "Программирование ключей",
-      "excerpt": "Поддержка программирования для многих современных ключей, пультов и брелоков.",
-      "slug": "key-programming"
+      "title": "Commercial Locksmith Service",
+      "excerpt": "Locksmith support for offices, storefronts, service doors, and business access needs.",
+      "slug": "commercial-locksmith"
     },
     {
-      "title": "Поддержка брелоков",
-      "excerpt": "Помощь с доступом и заменой, связанными с брелоками.",
-      "slug": "key-fob-assistance"
+      "title": "Residential Locksmith Service",
+      "excerpt": "Residential help for lockouts, rekeys, lock changes, smart locks, and repairs.",
+      "slug": "residential-locksmith"
     },
     {
-      "title": "Проблемы с ключом зажигания",
-      "excerpt": "Поддержка для проблем, связанных с ключом зажигания и доступом.",
-      "slug": "ignition-key-issues"
+      "title": "Access Control Service",
+      "excerpt": "Access control service for business entry, controlled doors, and security upgrades.",
+      "slug": "access-control"
     },
     {
-      "title": "Срочный мобильный сервис",
-      "excerpt": "Реакция 24/7 на срочные ситуации с автомобильными ключами и замками.",
-      "slug": "emergency-mobile-service"
+      "title": "Safe Opening",
+      "excerpt": "Safe opening request intake for locked, jammed, or forgotten-combination situations.",
+      "slug": "safe-opening"
     }
   ],
   "whyChoose": [
-    "Только мобильный автомобильный фокус",
-    "Срочная реакция 24/7",
-    "Доступность обслуживания в тот же день",
-    "Поддержка современных ключей и брелоков",
-    "Четкая коммуникация от запроса до приезда",
-    "Обслуживание по Филадельфии"
+    "24/7 emergency response",
+    "Car, home and business lockouts",
+    "Key programming and duplication",
+    "Rekeying, lock repair and lock replacement",
+    "Smart locks and access control",
+    "Clear communication before dispatch"
   ],
-  "emergencyTitle": "Нужна срочная автомобильная помощь?",
-  "emergencyText": "Мобильный сервис по Филадельфии для разблокировки, утерянных ключей, замены и поддержки программирования.",
-  "reviewsTitle": "Отзывы",
-  "faqTitle": "Частые вопросы",
-  "contactTitle": "Связаться",
-  "contactText": "Для немедленной помощи или запроса на обслуживание воспользуйтесь формой ниже или позвоните нам напрямую."
+  "emergencyTitle": "Locked out or need locksmith help right now?",
+  "emergencyText": "Request mobile locksmith help for car lockouts, all keys lost, residential lockouts, commercial locks, rekeys, key fobs, access control, safe opening, and urgent lock problems across Philadelphia.",
+  "reviewsTitle": "Отзывы клиентов",
+  "faqTitle": "Locksmith FAQ",
+  "contactTitle": "Request Mobile Locksmith Service",
+  "contactText": "Send your name, phone number, service type, location, and what happened. For vehicle jobs, include make, model, and year. For urgent lockouts or lost keys, calling is usually the fastest option."
 }
