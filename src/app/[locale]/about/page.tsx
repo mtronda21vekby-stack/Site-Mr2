@@ -24,8 +24,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 }
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string }> = {
-  en: { eyebrow: 'About Planetlocksmiths', title: 'Mobile automotive locksmith support built for clear, fast service requests.', body: 'Planetlocksmiths is structured around mobile automotive locksmith requests for car lockouts, replacement keys, key fob programming, transponder support, ignition-related help, and broken key situations.' },
-  es: { eyebrow: 'Sobre Planetlocksmiths', title: 'Soporte móvil de cerrajería automotriz para solicitudes claras y rápidas.', body: 'Planetlocksmiths está organizado para solicitudes móviles automotrices: autos cerrados, reemplazo de llaves, programación de controles, transponder, ignición y llaves rotas.' },
+  en: { eyebrow: 'About Planet Locksmiths', title: 'Mobile locksmith support built for clear, fast service requests.', body: 'Planet Locksmiths is structured around mobile locksmith requests for car lockouts, all keys lost, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and urgent key situations.' },
+  es: { eyebrow: 'Sobre Planet Locksmiths', title: 'Soporte móvil de cerrajería para solicitudes claras y rápidas.', body: 'Planet Locksmiths está organizado para solicitudes móviles de cerrajería: bloqueos, llaves de auto, programación, rekeys, reparación, reemplazo, residencial, comercial, access control, cajas fuertes y urgencias.' },
 }
 
 function createFallbackBlock(input: Omit<SiteContentBlock, 'items'> & { items?: string[] }): SiteContentBlock {
@@ -35,16 +35,16 @@ function createFallbackBlock(input: Omit<SiteContentBlock, 'items'> & { items?: 
 function getFallbackBlocks(locale: ActiveLocale): SiteContentBlock[] {
   if (locale === 'es') {
     return [
-      createFallbackBlock({ id: 'about-fallback-1-es', locale: 'es', pageKey: 'about', slot: 'section-1', eyebrow: 'Sobre 01', title: 'Enfoque automotriz', body: 'El sitio está diseñado para solicitudes específicas del vehículo: servicio, datos del auto, ubicación, urgencia y contacto.', ctaLabel: '', ctaHref: '', sortOrder: 1 }),
-      createFallbackBlock({ id: 'about-fallback-2-es', locale: 'es', pageKey: 'about', slot: 'section-2', eyebrow: 'Sobre 02', title: 'Ruta móvil de servicio', body: 'Los clientes pueden llamar o enviar una solicitud desde cualquier página. La disponibilidad depende de ubicación, vehículo, piezas, horario y complejidad.', ctaLabel: '', ctaHref: '', sortOrder: 2 }),
-      createFallbackBlock({ id: 'about-fallback-3-es', locale: 'es', pageKey: 'about', slot: 'section-3', eyebrow: 'Sobre 03', title: 'Información importante', body: 'Datos claros ayudan a confirmar el siguiente paso antes del servicio.', items: ['Marca, modelo y año', 'Ubicación actual o ZIP', 'Auto cerrado, llave perdida, control, transponder, ignición o llave rota', 'Teléfono y urgencia'], ctaLabel: '', ctaHref: '', sortOrder: 3 }),
+      createFallbackBlock({ id: 'about-fallback-1-es', locale: 'es', pageKey: 'about', slot: 'section-1', eyebrow: 'Sobre 01', title: 'Servicios completos', body: 'El sitio está diseñado para solicitudes de auto, hogar, negocio, rekey, instalación, safe opening, access control y emergencias.', ctaLabel: '', ctaHref: '', sortOrder: 1 }),
+      createFallbackBlock({ id: 'about-fallback-2-es', locale: 'es', pageKey: 'about', slot: 'section-2', eyebrow: 'Sobre 02', title: 'Ruta móvil de servicio', body: 'Los clientes pueden llamar o enviar una solicitud desde cualquier página. La disponibilidad depende de ubicación, servicio, piezas, horario, autorización y complejidad.', ctaLabel: '', ctaHref: '', sortOrder: 2 }),
+      createFallbackBlock({ id: 'about-fallback-3-es', locale: 'es', pageKey: 'about', slot: 'section-3', eyebrow: 'Sobre 03', title: 'Información importante', body: 'Datos claros ayudan a confirmar el siguiente paso antes del servicio.', items: ['Servicio requerido y ubicación', 'Datos del vehículo cuando aplique', 'Tipo de cerradura, puerta, caja fuerte o acceso', 'Teléfono y urgencia'], ctaLabel: '', ctaHref: '', sortOrder: 3 }),
     ]
   }
 
   return [
-    createFallbackBlock({ id: 'about-fallback-1', locale: 'en', pageKey: 'about', slot: 'section-1', eyebrow: 'About 01', title: 'Automotive focus', body: 'The site is designed around vehicle-specific requests so customers can provide service type, vehicle details, location, urgency, and contact information clearly.', ctaLabel: '', ctaHref: '', sortOrder: 1 }),
-    createFallbackBlock({ id: 'about-fallback-2', locale: 'en', pageKey: 'about', slot: 'section-2', eyebrow: 'About 02', title: 'Mobile-first service path', body: 'Customers can call or submit a request from any page. Service availability depends on location, vehicle details, parts, timing, and job complexity.', ctaLabel: '', ctaHref: '', sortOrder: 2 }),
-    createFallbackBlock({ id: 'about-fallback-3', locale: 'en', pageKey: 'about', slot: 'section-3', eyebrow: 'About 03', title: 'Information that matters', body: 'Cleaner request details help confirm the right next step before service begins.', items: ['Vehicle make, model, and year', 'Current location or ZIP code', 'Lockout, lost key, fob, transponder, ignition, or broken key situation', 'Phone number and urgency'], ctaLabel: '', ctaHref: '', sortOrder: 3 }),
+    createFallbackBlock({ id: 'about-fallback-1', locale: 'en', pageKey: 'about', slot: 'section-1', eyebrow: 'About 01', title: 'Full locksmith scope', body: 'The site is designed around auto, residential, commercial, rekey, installation, safe opening, access control, and emergency service requests.', ctaLabel: '', ctaHref: '', sortOrder: 1 }),
+    createFallbackBlock({ id: 'about-fallback-2', locale: 'en', pageKey: 'about', slot: 'section-2', eyebrow: 'About 02', title: 'Mobile-first service path', body: 'Customers can call or submit a request from any page. Service availability depends on location, service type, parts, timing, authorization, and job complexity.', ctaLabel: '', ctaHref: '', sortOrder: 2 }),
+    createFallbackBlock({ id: 'about-fallback-3', locale: 'en', pageKey: 'about', slot: 'section-3', eyebrow: 'About 03', title: 'Information that matters', body: 'Cleaner request details help confirm the right next step before service begins.', items: ['Service needed and current location', 'Vehicle details when relevant', 'Lock, door, safe, mailbox, or access-control details', 'Phone number and urgency'], ctaLabel: '', ctaHref: '', sortOrder: 3 }),
   ]
 }
 

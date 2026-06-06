@@ -6,15 +6,15 @@ interface TrustStripProps {
 
 const copy = {
   en: {
-    title: 'Clear mobile automotive support',
+    title: 'Clear mobile locksmith support',
     items: [
       {
         title: '24/7 request intake',
         text: 'Urgent requests can be submitted any time. Same-day help depends on availability.',
       },
       {
-        title: 'Automotive-only focus',
-        text: 'The site is built around vehicle lockouts, keys, programming, and mobile response.',
+        title: 'Full locksmith scope',
+        text: 'Service pages cover auto, residential, commercial, access control, safe opening, rekeys, lock repair, and emergency help.',
       },
       {
         title: 'Philadelphia coverage',
@@ -22,20 +22,20 @@ const copy = {
       },
       {
         title: 'Straight intake flow',
-        text: 'Call directly or send vehicle, location, and issue details through the request form.',
+        text: 'Call directly or send service, location, access, and issue details through the request form.',
       },
     ],
   },
   es: {
-    title: 'Soporte automotriz móvil y claro',
+    title: 'Soporte móvil de cerrajería claro',
     items: [
       {
         title: 'Solicitudes 24/7',
         text: 'Las solicitudes urgentes pueden enviarse en cualquier momento. La ayuda el mismo día depende de disponibilidad.',
       },
       {
-        title: 'Enfoque automotriz',
-        text: 'El sitio está construido alrededor de aperturas, llaves, programación y respuesta móvil.',
+        title: 'Servicios completos',
+        text: 'Las páginas cubren auto, residencial, comercial, access control, cajas fuertes, rekey, reparación y emergencias.',
       },
       {
         title: 'Cobertura en Filadelfia',
@@ -43,20 +43,20 @@ const copy = {
       },
       {
         title: 'Proceso simple',
-        text: 'Llama directamente o envía ubicación, vehículo y problema mediante el formulario.',
+        text: 'Llama directamente o envía servicio, ubicación, acceso y detalles del problema mediante el formulario.',
       },
     ],
   },
   ru: {
-    title: 'Понятный мобильный автомобильный сервис',
+    title: 'Понятный мобильный locksmith-сервис',
     items: [
       {
         title: 'Прием заявок 24/7',
         text: 'Срочные обращения можно отправлять в любое время. Same-day помощь зависит от загрузки.',
       },
       {
-        title: 'Фокус только на авто',
-        text: 'Сайт и сервис сфокусированы на вскрытии авто, ключах, программировании и выездной помощи.',
+        title: 'Полный список услуг',
+        text: 'На сайте есть авто, residential, commercial, access control, safe opening, rekey, ремонт замков и срочные заявки.',
       },
       {
         title: 'Покрытие по Филадельфии',
@@ -64,7 +64,7 @@ const copy = {
       },
       {
         title: 'Простой intake flow',
-        text: 'Можно позвонить сразу или отправить локацию, авто и проблему через форму.',
+        text: 'Можно позвонить сразу или отправить услугу, локацию, доступ и проблему через форму.',
       },
     ],
   },

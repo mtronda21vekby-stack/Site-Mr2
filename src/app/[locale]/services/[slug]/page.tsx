@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
   const activeLocale = toActiveLocale(locale)
   const service = await getServicePageFromSource(activeLocale, slug)
 
-  if (!service) return { title: 'Service Not Found | Planetlocksmiths', robots: { index: false, follow: false } }
+  if (!service) return { title: 'Service Not Found | Planet Locksmiths', robots: { index: false, follow: false } }
 
   return buildPageMetadata({ locale: activeLocale, path: `/services/${service.slug}`, title: service.seoTitle || service.title, description: service.seoDescription || service.excerpt })
 }

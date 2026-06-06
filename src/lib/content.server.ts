@@ -184,6 +184,13 @@ function normalizeEmail(value: string | null | undefined, fallback?: string): st
   return text
 }
 
+function normalizeServiceHours(value: string | null | undefined, fallback: string): string {
+  const text = normalizeText(value)
+  if (!text) return fallback
+  if (text.toLowerCase() === '24/7 mobile service') return fallback
+  return text
+}
+
 function normalizeLogoAlt(value: string | null | undefined, brandName: string): string {
   const text = normalizeText(value)
   if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
@@ -365,6 +372,41 @@ function normalizeHomeCopy(locale: Locale, content: HomeContent): HomeContent {
   }
 }
 
+function normalizeLegacyPublicText(value: string | null | undefined): string {
+  return normalizeText(value)
+    .replace(/Planetlocksmiths/g, 'Planet Locksmiths')
+    .replace(/Mobile Automotive Locksmith/g, 'Mobile Locksmith')
+    .replace(/Automotive Locksmith Services/g, 'Locksmith Services')
+    .replace(/Automotive locksmith service areas/g, 'Locksmith service areas')
+    .replace(/automotive locksmith coverage/gi, 'locksmith coverage')
+    .replace(/mobile automotive locksmith/gi, 'mobile locksmith')
+    .replace(/automotive locksmith/gi, 'locksmith')
+    .replace(/vehicle-specific requests/gi, 'locksmith service requests')
+    .replace(/vehicle details/gi, 'service details')
+    .replace(/vehicle information/gi, 'service information')
+    .replace(/vehicle requirements/gi, 'service requirements')
+    .replace(/vehicle make, model, and year/gi, 'service type, lock details, and vehicle info when relevant')
+    .replace(/vehicle security system/gi, 'lock, key, or security system')
+}
+
+function usesLegacyFaqCopy(rows: FaqRow[]): boolean {
+  const text = rows.map((row) => `${row.question || ''} ${row.answer || ''}`).join(' ').toLowerCase()
+  return (
+    text.includes('do you provide 24/7 automotive locksmith service') ||
+    text.includes('focused on mobile automotive locksmith service') ||
+    text.includes('if residential or commercial service is added later')
+  )
+}
+
+function usesLegacyReviewCopy(rows: ReviewRow[]): boolean {
+  const text = rows.map((row) => `${row.name || ''} ${row.quote || ''}`).join(' ').toLowerCase()
+  return (
+    text.includes('mobile automotive locksmith') ||
+    text.includes('local vehicle owner') ||
+    text.includes('possible for my vehicle')
+  )
+}
+
 function mergeCatalogServices(locale: Locale, _rows: ServiceRow[]): ServiceContent[] {
   return getCatalogServices(locale).map(mapCatalogService)
 }
@@ -406,11 +448,11 @@ export async function getContentBlocksFromSource(
       locale: row.locale as Locale,
       pageKey: row.page_key,
       slot: row.slot,
-      eyebrow: row.eyebrow ?? '',
-      title: row.title ?? '',
-      body: row.body ?? '',
-      items: normalizeItems(row.items),
-      ctaLabel: row.cta_label ?? '',
+      eyebrow: normalizeLegacyPublicText(row.eyebrow),
+      title: normalizeLegacyPublicText(row.title),
+      body: normalizeLegacyPublicText(row.body),
+      items: normalizeItems(row.items).map(normalizeLegacyPublicText),
+      ctaLabel: normalizeLegacyPublicText(row.cta_label),
       ctaHref: row.cta_href ?? '',
       sortOrder: Number(row.sort_order ?? 0),
     }))
@@ -450,11 +492,12 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
     const brandName = normalizeBrandName(row.brand_name, fileFallback.brandName)
     const settingsLogoUrl = normalizeText(row.logo_url)
     const logoFallback = await getLatestPublishedLogo(supabase)
+    const publishedLogoAlt = normalizeLogoAlt(logoFallback.logoAlt, brandName)
     const shouldUsePublishedLogo =
       Boolean(logoFallback.logoUrl) &&
       (!settingsLogoUrl || isAfterIsoDate(logoFallback.createdAt, row.updated_at))
     const logoUrl = shouldUsePublishedLogo ? logoFallback.logoUrl : settingsLogoUrl
-    const logoAlt = normalizeLogoAlt(row.logo_alt, (shouldUsePublishedLogo ? logoFallback.logoAlt : '') || brandName)
+    const logoAlt = normalizeLogoAlt(row.logo_alt, (shouldUsePublishedLogo ? publishedLogoAlt : '') || brandName)
 
     return {
       ...fileFallback,
@@ -464,7 +507,7 @@ export async function getGlobalSettingsFromSource(): Promise<GlobalSettings> {
       phonePrimary,
       phoneDisplay,
       email: normalizeEmail(row.email, fileFallback.email),
-      serviceHours: row.service_hours ?? fileFallback.serviceHours,
+      serviceHours: normalizeServiceHours(row.service_hours, fileFallback.serviceHours),
     }
   } catch (error) {
     console.error('getGlobalSettingsFromSource failed:', error)
@@ -544,12 +587,16 @@ export async function getReviewsFromSource(locale: Locale): Promise<ReviewItem[]
       return fileFallback
     }
 
+    if (usesLegacyReviewCopy(rows)) {
+      return fileFallback
+    }
+
     return rows.map((row) => ({
-      name: row.name ?? '',
+      name: normalizeLegacyPublicText(row.name),
       rating: row.rating ?? 5,
-      quote: row.quote ?? '',
+      quote: normalizeLegacyPublicText(row.quote),
       date: row.date ?? undefined,
-      city: row.city ?? undefined,
+      city: normalizeLegacyPublicText(row.city) || undefined,
     }))
   } catch (error) {
     console.error('getReviewsFromSource failed:', error)
@@ -584,9 +631,13 @@ export async function getFaqFromSource(locale: Locale): Promise<FaqItem[]> {
       return fileFallback
     }
 
+    if (usesLegacyFaqCopy(rows)) {
+      return fileFallback
+    }
+
     return rows.map((row) => ({
-      question: row.question ?? '',
-      answer: row.answer ?? '',
+      question: normalizeLegacyPublicText(row.question),
+      answer: normalizeLegacyPublicText(row.answer),
     }))
   } catch (error) {
     console.error('getFaqFromSource failed:', error)

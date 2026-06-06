@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: L
 
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro: string; call: string; request: string; cardPrefix: string; open: string; empty: string; sideTitle: string; sideText: string; countLabel: string }> = {
   en: {
-    eyebrow: 'Planetlocksmiths / services',
+    eyebrow: 'Planet Locksmiths / services',
     title: 'Locksmith Services',
     intro: 'Mobile locksmith help for car lockouts, all keys lost, key programming, rekeys, lock repair, lock replacement, residential, commercial, access control, safe opening, and emergency service requests.',
     call: 'Call',
@@ -41,7 +41,7 @@ const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; intro
     countLabel: 'Published services',
   },
   es: {
-    eyebrow: 'Planetlocksmiths / servicios',
+    eyebrow: 'Planet Locksmiths / servicios',
     title: 'Servicios de cerrajería',
     intro: 'Ayuda móvil de cerrajería para bloqueos de auto, todas las llaves perdidas, programación, rekeys, reparación y reemplazo de cerraduras, residencial, comercial, access control, cajas fuertes y emergencias.',
     call: 'Llamar',

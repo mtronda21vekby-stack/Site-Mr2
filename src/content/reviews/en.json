@@ -1,8 +1,8 @@
 [
   {
-    "name": "Recent customer",
+    "name": "Recent lockout request",
     "rating": 5,
-    "quote": "Fast communication, mobile arrival, and clear explanation of the key replacement process.",
+    "quote": "Fast communication, mobile arrival, and a clear explanation before the work started.",
     "city": "Philadelphia, PA"
   },
   {
@@ -12,15 +12,15 @@
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Local vehicle owner",
+    "name": "Local business request",
     "rating": 5,
-    "quote": "The technician explained what was possible for my vehicle before starting the job.",
+    "quote": "The technician explained the access issue clearly and reviewed the next step before starting.",
     "city": "Philadelphia, PA"
   },
   {
     "name": "Emergency request",
     "rating": 5,
-    "quote": "Good option when you are locked out and need mobile automotive locksmith help.",
+    "quote": "Good option when you are locked out and need mobile locksmith help.",
     "city": "Philadelphia, PA"
   }
 ]

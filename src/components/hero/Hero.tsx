@@ -20,7 +20,7 @@ export default function Hero(props: HeroProps) {
   const hasTitle = !isInvalidContent(title)
   const hasSubtitle = !isInvalidContent(subtitle)
   const visibleBadges = badges.slice(0, 3)
-  const fallbackBadges = ['24/7 Mobile Service', 'Philadelphia Coverage', 'Car Keys & Programming']
+  const fallbackBadges = ['24/7 Emergency Locksmith', 'Philadelphia Coverage', 'Auto, Residential & Commercial']
 
   return (
     <section className="relative overflow-hidden bg-transparent px-4 pb-10 pt-8 sm:px-6 md:pb-14 md:pt-12 lg:px-8">
@@ -28,7 +28,7 @@ export default function Hero(props: HeroProps) {
         <PremiumReveal className="relative z-10 flex min-h-[15rem] flex-col justify-center text-center lg:min-h-[22rem] lg:text-left">
           <div className="mb-5 inline-flex max-w-full items-center self-center gap-3 rounded-full border border-[#0B1F4D]/16 bg-white px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#123A73] shadow-[0_12px_34px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:text-[0.68rem] sm:tracking-[0.24em] lg:self-start">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#0B1F4D] shadow-[0_0_16px_rgba(11,31,77,0.24)]" />
-            <span className="truncate">24/7 Mobile Automotive Locksmith</span>
+            <span className="truncate">24/7 Mobile Locksmith Service</span>
           </div>
 
           {hasTitle ? (
@@ -59,10 +59,10 @@ export default function Hero(props: HeroProps) {
               <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-[#0B1F4D] sm:text-3xl">Need help now?</h2>
             </div>
 
-            <p className="text-sm leading-7 text-[#42526E]">Send the vehicle make, model, year, location, and urgency. Clear details help route the right automotive locksmith request faster.</p>
+            <p className="text-sm leading-7 text-[#42526E]">Send the service type, location, urgency, and access details. For vehicle jobs, add make, model, and year so the request can be routed faster.</p>
 
             <div className="mt-6 divide-y divide-[#0B1F4D]/10 border-y border-[#0B1F4D]/10">
-              {['Select service', 'Add vehicle details', 'Confirm location'].map((label) => (
+              {['Select service', 'Add job details', 'Confirm location'].map((label) => (
                 <div key={label} className="flex items-center justify-between gap-4 py-4 text-sm font-semibold text-[#0B1F4D]">
                   <span>{label}</span>
                   <span aria-hidden="true" className="text-[#123A73]">→</span>

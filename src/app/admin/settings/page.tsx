@@ -26,17 +26,49 @@ const IMAGE_BUCKET = 'site-images'
 
 const initialState: SettingsState = {
   id: '',
-  brandName: 'Planetlocksmiths',
+  brandName: 'Planet Locksmiths',
   logoUrl: '',
-  logoAlt: 'Planetlocksmiths',
-  phonePrimary: '+1 (267) 000-0000',
-  phoneDisplay: '(267) 000-0000',
-  email: 'hello@planetlocksmiths.com',
-  serviceHours: '24/7 Mobile Service',
+  logoAlt: 'Planet Locksmiths',
+  phonePrimary: '+12676122555',
+  phoneDisplay: '+1 (267) 612-2555',
+  email: 'planetlocksmits@gmail.com',
+  serviceHours: '24/7 Emergency Locksmith Service',
 }
 
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
+}
+
+const DEMO_PHONE_PATTERN = /(555[-\s)]?0?\d{3}|000[-\s)]?0{3})/i
+
+function normalizeBrandName(value: string | null | undefined) {
+  const text = String(value || '').trim()
+  if (!text || text.toLowerCase() === 'planetlocksmiths') return initialState.brandName
+  return text
+}
+
+function normalizeLogoAlt(value: string | null | undefined, brandName: string) {
+  const text = String(value || '').trim()
+  if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
+  return text
+}
+
+function normalizePhone(value: string | null | undefined, fallback: string) {
+  const text = String(value || '').trim()
+  if (!text || DEMO_PHONE_PATTERN.test(text)) return fallback
+  return text
+}
+
+function normalizeEmail(value: string | null | undefined) {
+  const text = String(value || '').trim().toLowerCase()
+  if (!text || text === 'hello@planetlocksmiths.com') return initialState.email
+  return text
+}
+
+function normalizeServiceHours(value: string | null | undefined) {
+  const text = String(value || '').trim()
+  if (!text || text.toLowerCase() === '24/7 mobile service') return initialState.serviceHours
+  return text
 }
 
 async function getLogoUploadError(file: File) {
@@ -90,16 +122,16 @@ export default function AdminSettingsPage() {
         const row = Array.isArray(result.data) ? result.data[0] : null
 
         if (mounted && row) {
-          const brandName = row.brand_name ?? initialState.brandName
+          const brandName = normalizeBrandName(row.brand_name)
           setForm({
             id: row.id ?? '',
             brandName,
             logoUrl: row.logo_url ?? initialState.logoUrl,
-            logoAlt: row.logo_alt ?? brandName,
-            phonePrimary: row.phone_primary ?? initialState.phonePrimary,
-            phoneDisplay: row.phone_display ?? initialState.phoneDisplay,
-            email: row.email ?? initialState.email,
-            serviceHours: row.service_hours ?? initialState.serviceHours,
+            logoAlt: normalizeLogoAlt(row.logo_alt, brandName),
+            phonePrimary: normalizePhone(row.phone_primary, initialState.phonePrimary),
+            phoneDisplay: normalizePhone(row.phone_display, initialState.phoneDisplay),
+            email: normalizeEmail(row.email),
+            serviceHours: normalizeServiceHours(row.service_hours),
           })
         }
       } catch (error) {
@@ -158,8 +190,8 @@ export default function AdminSettingsPage() {
       await (supabase.from('site_images') as any).insert({
         image_url: url,
         storage_path: filePath,
-        title: `${form.brandName || 'Planetlocksmiths'} logo`,
-        alt: form.logoAlt || form.brandName || 'Planetlocksmiths',
+        title: `${form.brandName || initialState.brandName} logo`,
+        alt: form.logoAlt || form.brandName || initialState.brandName,
         category: 'logo',
         is_published: true,
       })
@@ -167,7 +199,7 @@ export default function AdminSettingsPage() {
       setForm((prev) => ({
         ...prev,
         logoUrl: url,
-        logoAlt: prev.logoAlt || prev.brandName || 'Planetlocksmiths',
+        logoAlt: prev.logoAlt || prev.brandName || initialState.brandName,
       }))
       setSuccessMessage('Логотип загружен через Supabase. Нажми “Сохранить настройки”, чтобы применить его на сайте.')
     } catch (error) {
@@ -264,17 +296,17 @@ export default function AdminSettingsPage() {
 
         <div style={fieldGridStyle}>
           <Field label="URL логотипа" value={form.logoUrl} onChange={(value) => updateField('logoUrl', value)} placeholder="https://.../logo.png" />
-          <Field label="Alt текст логотипа" value={form.logoAlt} onChange={(value) => updateField('logoAlt', value)} placeholder="Planetlocksmiths logo" />
+          <Field label="Alt текст логотипа" value={form.logoAlt} onChange={(value) => updateField('logoAlt', value)} placeholder="Planet Locksmiths logo" />
         </div>
 
         <SectionTitle title="Бренд и контакты" text="Можно вводить любые данные без ограничений. Пустые поля сохраняются как пустые значения." />
 
         <div style={fieldGridStyle}>
-          <Field label="Название бренда" value={form.brandName} onChange={(value) => updateField('brandName', value)} placeholder="Planetlocksmiths" />
-          <Field label="Основной телефон" value={form.phonePrimary} onChange={(value) => updateField('phonePrimary', value)} placeholder="+1 (267) 000-0000" />
-          <Field label="Телефон для отображения" value={form.phoneDisplay} onChange={(value) => updateField('phoneDisplay', value)} placeholder="(267) 000-0000" />
-          <Field label="Email" value={form.email} onChange={(value) => updateField('email', value)} placeholder="hello@planetlocksmiths.com" />
-          <Field label="Часы работы" value={form.serviceHours} onChange={(value) => updateField('serviceHours', value)} placeholder="24/7 Mobile Service" />
+          <Field label="Название бренда" value={form.brandName} onChange={(value) => updateField('brandName', value)} placeholder="Planet Locksmiths" />
+          <Field label="Основной телефон" value={form.phonePrimary} onChange={(value) => updateField('phonePrimary', value)} placeholder="+12676122555" />
+          <Field label="Телефон для отображения" value={form.phoneDisplay} onChange={(value) => updateField('phoneDisplay', value)} placeholder="+1 (267) 612-2555" />
+          <Field label="Email" value={form.email} onChange={(value) => updateField('email', value)} placeholder="planetlocksmits@gmail.com" />
+          <Field label="Часы работы" value={form.serviceHours} onChange={(value) => updateField('serviceHours', value)} placeholder="24/7 Emergency Locksmith Service" />
         </div>
       </form>
 

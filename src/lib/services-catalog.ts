@@ -103,7 +103,7 @@ function makeCatalog(seed: ServiceSeed): CatalogService {
     title: seed.title,
     excerpt: seed.excerpt,
     intro: seed.intro || seed.excerpt,
-    seoTitle: `${seed.title} Philadelphia | Planetlocksmiths`,
+    seoTitle: `${seed.title} Philadelphia | Planet Locksmiths`,
     seoDescription: seed.excerpt,
   }
 }

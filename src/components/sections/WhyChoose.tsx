@@ -11,8 +11,8 @@ export default function WhyChoose({ items }: WhyChooseProps) {
         <div className="grid gap-9 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <div>
             <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-accent-gold">Why choose us</p>
-            <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">Clear mobile locksmith help when the vehicle matters.</h2>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-muted">Customers need fast communication, realistic expectations, and the right vehicle details before service. This section keeps the value proposition direct.</p>
+            <h2 className="text-balance text-3xl font-semibold tracking-[-0.04em] text-text sm:text-4xl lg:text-5xl">Clear mobile locksmith help across the full service list.</h2>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-muted">Customers need fast communication, realistic expectations, and the right service details before dispatch. This section keeps the value proposition direct.</p>
           </div>
 
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">

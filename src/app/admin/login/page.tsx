@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
               letterSpacing: 0.8,
             }}
           >
-            Planetlocksmiths
+            Planet Locksmiths
           </p>
 
           <h1

@@ -1,8 +1,8 @@
 [
   {
-    "name": "Cliente reciente",
+    "name": "Solicitud reciente",
     "rating": 5,
-    "quote": "Comunicación rápida, llegada móvil y explicación clara del proceso de reemplazo de llave.",
+    "quote": "Comunicación rápida, llegada móvil y explicación clara antes de empezar el trabajo.",
     "city": "Philadelphia, PA"
   },
   {
@@ -12,15 +12,15 @@
     "city": "Philadelphia, PA"
   },
   {
-    "name": "Dueño de vehículo",
+    "name": "Solicitud comercial",
     "rating": 5,
-    "quote": "El técnico explicó qué era posible para mi vehículo antes de comenzar el trabajo.",
+    "quote": "El técnico explicó el problema de acceso y revisó el siguiente paso antes de comenzar.",
     "city": "Philadelphia, PA"
   },
   {
     "name": "Solicitud urgente",
     "rating": 5,
-    "quote": "Buena opción cuando no puedes abrir el auto y necesitas ayuda móvil automotriz.",
+    "quote": "Buena opción cuando estás bloqueado afuera y necesitas ayuda móvil de cerrajería.",
     "city": "Philadelphia, PA"
   }
 ]

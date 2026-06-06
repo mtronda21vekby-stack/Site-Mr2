@@ -2,9 +2,9 @@ import Link from 'next/link'
 import type { Locale } from './Header'
 
 const labels: Record<Locale, { request: string; callAria: string }> = {
-  en: { request: 'Request', callAria: 'Call Planetlocksmiths now' },
-  es: { request: 'Solicitud', callAria: 'Llamar a Planetlocksmiths ahora' },
-  ru: { request: 'Request', callAria: 'Call Planetlocksmiths now' },
+  en: { request: 'Request', callAria: 'Call Planet Locksmiths now' },
+  es: { request: 'Solicitud', callAria: 'Llamar a Planet Locksmiths ahora' },
+  ru: { request: 'Request', callAria: 'Call Planet Locksmiths now' },
 }
 
 export default function MobileStickyCta({

@@ -54,7 +54,7 @@ export function buildAreaCollectionSchema({ locale, areas }: { locale: SeoLocale
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     '@id': `${getCanonicalUrl(locale, '/areas')}#areas`,
-    name: 'Automotive locksmith service areas',
+    name: 'Locksmith service areas',
     itemListElement: areas.map((area, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -131,7 +131,7 @@ export function buildContactPageSchema({ locale, global, description }: { locale
     '@type': 'ContactPage',
     '@id': `${getCanonicalUrl(locale, '/contact')}#contact`,
     url: getCanonicalUrl(locale, '/contact'),
-    name: 'Contact Planetlocksmiths',
+    name: `Contact ${global.brandName}`,
     description,
     mainEntity: {
       '@type': 'Locksmith',

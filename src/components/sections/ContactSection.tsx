@@ -46,7 +46,8 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
 
   const makes = Object.keys(VEHICLE_MODELS)
   const selectedModels = formData.vehicle_make ? VEHICLE_MODELS[formData.vehicle_make] ?? [] : []
-  const completionScore = [formData.phone, formData.service_needed, formData.vehicle_make, formData.vehicle_model || formData.vehicle_make_model, formData.vehicle_year, formData.location].filter(Boolean).length
+  const optionalDetails = formData.vehicle_make || formData.vehicle_model || formData.vehicle_make_model || formData.vehicle_year || formData.message
+  const completionScore = [formData.phone, formData.service_needed, formData.location, optionalDetails, formData.name || formData.email].filter(Boolean).length
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target
@@ -83,17 +84,17 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             <div className="relative z-10 flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-[#123A73]">Request readiness</p>
-                <p className="mt-2 text-sm leading-7 text-[#42526E]">Phone, service, vehicle, year, and location help speed up the callback.</p>
+                <p className="mt-2 text-sm leading-7 text-[#42526E]">Phone, service, location, urgency, and job details help speed up the callback.</p>
               </div>
-              <span className="rounded-full border border-[#0B1F4D]/18 bg-white px-3 py-1 text-sm font-black text-[#0B1F4D] shadow-[0_10px_26px_rgba(11,31,77,0.06)]">{completionScore}/6</span>
+              <span className="rounded-full border border-[#0B1F4D]/18 bg-white px-3 py-1 text-sm font-black text-[#0B1F4D] shadow-[0_10px_26px_rgba(11,31,77,0.06)]">{completionScore}/5</span>
             </div>
-            <div className="relative z-10 mt-4 h-2 overflow-hidden rounded-full bg-[#0B1F4D]/10"><div className="h-full rounded-full bg-[#0B1F4D] transition-all" style={{ width: `${Math.round((completionScore / 6) * 100)}%` }} /></div>
+            <div className="relative z-10 mt-4 h-2 overflow-hidden rounded-full bg-[#0B1F4D]/10"><div className="h-full rounded-full bg-[#0B1F4D] transition-all" style={{ width: `${Math.round((completionScore / 5) * 100)}%` }} /></div>
           </div>
 
           <div className="mt-5 grid gap-3">
             {[
               ['Service', 'Select the locksmith service needed.'],
-              ['Vehicle', 'Choose make, model, and year.'],
+              ['Details', 'Add lock, key, property, or vehicle details.'],
               ['Location', 'Add address, ZIP, or landmark.'],
             ].map(([heading, copy], index) => (
               <div key={heading} className="premium-panel rounded-[1.15rem] p-4">
@@ -111,8 +112,8 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
         <form onSubmit={handleSubmit} className="premium-panel rounded-[1.75rem] p-5 sm:p-7">
           <div className="relative z-10 mb-6 border-b border-[#0B1F4D]/10 pb-6">
             <p className="text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Service request form</p>
-            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D]">Vehicle + service details</h3>
-            <p className="mt-3 text-sm leading-7 text-[#42526E]">Required: phone and service. More vehicle details improve routing accuracy.</p>
+            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D]">Service details</h3>
+            <p className="mt-3 text-sm leading-7 text-[#42526E]">Required: phone and service. Vehicle fields are optional; for home, business, safe, or access-control work, use Extra Details.</p>
           </div>
 
           <div className="relative z-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -120,14 +121,14 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
             <Field label="Phone *" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 215 000 0000" required inputMode="tel" />
             <Field label="Email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="name@email.com" />
             <SelectField label="Service Needed *" name="service_needed" value={formData.service_needed} onChange={handleChange} required placeholder="Select service" options={SERVICE_OPTIONS} />
-            <SelectField label="Vehicle Make" name="vehicle_make" value={formData.vehicle_make} onChange={handleChange} placeholder="Select make" options={makes.map((make) => MAKE_LABELS[make] ?? make)} rawValues={makes} />
+            <SelectField label="Vehicle Make (if automotive)" name="vehicle_make" value={formData.vehicle_make} onChange={handleChange} placeholder="Select make" options={makes.map((make) => MAKE_LABELS[make] ?? make)} rawValues={makes} />
             {formData.vehicle_make === 'Other' ? <Field label="Vehicle Make / Model" name="vehicle_make_model" value={formData.vehicle_make_model} onChange={handleChange} placeholder="Enter vehicle" /> : <SelectField label="Vehicle Model" name="vehicle_model" value={formData.vehicle_model} onChange={handleChange} placeholder={formData.vehicle_make ? 'Select model' : 'Select make first'} options={selectedModels} disabled={!formData.vehicle_make} />}
-            <SelectField label="Vehicle Year" name="vehicle_year" value={formData.vehicle_year} onChange={handleChange} placeholder="Select year" options={years} />
+            <SelectField label="Vehicle Year (if automotive)" name="vehicle_year" value={formData.vehicle_year} onChange={handleChange} placeholder="Select year" options={years} />
             <SelectField label="Urgency" name="urgency" value={formData.urgency} onChange={handleChange} options={['ASAP / locked out now', 'Same day', 'Scheduled appointment', 'Not urgent']} rawValues={['asap', 'same_day', 'scheduled', 'normal']} />
             <Field label="Service Location" name="location" value={formData.location} onChange={handleChange} placeholder="Philadelphia, PA / address / ZIP" />
             <Field label="Preferred Time" name="preferred_time" value={formData.preferred_time} onChange={handleChange} placeholder="ASAP / Today / 5 PM" />
 
-            <div className="flex flex-col sm:col-span-2"><label htmlFor="message" className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#42526E]">Extra Details</label><textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className={`${glassControlClass} min-h-28 resize-y`} placeholder="Example: keys lost, car is running, door locked, key fob not detected, parking lot name, etc." /></div>
+            <div className="flex flex-col sm:col-span-2"><label htmlFor="message" className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-[#42526E]">Extra Details</label><textarea id="message" name="message" value={formData.message} onChange={handleChange} rows={4} className={`${glassControlClass} min-h-28 resize-y`} placeholder="Example: keys lost, house lockout, office rekey, safe opening, access control issue, car is running, parking lot name, etc." /></div>
 
             <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
               <button type="submit" disabled={status === 'submitting'} className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#0B1F4D]/10 bg-[#0B1F4D] px-7 py-3 text-sm font-black uppercase tracking-[0.16em] text-white shadow-[0_16px_42px_rgba(11,31,77,0.22)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_60px_rgba(11,31,77,0.28)] disabled:opacity-50">{status === 'submitting' ? 'Submitting…' : 'Submit Request'}</button>

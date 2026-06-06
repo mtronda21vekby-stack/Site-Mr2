@@ -27,7 +27,7 @@ export default function ServiceSchema({
     },
     provider: {
       '@type': ['LocalBusiness', 'Locksmith'],
-      name: 'Planetlocksmiths',
+      name: 'Planet Locksmiths',
       url: siteUrl,
     },
   }

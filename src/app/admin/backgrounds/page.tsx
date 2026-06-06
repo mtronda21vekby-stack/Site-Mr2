@@ -31,7 +31,7 @@ const initialState: BackgroundState = {
   id: '',
   desktopUrl: '',
   mobileUrl: '',
-  alt: 'Planetlocksmiths background',
+  alt: 'Planet Locksmiths background',
   opacity: '0.12',
   desktopPosition: 'center center',
   mobilePosition: 'center center',
@@ -178,7 +178,7 @@ export default function AdminBackgroundsPage() {
         image_url: url,
         storage_path: filePath,
         title: slot === 'desktop' ? 'Site desktop background' : 'Site mobile background',
-        alt: form.alt || 'Planetlocksmiths background',
+        alt: form.alt || 'Planet Locksmiths background',
         category: slot === 'desktop' ? 'background-desktop' : 'background-mobile',
         is_published: true,
       })
@@ -218,7 +218,7 @@ export default function AdminBackgroundsPage() {
             image_url: url,
             storage_path: filePath,
             title: 'Small background photo',
-            alt: form.alt || 'Planetlocksmiths background photo',
+            alt: form.alt || 'Planet Locksmiths background photo',
             category: 'background-decor',
             sort_order: decorImages.length + uploaded.length,
             is_published: true,
@@ -387,7 +387,7 @@ export default function AdminBackgroundsPage() {
           <div style={fieldGridStyle}>
             <Field label="Desktop URL" value={form.desktopUrl} onChange={(value) => updateField('desktopUrl', value)} placeholder="https://.../desktop-background.webp" />
             <Field label="Mobile URL" value={form.mobileUrl} onChange={(value) => updateField('mobileUrl', value)} placeholder="https://.../mobile-background.webp" />
-            <Field label="Alt / описание" value={form.alt} onChange={(value) => updateField('alt', value)} placeholder="Planetlocksmiths background" />
+            <Field label="Alt / описание" value={form.alt} onChange={(value) => updateField('alt', value)} placeholder="Planet Locksmiths background" />
             <Field label="Opacity fallback" value={form.opacity} onChange={(value) => updateField('opacity', value)} placeholder="0.12" type="number" step="0.01" min="0.04" max="0.35" />
             <SelectField label="Desktop position" value={form.desktopPosition} onChange={(value) => updateField('desktopPosition', value)} />
             <SelectField label="Mobile position" value={form.mobilePosition} onChange={(value) => updateField('mobilePosition', value)} />

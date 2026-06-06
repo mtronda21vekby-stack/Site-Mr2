@@ -69,7 +69,20 @@ function isAfterIsoDate(value: string | null | undefined, compareTo: string | nu
   return timestamp > compareTimestamp
 }
 
-export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planetlocksmiths', logoUrl = '', logoAlt }: HeaderProps) {
+function normalizeBrandName(value: string | null | undefined, fallback: string) {
+  const text = String(value || '').trim()
+  if (!text) return fallback
+  if (text.toLowerCase() === 'planetlocksmiths') return fallback
+  return text
+}
+
+function normalizeLogoAlt(value: string | null | undefined, brandName: string) {
+  const text = String(value || '').trim()
+  if (!text || text.toLowerCase() === 'planetlocksmiths') return brandName
+  return text
+}
+
+export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planet Locksmiths', logoUrl = '', logoAlt }: HeaderProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [logoFailed, setLogoFailed] = useState(false)
@@ -119,8 +132,8 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
 
         const settings = settingsResult.data?.[0]
         let nextLogoUrl = normalizeLogoUrl(String(settings?.logo_url || ''))
-        let nextLogoAlt = String(settings?.logo_alt || settings?.brand_name || logoAlt || brandName).trim()
-        const nextBrandName = String(settings?.brand_name || brandName).trim() || brandName
+        const nextBrandName = normalizeBrandName(settings?.brand_name, brandName)
+        let nextLogoAlt = normalizeLogoAlt(settings?.logo_alt || logoAlt, nextBrandName)
 
         const logoResult = await (supabase.from('site_images') as any)
           .select('image_url, alt, title, created_at')
@@ -145,7 +158,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
         setBrand({
           brandName: nextBrandName,
           logoUrl: nextLogoUrl,
-          logoAlt: nextLogoAlt || nextBrandName,
+          logoAlt: normalizeLogoAlt(nextLogoAlt, nextBrandName),
         })
       } catch {
         // Keep the generated fallback mark.
@@ -183,7 +196,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
           </span>
           <span className="min-w-0 leading-none">
             <span className="block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg">{visibleBrandName}</span>
-            <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile auto key response</span>
+            <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile locksmith response</span>
           </span>
         </Link>
 

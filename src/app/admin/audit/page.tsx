@@ -130,7 +130,7 @@ export default function AdminAuditPage() {
     <div style={pageStyle}>
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>Planetlocksmiths / CMS контроль качества</p>
+          <p style={eyebrowStyle}>Planet Locksmiths / CMS контроль качества</p>
           <h1 style={heroTitleStyle}>Аудит сайта</h1>
           <p style={mutedStyle}>Проверка Supabase CMS, логотипа, фото, главной, услуг, городов, отзывов, FAQ, заявок и контент-блоков. Это рабочий чеклист перед показом клиенту и запуском рекламы.</p>
         </div>
