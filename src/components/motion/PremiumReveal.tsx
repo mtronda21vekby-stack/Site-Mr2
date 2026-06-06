@@ -1,30 +1,27 @@
-'use client'
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
 
-import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
-import type { ReactNode } from 'react'
-
-type PremiumRevealProps = HTMLMotionProps<'div'> & {
+type PremiumRevealProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode
   delay?: number
 }
 
-export default function PremiumReveal({ children, delay = 0, className = '', ...props }: PremiumRevealProps) {
-  const reduceMotion = useReducedMotion()
-
-  if (reduceMotion) {
-    return <div className={className}>{children}</div>
-  }
-
+export default function PremiumReveal({
+  children,
+  delay = 0,
+  className = '',
+  style,
+  ...props
+}: PremiumRevealProps) {
   return (
-    <motion.div
+    <div
       {...props}
-      className={className}
-      initial={{ opacity: 0, y: 18, filter: 'blur(10px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.62, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={`premium-reveal ${className}`}
+      style={{
+        ...style,
+        '--premium-reveal-delay': `${delay}s`,
+      } as CSSProperties}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
