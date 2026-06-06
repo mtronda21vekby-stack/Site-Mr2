@@ -10,7 +10,7 @@ import ReviewsSection from '@/components/sections/ReviewsSection'
 import FaqSection from '@/components/sections/FaqSection'
 import ContactSection from '@/components/sections/ContactSection'
 import AreasShowcase from '@/components/sections/AreasShowcase'
-import ServiceScopeShowcase from '@/components/sections/ServiceScopeShowcase'
+import SiteGallery from '@/components/sections/SiteGallery'
 import {
   getGlobalSettingsFromSource,
   getHomeContentFromSource,
@@ -108,7 +108,7 @@ export default async function LocaleHome({
           secondaryCtaHref={`/${locale}/contact#request-service`}
         />
 
-        <ServiceScopeShowcase locale={locale} phoneNumber={global.phonePrimary} />
+        <SiteGallery />
         <ServicesGrid services={services} locale={locale} />
         <InsuranceTrustSection locale={locale} />
 
