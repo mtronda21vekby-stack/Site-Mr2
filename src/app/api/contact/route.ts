@@ -86,13 +86,27 @@ function buildEmailHtml(contact: ContactRequest) {
   `
 }
 
-async function sendContactNotification(contact: ContactRequest) {
+async function getSettingsContactEmail(supabase: any) {
+  try {
+    const result = await (supabase.from('site_settings') as any)
+      .select('email')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+
+    const email = String(result.data?.[0]?.email || '').trim()
+    return isLikelyEmail(email) ? email : ''
+  } catch {
+    return ''
+  }
+}
+
+async function sendContactNotification(contact: ContactRequest, settingsEmail = '') {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
     return { sent: false, reason: 'missing_resend_api_key' }
   }
 
-  const to = (process.env.CONTACT_TO_EMAIL || process.env.ADMIN_EMAIL || defaultContactEmail).trim()
+  const to = (process.env.CONTACT_TO_EMAIL || process.env.ADMIN_EMAIL || settingsEmail || defaultContactEmail).trim()
   const from = (process.env.CONTACT_FROM_EMAIL || defaultFromEmail).trim()
   const subjectParts = ['New locksmith request', contact.serviceNeeded, contact.urgency === 'asap' ? 'ASAP' : '']
   const subject = subjectParts.filter(Boolean).join(' - ')
@@ -224,7 +238,8 @@ export async function POST(request: Request) {
       )
     }
 
-    const notification = await sendContactNotification(contactRequest)
+    const notificationEmail = await getSettingsContactEmail(supabase)
+    const notification = await sendContactNotification(contactRequest, notificationEmail)
 
     return NextResponse.json({ success: true, notificationSent: notification.sent })
   } catch (error) {
