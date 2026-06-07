@@ -153,6 +153,8 @@ export default function ControlPanelPage() {
     metrics.reviews >= 6,
     true,
   ].filter(Boolean).length
+  const readinessScore = Math.round((readyItems / 5) * 100)
+  const liveLoad = metrics.newOrders + metrics.activeOrders
 
   return (
     <div style={pageStyle}>
@@ -161,8 +163,23 @@ export default function ControlPanelPage() {
           <p style={eyebrowStyle}>Planet Locksmiths / рабочая панель сайта</p>
           <h1 style={heroTitleStyle}>Панель управления сайтом</h1>
           <p style={heroTextStyle}>
-            Управление заявками, фотографиями, услугами, городами, отзывами, FAQ и основным контентом сайта. Версия панели: RU-CONTROL-v6.
+            Управление заявками, фотографиями, услугами, городами, отзывами, FAQ и основным контентом сайта. Рабочий центр для live production.
           </p>
+        </div>
+
+        <div style={heroScoreCardStyle}>
+          <div style={scoreHeadStyle}>
+            <span style={smallLabelStyle}>Readiness</span>
+            <strong style={scoreValueStyle}>{readinessScore}%</strong>
+          </div>
+          <div style={scoreTrackStyle}>
+            <span style={{ ...scoreFillStyle, width: `${readinessScore}%` }} />
+          </div>
+          <div style={signalGridStyle}>
+            <span><b>{liveLoad}</b> active</span>
+            <span><b>{metrics.services}</b> services</span>
+            <span><b>{metrics.areas}</b> areas</span>
+          </div>
         </div>
 
         <div style={heroActionsStyle}>
@@ -280,27 +297,33 @@ function QualityCard({ title, href, status, note }: { title: string; href: strin
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
 const heroStyle: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
   gap: 20,
   alignItems: 'end',
-  border: '1px solid rgba(214,168,95,0.24)',
-  borderRadius: 24,
-  padding: 24,
-  background: 'linear-gradient(180deg, rgba(255,255,255,0.065), rgba(255,255,255,0.024)), rgba(255,255,255,0.018)',
-  boxShadow: '0 18px 54px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.055)',
+  border: '1px solid rgba(214,168,95,0.30)',
+  borderRadius: 28,
+  padding: 26,
+  background: 'linear-gradient(145deg, rgba(255,255,255,0.092), rgba(255,255,255,0.024)), linear-gradient(135deg, rgba(214,168,95,0.14), transparent 42%, rgba(92,141,255,0.060)), rgba(255,255,255,0.018)',
+  boxShadow: '0 28px 90px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.085)',
 }
 const eyebrowStyle: CSSProperties = { margin: 0, color: '#D6A85F', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
 const smallLabelStyle: CSSProperties = { margin: 0, color: '#F0D099', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
 const loadingTitleStyle: CSSProperties = { margin: '10px 0 0', color: '#F5F7FB', fontSize: 34 }
 const heroTitleStyle: CSSProperties = { margin: '12px 0 0', color: '#F5F7FB', fontSize: 'clamp(36px, 6vw, 68px)', lineHeight: 0.96, letterSpacing: -1.1 }
 const heroTextStyle: CSSProperties = { maxWidth: 740, margin: '18px 0 0', color: '#9CA3AF', fontSize: 15, lineHeight: 1.75 }
-const heroActionsStyle: CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
-const primaryLinkStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(214,168,95,0.42)', background: 'rgba(214,168,95,0.14)', color: '#F0D099', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
-const secondaryLinkStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.028)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.4 }
-function refreshButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 46, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, opacity: disabled ? 0.7 : 1 } }
+const heroScoreCardStyle: CSSProperties = { alignSelf: 'stretch', display: 'grid', alignContent: 'space-between', gap: 16, minHeight: 190, border: '1px solid rgba(255,255,255,0.11)', borderRadius: 24, background: 'linear-gradient(155deg, rgba(255,255,255,0.080), rgba(255,255,255,0.026)), rgba(5,7,11,0.40)', padding: 18, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.075)' }
+const scoreHeadStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }
+const scoreValueStyle: CSSProperties = { color: '#F5F7FB', fontSize: 48, lineHeight: 1, letterSpacing: -1.8 }
+const scoreTrackStyle: CSSProperties = { position: 'relative', height: 10, overflow: 'hidden', borderRadius: 999, background: 'rgba(255,255,255,0.08)' }
+const scoreFillStyle: CSSProperties = { position: 'absolute', inset: 0, borderRadius: 999, background: 'linear-gradient(90deg, #D6A85F, #6EE7B7)' }
+const signalGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, color: '#95A0B8', fontSize: 12, lineHeight: 1.35 }
+const heroActionsStyle: CSSProperties = { gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
+const primaryLinkStyle: CSSProperties = { minHeight: 48, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 15, border: '1px solid rgba(214,168,95,0.42)', background: 'rgba(214,168,95,0.14)', color: '#F0D099', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
+const secondaryLinkStyle: CSSProperties = { minHeight: 48, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 15, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.028)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.4 }
+function refreshButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 48, padding: '0 18px', borderRadius: 15, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, opacity: disabled ? 0.7 : 1 } }
 const errorStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '14px 16px', fontSize: 14, lineHeight: 1.5 }
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14 }
-const panelStyle: CSSProperties = { background: 'linear-gradient(180deg, rgba(255,255,255,0.052), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 22, padding: 18, minWidth: 0, boxShadow: '0 18px 54px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.055)' }
+const panelStyle: CSSProperties = { background: 'linear-gradient(155deg, rgba(255,255,255,0.070), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)', border: '1px solid rgba(255,255,255,0.105)', borderRadius: 24, padding: 18, minWidth: 0, boxShadow: '0 22px 68px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.066)' }
 const photoPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 18, alignItems: 'end', border: '1px solid rgba(214,168,95,0.28)', background: 'linear-gradient(180deg, rgba(214,168,95,0.10), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)' }
 const sectionTitleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.1, letterSpacing: -0.7 }
 const sectionTextStyle: CSSProperties = { margin: '12px 0 0', color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }

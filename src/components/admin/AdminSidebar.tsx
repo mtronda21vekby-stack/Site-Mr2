@@ -3,6 +3,21 @@
 import { usePathname } from 'next/navigation'
 import { adminNavGroups } from './admin-nav'
 
+const navBadges: Record<string, string> = {
+  '/admin/direct': 'OV',
+  '/admin/photos': 'PX',
+  '/admin/backgrounds': 'BG',
+  '/admin/orders': 'RQ',
+  '/admin/settings': 'ST',
+  '/admin/audit': 'QA',
+  '/admin/home': 'HM',
+  '/admin/content-blocks': 'CB',
+  '/admin/services': 'SV',
+  '/admin/areas': 'AR',
+  '/admin/reviews': 'RV',
+  '/admin/faq': 'FQ',
+}
+
 export default function AdminSidebar() {
   const pathname = usePathname()
 
@@ -19,8 +34,11 @@ export default function AdminSidebar() {
       </div>
 
       <a href="/admin/photos" className="photo-cta">
-        <span>Media</span>
-        <strong>Фото и галерея</strong>
+        <div>
+          <span>Media Center</span>
+          <strong>Фото, логотип, фон</strong>
+        </div>
+        <b>Open</b>
       </a>
 
       <nav className="nav-stack">
@@ -34,8 +52,9 @@ export default function AdminSidebar() {
 
                 return (
                   <a key={item.href} href={item.href} className={active ? 'nav-link nav-link--active' : 'nav-link'}>
-                    <span className="nav-dot" />
+                    <span className="nav-badge">{navBadges[item.href] ?? 'AD'}</span>
                     <span>{label}</span>
+                    <span className="nav-arrow">→</span>
                   </a>
                 )
               })}
@@ -45,6 +64,11 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="side-footer">
+        <div className="health-card">
+          <p>Production</p>
+          <strong>Live CMS</strong>
+          <span>Supabase connected</span>
+        </div>
         <div className="status-pill"><span /> Сессия активна</div>
         <a href="/en" className="site-link">Открыть сайт ↗</a>
       </div>
@@ -52,11 +76,11 @@ export default function AdminSidebar() {
       <style jsx>{`
         .side-panel {
           min-height: 100vh;
-          padding: 16px;
+          padding: 18px;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 16px;
         }
 
         .brand-card {
@@ -65,12 +89,13 @@ export default function AdminSidebar() {
           gap: 12px;
           align-items: center;
           padding: 12px;
-          border-radius: 22px;
+          border-radius: 24px;
           border: 1px solid rgba(255, 255, 255, 0.10);
           background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.024)),
+            linear-gradient(155deg, rgba(255, 255, 255, 0.088), rgba(255, 255, 255, 0.024)),
+            linear-gradient(135deg, rgba(214, 168, 95, 0.12), transparent 48%),
             rgba(255, 255, 255, 0.028);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+          box-shadow: 0 18px 64px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.09);
         }
 
         .brand-mark {
@@ -110,18 +135,25 @@ export default function AdminSidebar() {
 
         .photo-cta {
           min-height: 58px;
-          display: grid;
-          align-content: center;
-          gap: 4px;
-          border-radius: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          border-radius: 20px;
           border: 1px solid rgba(214, 168, 95, 0.34);
           background:
-            linear-gradient(135deg, rgba(214, 168, 95, 0.14), rgba(255, 255, 255, 0.028)),
+            linear-gradient(135deg, rgba(214, 168, 95, 0.18), rgba(90, 212, 178, 0.06) 48%, rgba(255, 255, 255, 0.028)),
             rgba(255, 255, 255, 0.026);
           color: #f5f7fb;
           text-decoration: none;
-          padding: 0 14px;
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+          padding: 0 12px 0 14px;
+          box-shadow: 0 18px 54px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+          transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        }
+
+        .photo-cta:hover {
+          transform: translateY(-1px);
+          border-color: rgba(214, 168, 95, 0.56);
         }
 
         .photo-cta span {
@@ -135,6 +167,20 @@ export default function AdminSidebar() {
         .photo-cta strong {
           font-size: 14px;
           line-height: 1.1;
+        }
+
+        .photo-cta b {
+          width: 46px;
+          height: 34px;
+          display: grid;
+          place-items: center;
+          border-radius: 999px;
+          background: #f5f7fb;
+          color: #05070b;
+          font-size: 10px;
+          font-weight: 950;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
         }
 
         .nav-stack {
@@ -161,8 +207,8 @@ export default function AdminSidebar() {
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 0 12px;
-          border-radius: 14px;
+          padding: 0 10px;
+          border-radius: 16px;
           border: 1px solid rgba(255, 255, 255, 0.07);
           background: rgba(255, 255, 255, 0.018);
           color: #dfe8f8;
@@ -187,17 +233,39 @@ export default function AdminSidebar() {
           box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
         }
 
-        .nav-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 99px;
-          background: #7f8797;
+        .nav-badge {
+          width: 31px;
+          height: 29px;
+          display: grid;
+          place-items: center;
+          border-radius: 11px;
+          border: 1px solid rgba(255, 255, 255, 0.09);
+          background: rgba(255, 255, 255, 0.035);
+          color: #9ca3af;
+          font-size: 10px;
+          font-weight: 950;
           flex: 0 0 auto;
         }
 
-        .nav-link--active .nav-dot {
-          background: #d6a85f;
-          box-shadow: 0 0 16px rgba(214, 168, 95, 0.55);
+        .nav-link--active .nav-badge {
+          border-color: rgba(214, 168, 95, 0.42);
+          background: rgba(214, 168, 95, 0.18);
+          color: #f0d099;
+          box-shadow: 0 0 18px rgba(214, 168, 95, 0.28);
+        }
+
+        .nav-arrow {
+          margin-left: auto;
+          color: #667085;
+          opacity: 0;
+          transform: translateX(-4px);
+          transition: opacity 160ms ease, transform 160ms ease;
+        }
+
+        .nav-link:hover .nav-arrow,
+        .nav-link--active .nav-arrow {
+          opacity: 1;
+          transform: translateX(0);
         }
 
         .side-footer {
@@ -206,6 +274,38 @@ export default function AdminSidebar() {
           gap: 10px;
           padding-top: 14px;
           border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .health-card {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          background:
+            linear-gradient(140deg, rgba(90, 212, 178, 0.11), transparent 42%),
+            rgba(255, 255, 255, 0.026);
+          padding: 13px;
+          display: grid;
+          gap: 4px;
+        }
+
+        .health-card p {
+          margin: 0;
+          color: #5ad4b2;
+          font-size: 10px;
+          font-weight: 950;
+          text-transform: uppercase;
+          letter-spacing: 1.6px;
+        }
+
+        .health-card strong {
+          color: #f5f7fb;
+          font-size: 18px;
+          line-height: 1.1;
+        }
+
+        .health-card span {
+          color: #95a0b8;
+          font-size: 12px;
+          font-weight: 760;
         }
 
         .status-pill {
