@@ -26,6 +26,7 @@ interface HeaderProps {
 }
 
 const activeLocales: ActiveLocale[] = ['en', 'es']
+const staticLogoUrl = '/planetlocksmiths-logo.svg'
 
 const navConfig: Record<Locale, Array<{ label: string; href: (locale: Locale) => string }>> = {
   en: [
@@ -91,6 +92,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [logoFailed, setLogoFailed] = useState(false)
+  const [staticLogoFailed, setStaticLogoFailed] = useState(false)
   const [fallbackAttempted, setFallbackAttempted] = useState(false)
   const [brand, setBrand] = useState<HeaderBrandState>({
     brandName: normalizeBrandName(brandName, 'Planet Locksmiths'),
@@ -104,10 +106,13 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   const visibleLogoUrl = normalizeLogoUrl(brand.logoUrl)
   const visibleBrandName = normalizeBrandName(brand.brandName, normalizeBrandName(brandName, 'Planet Locksmiths'))
   const visibleLogoAlt = normalizeLogoAlt(brand.logoAlt, visibleBrandName)
-  const shouldShowImageLogo = Boolean(visibleLogoUrl) && !logoFailed
+  const renderedLogoUrl = !logoFailed && visibleLogoUrl ? visibleLogoUrl : staticLogoFailed ? '' : staticLogoUrl
+  const renderedLogoAlt = renderedLogoUrl === staticLogoUrl ? 'Planet Locksmiths' : visibleLogoAlt
+  const shouldShowImageLogo = Boolean(renderedLogoUrl)
 
   useEffect(() => {
     setLogoFailed(false)
+    setStaticLogoFailed(false)
     setFallbackAttempted(false)
     const nextBrandName = normalizeBrandName(brandName, 'Planet Locksmiths')
     setBrand({
@@ -119,10 +124,11 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
 
   useEffect(() => {
     setLogoFailed(false)
+    setStaticLogoFailed(false)
   }, [visibleLogoUrl])
 
   useEffect(() => {
-    if (visibleLogoUrl && !logoFailed) return
+    if (visibleLogoUrl) return
     if (fallbackAttempted) return
     let mounted = true
 
@@ -186,14 +192,30 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
           <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
             {shouldShowImageLogo ? (
               <img
-                src={visibleLogoUrl}
-                alt={visibleLogoAlt}
+                src={renderedLogoUrl}
+                alt={renderedLogoAlt}
                 width="160"
                 height="117"
                 decoding="async"
                 loading="eager"
                 fetchPriority="high"
-                onError={() => setLogoFailed(true)}
+                onError={() => {
+                  if (renderedLogoUrl === staticLogoUrl) {
+                    setStaticLogoFailed(true)
+                  } else {
+                    setLogoFailed(true)
+                  }
+                }}
+                onLoad={(event) => {
+                  const image = event.currentTarget
+                  if (image.naturalWidth > 0 && image.naturalHeight > 0) return
+
+                  if (renderedLogoUrl === staticLogoUrl) {
+                    setStaticLogoFailed(true)
+                  } else {
+                    setLogoFailed(true)
+                  }
+                }}
                 className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
               />
             ) : (

@@ -35,9 +35,21 @@ function normalizeImages(rows: SiteImage[]) {
     })
     .map((image, index) => ({
       ...image,
+      alt: normalizeImageAlt(image.alt),
       category: image.category || 'gallery',
       sort_order: image.sort_order ?? index,
     }))
+}
+
+function isLegacyBrandText(value: string | null | undefined) {
+  const compact = String(value || '').trim().replace(/[^a-z0-9]/gi, '').toLowerCase()
+  return compact === 'planetlocksmith' || compact === 'planetlocksmiths'
+}
+
+function normalizeImageAlt(value: string | null | undefined) {
+  const text = String(value || '').trim()
+  if (!text || isLegacyBrandText(text)) return 'Planet Locksmiths service photo'
+  return text
 }
 
 async function getGalleryImages(): Promise<SiteImage[]> {

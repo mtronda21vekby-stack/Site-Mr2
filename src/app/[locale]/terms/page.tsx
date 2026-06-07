@@ -1,7 +1,9 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -16,6 +18,19 @@ export const revalidate = 60
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; sections: Array<{ title: string; body: string }> }> = {
   en: { eyebrow: 'Customer information', title: 'Terms of Service', body: 'These terms explain the basic conditions for using this website and submitting a mobile locksmith service request to Planet Locksmiths.', sections: [{ title: 'Website use', body: 'This website provides information about locksmith services and allows customers to submit service requests. You agree to provide accurate contact, service, authorization, location, and vehicle details when relevant.' }, { title: 'Service availability', body: 'Submitting a request does not guarantee immediate availability, dispatch, price, or completion of service. Availability depends on location, service type, parts, technician availability, timing, authorization, and job complexity.' }, { title: 'Pricing and estimates', body: 'Any estimate may depend on service type, lock or key system, programming requirements, lock condition, parts availability, distance, emergency timing, and authorization requirements. Final pricing should be confirmed before work begins.' }, { title: 'Access and authorization', body: 'Customers may be asked to confirm authorization to access or service a vehicle, property, door, lock, safe, mailbox, or access-control system. Service may be declined if ownership, authorization, safety, or legal concerns cannot be reasonably resolved.' }, { title: 'No misuse', body: 'You may not use this website to submit false requests, interfere with website operation, impersonate others, or request service for property, locks, safes, mailboxes, access systems, or vehicles you are not authorized to access.' }] },
   es: { eyebrow: 'Información del cliente', title: 'Términos de servicio', body: 'Estos términos explican las condiciones básicas para usar este sitio y enviar una solicitud móvil de cerrajería a Planet Locksmiths.', sections: [{ title: 'Uso del sitio', body: 'Este sitio ofrece información sobre servicios de cerrajería y permite enviar solicitudes. Usted acepta proporcionar datos correctos de contacto, servicio, autorización, ubicación y vehículo cuando aplique.' }, { title: 'Disponibilidad del servicio', body: 'Enviar una solicitud no garantiza disponibilidad inmediata, despacho, precio o finalización. La disponibilidad depende de ubicación, servicio, piezas, técnico, horario, autorización y complejidad.' }, { title: 'Precios y estimados', body: 'Todo estimado puede depender del servicio, sistema de cerradura o llave, programación, condición, piezas, distancia, urgencia y autorización. El precio final debe confirmarse antes del trabajo.' }, { title: 'Acceso y autorización', body: 'Puede solicitarse confirmación de autorización para acceder o trabajar en un vehículo, propiedad, puerta, cerradura, caja fuerte, buzón o sistema de access control. El servicio puede rechazarse si hay dudas legales, de seguridad o autorización.' }, { title: 'No uso indebido', body: 'No puede usar el sitio para solicitudes falsas, interferir con el sitio, suplantar personas o pedir servicio para propiedad, cerraduras, cajas fuertes, buzones, access control o vehículos sin autorización.' }] },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+
+  return buildPageMetadata({
+    locale: activeLocale,
+    path: '/terms',
+    title: copy.title,
+    description: copy.body,
+  })
 }
 
 export default async function TermsPage({ params }: { params: Promise<{ locale: Locale }> }) {

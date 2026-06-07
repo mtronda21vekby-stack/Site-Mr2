@@ -1,7 +1,9 @@
+import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileStickyCta from '@/components/layout/MobileStickyCta'
 import CinematicBackground from '@/components/layout/CinematicBackground'
+import { buildPageMetadata } from '@/lib/seo'
 import {
   getContentBlocksFromSource,
   getGlobalSettingsFromSource,
@@ -16,6 +18,19 @@ export const revalidate = 60
 const fallbackCopy: Record<ActiveLocale, { eyebrow: string; title: string; body: string; sections: Array<{ title: string; body: string }> }> = {
   en: { eyebrow: 'Customer information', title: 'Privacy Policy', body: 'This page explains how Planet Locksmiths handles information submitted through this website for mobile locksmith service requests.', sections: [{ title: 'Information we collect', body: 'When you submit a service request, we may collect your name, phone number, email address, requested service, authorization details, vehicle details when relevant, service location, urgency, preferred time, and message details. This information is used to respond to your request and understand the service needed.' }, { title: 'How we use information', body: 'Submitted information is used to contact you, review your locksmith request, help estimate required tools or parts, coordinate service availability, and improve customer communication.' }, { title: 'Sharing information', body: 'We do not sell customer request information. Information may be shared only when needed to process a service request, comply with law, protect rights and safety, or operate website infrastructure and customer communication systems.' }, { title: 'Security', body: 'We use reasonable technical and organizational measures to protect submitted information. No website or internet transmission can be guaranteed completely secure.' }, { title: 'Customer choices', body: 'You may contact us to ask about a service request, correct information, or request deletion of submitted request details where legally and operationally appropriate.' }] },
   es: { eyebrow: 'Información del cliente', title: 'Política de privacidad', body: 'Esta página explica cómo Planet Locksmiths maneja la información enviada a través del sitio para solicitudes móviles de cerrajería.', sections: [{ title: 'Información que recopilamos', body: 'Cuando envía una solicitud, podemos recopilar nombre, teléfono, email, servicio solicitado, autorización, datos del vehículo cuando aplique, ubicación, urgencia, horario preferido y mensaje.' }, { title: 'Cómo usamos la información', body: 'La información se usa para contactarlo, revisar la solicitud de cerrajería, estimar herramientas o piezas, coordinar disponibilidad y mejorar la comunicación.' }, { title: 'Compartir información', body: 'No vendemos información de solicitudes. Puede compartirse solo cuando sea necesario para procesar servicio, cumplir la ley, proteger derechos o operar sistemas.' }, { title: 'Seguridad', body: 'Usamos medidas razonables para proteger información enviada. Ningún sitio o transmisión por internet puede garantizar seguridad absoluta.' }, { title: 'Opciones del cliente', body: 'Puede contactarnos para preguntar sobre una solicitud, corregir información o pedir eliminación cuando sea apropiado legal y operativamente.' }] },
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params
+  const activeLocale: ActiveLocale = locale === 'es' ? 'es' : 'en'
+  const copy = fallbackCopy[activeLocale]
+
+  return buildPageMetadata({
+    locale: activeLocale,
+    path: '/privacy',
+    title: copy.title,
+    description: copy.body,
+  })
 }
 
 export default async function PrivacyPage({ params }: { params: Promise<{ locale: Locale }> }) {

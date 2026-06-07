@@ -16,6 +16,13 @@ function normalizeIndex(index: number, length: number) {
   return ((index % length) + length) % length
 }
 
+function shouldPrioritizeImage(index: number, activeIndex: number, length: number) {
+  if (length <= 3) return true
+  const previous = normalizeIndex(activeIndex - 1, length)
+  const next = normalizeIndex(activeIndex + 1, length)
+  return index === activeIndex || index === previous || index === next || index <= 1
+}
+
 export default function MobileScrollSpinGallery({ images }: { images: GalleryImage[] }) {
   const visibleImages = images.slice(0, 10)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -64,34 +71,39 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
           ref={trackRef}
           className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {visibleImages.map((image, index) => (
-            <button
-              key={image.id}
-              type="button"
-              onClick={() => setLightboxIndex(index)}
-              aria-label="Open service photo"
-              className="w-full min-w-full snap-center bg-[#F3F7FF] p-3 text-left outline-none"
-            >
-              <span className="block overflow-hidden rounded-[1.25rem] border border-[#0B1F4D]/10 bg-white">
-                <ResilientSupabaseImage
-                  src={image.image_url}
-                  widthHint={900}
-                  quality={74}
-                  resize="contain"
-                  alt={image.alt || image.title || 'Planet Locksmiths service photo'}
-                  loading={index <= 1 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  className="h-[21rem] w-full bg-[#EEF3FA] object-contain"
-                  draggable="false"
-                />
-              </span>
-              {(image.title || image.alt) ? (
-                <span className="block px-2 pb-1 pt-3 text-sm font-semibold leading-6 text-[#0B1F4D]">
-                  {image.title || image.alt}
+          {visibleImages.map((image, index) => {
+            const prioritizeImage = shouldPrioritizeImage(index, activeIndex, visibleImages.length)
+
+            return (
+              <button
+                key={image.id}
+                type="button"
+                onClick={() => setLightboxIndex(index)}
+                aria-label="Open service photo"
+                className="w-full min-w-full snap-center bg-[#F3F7FF] p-3 text-left outline-none"
+              >
+                <span className="block overflow-hidden rounded-[1.25rem] border border-[#0B1F4D]/10 bg-white">
+                  <ResilientSupabaseImage
+                    src={image.image_url}
+                    widthHint={900}
+                    quality={74}
+                    resize="contain"
+                    alt={image.alt || image.title || 'Planet Locksmiths service photo'}
+                    loading={prioritizeImage ? 'eager' : 'lazy'}
+                    fetchPriority={prioritizeImage ? 'high' : 'low'}
+                    decoding="async"
+                    className="h-[21rem] w-full bg-[#EEF3FA] object-contain"
+                    draggable="false"
+                  />
                 </span>
-              ) : null}
-            </button>
-          ))}
+                {(image.title || image.alt) ? (
+                  <span className="block px-2 pb-1 pt-3 text-sm font-semibold leading-6 text-[#0B1F4D]">
+                    {image.title || image.alt}
+                  </span>
+                ) : null}
+              </button>
+            )
+          })}
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-[#0B1F4D]/10 px-4 py-3">

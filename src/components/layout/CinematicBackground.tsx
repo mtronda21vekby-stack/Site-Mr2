@@ -76,6 +76,17 @@ function uniqueDecorImages(images: DecorImage[]) {
   })
 }
 
+function isLegacyBrandText(value: string | null | undefined) {
+  const compact = String(value || '').trim().replace(/[^a-z0-9]/gi, '').toLowerCase()
+  return compact === 'planetlocksmith' || compact === 'planetlocksmiths'
+}
+
+function normalizeDecorAlt(value: string | null | undefined) {
+  const text = String(value || '').trim()
+  if (!text || isLegacyBrandText(text)) return 'Planet Locksmiths service photo'
+  return text
+}
+
 function imageForSlot(images: DecorImage[], index: number) {
   if (!images.length) return null
   return images[index % images.length]
@@ -167,7 +178,7 @@ export default function CinematicBackground() {
               imagesResult.data.map((image: any) => ({
                 id: String(image.id),
                 imageUrl: optimizeImageUrl(String(image.image_url || ''), activeViewport, 'decor'),
-                alt: String(image.alt || 'Planet Locksmiths work photo'),
+                alt: normalizeDecorAlt(image.alt),
               })),
             ),
           )
