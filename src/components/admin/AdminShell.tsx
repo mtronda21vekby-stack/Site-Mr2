@@ -7,8 +7,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div className="control-shell">
       <div className="control-shell__noise" aria-hidden="true" />
-      <div className="control-shell__orb control-shell__orb--blue" aria-hidden="true" />
-      <div className="control-shell__orb control-shell__orb--cyan" aria-hidden="true" />
 
       <div className="control-shell__body">
         <aside className="control-shell__sidebar">
@@ -38,11 +36,10 @@ export default function AdminShell({ children }: { children: ReactNode }) {
         .control-shell {
           min-height: 100vh;
           position: relative;
-          overflow: hidden;
+          overflow-x: clip;
           background:
-            radial-gradient(circle at 84% -10%, rgba(45, 226, 230, 0.16), transparent 34%),
-            radial-gradient(circle at 14% 12%, rgba(77, 162, 255, 0.16), transparent 30%),
-            linear-gradient(135deg, #02040a 0%, #060916 48%, #02040a 100%);
+            linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 260px),
+            linear-gradient(135deg, #08090d 0%, #0f1218 44%, #06070a 100%);
           color: #f5f7fb;
           font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
@@ -51,34 +48,12 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           position: fixed;
           inset: 0;
           pointer-events: none;
-          opacity: 0.28;
+          opacity: 0.18;
           background-image:
             linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-          background-size: 44px 44px;
-          mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 80%);
-        }
-
-        .control-shell__orb {
-          position: fixed;
-          width: 460px;
-          height: 460px;
-          border-radius: 999px;
-          filter: blur(90px);
-          pointer-events: none;
-          opacity: 0.42;
-        }
-
-        .control-shell__orb--blue {
-          right: -220px;
-          top: -180px;
-          background: rgba(77, 162, 255, 0.38);
-        }
-
-        .control-shell__orb--cyan {
-          left: 18%;
-          bottom: -260px;
-          background: rgba(45, 226, 230, 0.18);
+            linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+          background-size: 48px 48px;
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,0.86), transparent 82%);
         }
 
         .control-shell__body {
@@ -90,38 +65,46 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
         .control-shell__sidebar {
           min-width: 0;
-          border-right: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(2, 4, 10, 0.54);
-          backdrop-filter: blur(28px);
+          border-right: 1px solid rgba(255, 255, 255, 0.075);
+          background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+            rgba(8, 9, 13, 0.82);
+          backdrop-filter: blur(26px);
         }
 
         .control-shell__main {
           min-width: 0;
-          padding: 22px;
+          padding: 18px;
           box-sizing: border-box;
         }
 
         .control-shell__workspace {
           width: 100%;
           max-width: 1380px;
-          min-height: calc(100vh - 44px);
+          min-height: calc(100vh - 36px);
           margin: 0 auto;
-          border: 1px solid rgba(255, 255, 255, 0.09);
-          border-radius: 32px;
-          background: linear-gradient(145deg, rgba(12, 18, 34, 0.72), rgba(2, 4, 10, 0.58));
-          box-shadow: 0 34px 120px rgba(0, 0, 0, 0.42);
-          backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 28px;
+          background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025) 22%, rgba(255, 255, 255, 0.018)),
+            rgba(10, 12, 18, 0.78);
+          box-shadow:
+            0 34px 120px rgba(0, 0, 0, 0.40),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(22px);
           overflow: hidden;
         }
 
         .control-shell__desktopTopbar {
-          padding: 20px 22px;
+          padding: 18px 20px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.025);
+          background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.022)),
+            rgba(255, 255, 255, 0.018);
         }
 
         .control-shell__content {
-          padding: 22px;
+          padding: 20px;
           min-width: 0;
         }
 
@@ -139,7 +122,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           }
 
           .control-shell__main {
-            padding: calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+            padding: calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
           }
 
           .control-shell__mobileHead {
@@ -153,9 +136,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
           .control-shell__mobileTopbar,
           .control-shell__mobileNav {
-            border: 1px solid rgba(255, 255, 255, 0.09);
-            border-radius: 22px;
-            background: rgba(9, 14, 28, 0.86);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 20px;
+            background:
+              linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.022)),
+              rgba(10, 12, 18, 0.92);
             backdrop-filter: blur(22px);
             box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
           }
@@ -170,7 +155,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
           .control-shell__workspace {
             min-height: auto;
-            border-radius: 24px;
+            border-radius: 22px;
           }
 
           .control-shell__desktopTopbar {

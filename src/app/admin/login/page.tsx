@@ -18,10 +18,10 @@ export default function AdminLoginPage() {
 
     async function checkSession() {
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession()
 
-      if (user && mounted) {
+      if (session && mounted) {
         router.replace('/admin/direct')
       }
     }
@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
         display: 'grid',
         placeItems: 'center',
         background:
-          'radial-gradient(circle at top, rgba(77,162,255,0.10), transparent 30%), #05070B',
+          'linear-gradient(180deg, #111319 0%, #06070A 48%, #020304 100%)',
         color: '#F5F7FB',
         padding: 20,
         fontFamily: 'Inter, sans-serif',
@@ -71,25 +71,61 @@ export default function AdminLoginPage() {
         style={{
           width: '100%',
           maxWidth: 520,
-          background: 'rgba(11,16,32,0.88)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 28,
-          padding: 24,
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.072), rgba(255,255,255,0.028)), rgba(9,10,14,0.92)',
+          border: '1px solid rgba(214,168,95,0.22)',
+          borderRadius: 26,
+          padding: 26,
           boxSizing: 'border-box',
           backdropFilter: 'blur(12px)',
+          boxShadow:
+            '0 28px 90px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.06)',
         }}
       >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
+          <img
+            src="/planetlocksmiths-logo.svg"
+            alt="Planet Locksmiths"
+            style={{
+              width: 54,
+              height: 54,
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: '#05070B',
+              objectFit: 'contain',
+            }}
+          />
+          <div>
+            <p
+              style={{
+                margin: 0,
+                color: '#D6A85F',
+                fontSize: 11,
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                letterSpacing: 1.7,
+              }}
+            >
+              Planet Locksmiths
+            </p>
+            <strong style={{ display: 'block', marginTop: 4, color: '#F5F7FB', fontSize: 17 }}>
+              Admin Control Room
+            </strong>
+          </div>
+        </div>
+
         <div style={{ marginBottom: 18 }}>
           <p
             style={{
               margin: 0,
-              color: '#95A0B8',
+              color: '#F0D099',
               fontSize: 12,
+              fontWeight: 900,
               textTransform: 'uppercase',
-              letterSpacing: 0.8,
+              letterSpacing: 1.7,
             }}
           >
-            Planet Locksmiths
+            Secure workspace
           </p>
 
           <h1
@@ -97,6 +133,7 @@ export default function AdminLoginPage() {
               margin: '10px 0 8px',
               fontSize: 34,
               lineHeight: 1.05,
+              letterSpacing: -0.7,
             }}
           >
             Secure Admin Access
@@ -180,7 +217,7 @@ const inputStyle: React.CSSProperties = {
   minHeight: 52,
   borderRadius: 14,
   border: '1px solid rgba(255,255,255,0.10)',
-  background: '#11192E',
+  background: 'rgba(255,255,255,0.045)',
   color: '#F5F7FB',
   padding: '0 14px',
   outline: 'none',
@@ -192,8 +229,9 @@ const inputStyle: React.CSSProperties = {
 const buttonStyle: React.CSSProperties = {
   minHeight: 52,
   borderRadius: 14,
-  border: 'none',
-  background: '#4DA2FF',
+  border: '1px solid rgba(245,247,251,0.24)',
+  background:
+    'linear-gradient(180deg, rgba(255,255,255,1), rgba(223,226,232,1))',
   color: '#05070B',
   fontWeight: 800,
   fontSize: 16,

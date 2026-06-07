@@ -50,13 +50,13 @@ export default function AdminTopbar() {
   return (
     <header className="topbar">
       <div className="topbar__titleBlock">
-        <span className="topbar__status"><span /> Сессия активна</span>
+        <span className="topbar__status"><span /> Online workspace</span>
         <h1>{currentPage}</h1>
         <p>Пользователь: <strong>{userEmail}</strong></p>
       </div>
 
       <div className="topbar__actions">
-        <a href="/admin/photos" className="topbar__button topbar__button--accent">Фото</a>
+        <a href="/admin/photos" className="topbar__button topbar__button--accent">Media</a>
         <a href="/admin/orders" className="topbar__button">Заявки</a>
         <a href="/en" className="topbar__button topbar__button--primary">Открыть сайт</a>
         <button type="button" onClick={handleLogout} disabled={isLoggingOut} className="topbar__button topbar__button--ghost">
@@ -83,7 +83,7 @@ export default function AdminTopbar() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          color: #a9d0ff;
+          color: #c2c8d3;
           font-size: 11px;
           font-weight: 900;
           text-transform: uppercase;
@@ -94,8 +94,8 @@ export default function AdminTopbar() {
           width: 8px;
           height: 8px;
           border-radius: 999px;
-          background: #2de2e6;
-          box-shadow: 0 0 14px rgba(45, 226, 230, 0.85);
+          background: #6ee7b7;
+          box-shadow: 0 0 14px rgba(110, 231, 183, 0.58);
         }
 
         h1 {
@@ -103,12 +103,12 @@ export default function AdminTopbar() {
           color: #f5f7fb;
           font-size: clamp(22px, 3vw, 32px);
           line-height: 1.05;
-          letter-spacing: -1.1px;
+          letter-spacing: -0.6px;
         }
 
         p {
           margin: 0;
-          color: #95a0b8;
+          color: #9ca3af;
           font-size: 13px;
           line-height: 1.5;
         }
@@ -133,8 +133,8 @@ export default function AdminTopbar() {
           justify-content: center;
           padding: 0 15px;
           border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.11);
+          background: rgba(255, 255, 255, 0.028);
           color: #f5f7fb;
           text-decoration: none;
           font-size: 12px;
@@ -142,18 +142,25 @@ export default function AdminTopbar() {
           text-transform: uppercase;
           letter-spacing: 1.35px;
           cursor: pointer;
+          transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+        }
+
+        .topbar__button:hover {
+          transform: translateY(-1px);
+          border-color: rgba(214, 168, 95, 0.34);
+          background: rgba(255, 255, 255, 0.055);
         }
 
         .topbar__button--accent {
-          border-color: rgba(45, 226, 230, 0.36);
-          background: rgba(45, 226, 230, 0.12);
-          color: #2de2e6;
+          border-color: rgba(214, 168, 95, 0.34);
+          background: rgba(214, 168, 95, 0.13);
+          color: #f0d099;
         }
 
         .topbar__button--primary {
-          border-color: rgba(77, 162, 255, 0.45);
-          background: #4da2ff;
-          color: #02040a;
+          border-color: rgba(245, 247, 251, 0.24);
+          background: #f5f7fb;
+          color: #08090d;
         }
 
         .topbar__button--ghost {

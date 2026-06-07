@@ -19,31 +19,18 @@ export default function AdminReadinessGuide({
         overflow: 'hidden',
         marginBottom: 18,
         borderRadius: 22,
-        border: '1px solid rgba(77,162,255,0.22)',
+        border: '1px solid rgba(214,168,95,0.24)',
         background:
-          'radial-gradient(circle at 10% 0%, rgba(77,162,255,0.16), transparent 280px), linear-gradient(145deg, rgba(17,25,46,0.82), rgba(5,7,11,0.82))',
+          'linear-gradient(180deg, rgba(255,255,255,0.058), rgba(255,255,255,0.024)), rgba(8,9,13,0.86)',
         padding: 18,
         boxShadow: '0 24px 80px rgba(0,0,0,0.26)',
       }}
     >
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          right: -46,
-          top: -46,
-          width: 130,
-          height: 130,
-          borderRadius: 999,
-          border: '1px solid rgba(214,168,95,0.20)',
-        }}
-      />
-
       <p
         style={{
           position: 'relative',
           margin: 0,
-          color: '#2DE2E6',
+          color: '#D6A85F',
           fontSize: 11,
           fontWeight: 900,
           textTransform: 'uppercase',
@@ -93,7 +80,7 @@ export default function AdminReadinessGuide({
                 width: 28,
                 height: 28,
                 borderRadius: 999,
-                background: '#4DA2FF',
+                background: '#F5F7FB',
                 color: '#02040A',
                 fontSize: 12,
                 fontWeight: 900,

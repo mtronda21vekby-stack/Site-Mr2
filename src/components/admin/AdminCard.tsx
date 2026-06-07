@@ -16,11 +16,13 @@ export default function AdminCard({
   const content = (
     <div
       style={{
-        background: '#0B1020',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 20,
-        padding: 20,
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.052), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)',
+        border: '1px solid rgba(255,255,255,0.10)',
+        borderRadius: 18,
+        padding: 18,
         minHeight: 140,
+        boxShadow: '0 18px 54px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.055)',
       }}
     >
       <h3
@@ -38,7 +40,7 @@ export default function AdminCard({
         <p
           style={{
             margin: '12px 0 0',
-            color: '#95A0B8',
+            color: '#9CA3AF',
             fontSize: 15,
             lineHeight: 1.7,
           }}

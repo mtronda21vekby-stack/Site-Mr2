@@ -21,13 +21,14 @@ export default function AdminAuthGate({
 
     async function boot() {
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession()
 
       const isLoginRoute = pathname === '/admin/login'
+      const hasSession = Boolean(session)
 
       if (isLoginRoute) {
-        if (user) {
+        if (hasSession) {
           router.replace('/admin/direct')
           return
         }
@@ -40,7 +41,7 @@ export default function AdminAuthGate({
         return
       }
 
-      if (!user) {
+      if (!hasSession) {
         router.replace('/admin/login')
         return
       }
@@ -79,7 +80,7 @@ export default function AdminAuthGate({
       <main
         style={{
           minHeight: '100vh',
-          background: '#05070B',
+          background: 'linear-gradient(180deg, #111319 0%, #06070A 48%, #020304 100%)',
           color: '#F5F7FB',
           display: 'grid',
           placeItems: 'center',
@@ -91,20 +92,37 @@ export default function AdminAuthGate({
           style={{
             width: '100%',
             maxWidth: 420,
-            background: '#0B1020',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 20,
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.072), rgba(255,255,255,0.028)), rgba(9,10,14,0.92)',
+            border: '1px solid rgba(214,168,95,0.22)',
+            borderRadius: 22,
             padding: 24,
             boxSizing: 'border-box',
+            boxShadow:
+              '0 28px 90px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.06)',
           }}
         >
+          <img
+            src="/planetlocksmiths-logo.svg"
+            alt="Planet Locksmiths"
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: '#05070B',
+              objectFit: 'contain',
+              marginBottom: 16,
+            }}
+          />
           <p
             style={{
               margin: 0,
-              color: '#95A0B8',
+              color: '#D6A85F',
               fontSize: 12,
+              fontWeight: 900,
               textTransform: 'uppercase',
-              letterSpacing: 0.8,
+              letterSpacing: 1.7,
             }}
           >
             Planet Locksmiths

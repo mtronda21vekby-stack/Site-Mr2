@@ -9,14 +9,19 @@ export default function AdminSidebar() {
   return (
     <aside className="side-panel">
       <div className="brand-card">
-        <div className="brand-mark">PL</div>
+        <div className="brand-mark">
+          <img src="/planetlocksmiths-logo.svg" alt="Planet Locksmiths" />
+        </div>
         <div>
           <p className="brand-kicker">Planet Locksmiths</p>
-          <h2>Управление сайтом</h2>
+          <h2>Control Room</h2>
         </div>
       </div>
 
-      <a href="/admin/photos" className="photo-cta">📸 Фото и галерея</a>
+      <a href="/admin/photos" className="photo-cta">
+        <span>Media</span>
+        <strong>Фото и галерея</strong>
+      </a>
 
       <nav className="nav-stack">
         {adminNavGroups.map((group) => (
@@ -47,69 +52,89 @@ export default function AdminSidebar() {
       <style jsx>{`
         .side-panel {
           min-height: 100vh;
-          padding: 18px;
+          padding: 16px;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 14px;
         }
 
         .brand-card {
           display: grid;
-          grid-template-columns: 46px minmax(0, 1fr);
+          grid-template-columns: 58px minmax(0, 1fr);
           gap: 12px;
           align-items: center;
-          padding: 14px;
-          border-radius: 24px;
-          border: 1px solid rgba(45, 226, 230, 0.22);
-          background: linear-gradient(145deg, rgba(45, 226, 230, 0.11), rgba(255, 255, 255, 0.035));
-          box-shadow: 0 18px 60px rgba(45, 226, 230, 0.06);
+          padding: 12px;
+          border-radius: 22px;
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.024)),
+            rgba(255, 255, 255, 0.028);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
 
         .brand-mark {
-          width: 46px;
-          height: 46px;
+          width: 58px;
+          height: 58px;
           display: grid;
           place-items: center;
-          border-radius: 16px;
-          background: #2de2e6;
-          color: #02040a;
-          font-weight: 950;
-          letter-spacing: -0.8px;
-          box-shadow: 0 0 34px rgba(45, 226, 230, 0.32);
+          overflow: hidden;
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background: #05070b;
+          box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
+        }
+
+        .brand-mark img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         .brand-kicker {
           margin: 0;
-          color: #95a0b8;
+          color: #a4acba;
           font-size: 10px;
           font-weight: 900;
           text-transform: uppercase;
-          letter-spacing: 1.8px;
+          letter-spacing: 1.6px;
         }
 
         h2 {
           margin: 5px 0 0;
           color: #f5f7fb;
-          font-size: 19px;
+          font-size: 20px;
           line-height: 1.05;
-          letter-spacing: -0.5px;
+          letter-spacing: -0.4px;
         }
 
         .photo-cta {
-          min-height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          min-height: 58px;
+          display: grid;
+          align-content: center;
+          gap: 4px;
           border-radius: 18px;
-          border: 1px solid rgba(45, 226, 230, 0.38);
-          background: linear-gradient(135deg, rgba(45, 226, 230, 0.18), rgba(77, 162, 255, 0.10));
-          color: #2de2e6;
+          border: 1px solid rgba(214, 168, 95, 0.34);
+          background:
+            linear-gradient(135deg, rgba(214, 168, 95, 0.14), rgba(255, 255, 255, 0.028)),
+            rgba(255, 255, 255, 0.026);
+          color: #f5f7fb;
           text-decoration: none;
-          font-size: 13px;
+          padding: 0 14px;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+        }
+
+        .photo-cta span {
+          color: #d6a85f;
+          font-size: 10px;
           font-weight: 950;
           text-transform: uppercase;
-          letter-spacing: 1.4px;
+          letter-spacing: 1.8px;
+        }
+
+        .photo-cta strong {
+          font-size: 14px;
+          line-height: 1.1;
         }
 
         .nav-stack {
@@ -119,7 +144,7 @@ export default function AdminSidebar() {
 
         .nav-title {
           margin: 0 0 8px;
-          color: #768199;
+          color: #7f8797;
           font-size: 10px;
           font-weight: 900;
           text-transform: uppercase;
@@ -128,18 +153,18 @@ export default function AdminSidebar() {
 
         .nav-list {
           display: grid;
-          gap: 7px;
+          gap: 6px;
         }
 
         .nav-link {
-          min-height: 44px;
+          min-height: 43px;
           display: flex;
           align-items: center;
           gap: 10px;
           padding: 0 12px;
-          border-radius: 16px;
+          border-radius: 14px;
           border: 1px solid rgba(255, 255, 255, 0.07);
-          background: rgba(255, 255, 255, 0.028);
+          background: rgba(255, 255, 255, 0.018);
           color: #dfe8f8;
           text-decoration: none;
           font-size: 14px;
@@ -149,29 +174,30 @@ export default function AdminSidebar() {
 
         .nav-link:hover {
           transform: translateX(3px);
-          border-color: rgba(45, 226, 230, 0.24);
-          background: rgba(45, 226, 230, 0.075);
+          border-color: rgba(214, 168, 95, 0.26);
+          background: rgba(255, 255, 255, 0.045);
         }
 
         .nav-link--active {
-          border-color: rgba(45, 226, 230, 0.50);
-          background: linear-gradient(135deg, rgba(45, 226, 230, 0.20), rgba(77, 162, 255, 0.12));
+          border-color: rgba(214, 168, 95, 0.50);
+          background:
+            linear-gradient(135deg, rgba(214, 168, 95, 0.18), rgba(255, 255, 255, 0.045)),
+            rgba(255, 255, 255, 0.03);
           color: #ffffff;
-          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 0 28px rgba(45, 226, 230, 0.10);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
         }
 
         .nav-dot {
-          width: 8px;
-          height: 8px;
+          width: 6px;
+          height: 6px;
           border-radius: 99px;
-          background: #4da2ff;
-          box-shadow: 0 0 14px rgba(77, 162, 255, 0.7);
+          background: #7f8797;
           flex: 0 0 auto;
         }
 
         .nav-link--active .nav-dot {
-          background: #2de2e6;
-          box-shadow: 0 0 18px rgba(45, 226, 230, 0.88);
+          background: #d6a85f;
+          box-shadow: 0 0 16px rgba(214, 168, 95, 0.55);
         }
 
         .side-footer {
@@ -186,7 +212,7 @@ export default function AdminSidebar() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          color: #a9d0ff;
+          color: #c2c8d3;
           font-size: 12px;
           font-weight: 800;
         }
@@ -195,8 +221,8 @@ export default function AdminSidebar() {
           width: 8px;
           height: 8px;
           border-radius: 99px;
-          background: #2de2e6;
-          box-shadow: 0 0 16px rgba(45, 226, 230, 0.8);
+          background: #6ee7b7;
+          box-shadow: 0 0 14px rgba(110, 231, 183, 0.55);
         }
 
         .site-link {
@@ -206,7 +232,7 @@ export default function AdminSidebar() {
           justify-content: center;
           border-radius: 999px;
           border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(255, 255, 255, 0.035);
+          background: rgba(255, 255, 255, 0.028);
           color: #f5f7fb;
           text-decoration: none;
           font-size: 12px;

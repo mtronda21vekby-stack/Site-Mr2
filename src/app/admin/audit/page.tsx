@@ -369,24 +369,24 @@ function AuditCard({ item }: { item: AuditItem }) {
 }
 
 function Stat({ title, value, note, tone = 'neutral' }: { title: string; value: string; note: string; tone?: 'neutral' | IssueLevel }) {
-  const color = tone === 'neutral' ? '#A9D0FF' : toneColor(tone)
+  const color = tone === 'neutral' ? '#C6CBD6' : toneColor(tone)
   return <article style={{ ...statStyle, borderColor: `${color}55` }}><p style={{ ...smallCapsStyle, color }}>{title}</p><strong style={statValueStyle}>{value}</strong><p style={mutedSmallStyle}>{note}</p></article>
 }
 
 function toneColor(tone: IssueLevel) {
-  return tone === 'good' ? '#2DE2E6' : tone === 'warn' ? '#D6A85F' : '#FF9A9A'
+  return tone === 'good' ? '#D6A85F' : tone === 'warn' ? '#D6A85F' : '#FF9A9A'
 }
 
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0, paddingBottom: 24 }
 const panelStyle: CSSProperties = { borderRadius: 26, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(11,16,32,0.78), rgba(5,7,11,0.82))', padding: 18, boxShadow: '0 24px 80px rgba(0,0,0,0.28)' }
-const heroStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', alignItems: 'end', gap: 18, background: 'radial-gradient(circle at 12% 0%, rgba(77,162,255,0.20), transparent 320px), linear-gradient(145deg, rgba(17,25,46,0.78), rgba(3,5,11,0.86))' }
-const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
+const heroStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', alignItems: 'end', gap: 18, background: 'linear-gradient(180deg, rgba(214,168,95,0.10), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)' }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#D6A85F', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
 const titleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 34, lineHeight: 1.05 }
 const heroTitleStyle: CSSProperties = { margin: '10px 0 0', color: '#F5F7FB', fontSize: 'clamp(36px, 6vw, 64px)', lineHeight: 0.95, letterSpacing: -2.4 }
 const mutedStyle: CSSProperties = { margin: '14px 0 0', color: '#95A0B8', fontSize: 15, lineHeight: 1.8, maxWidth: 760 }
 const heroActionsStyle: CSSProperties = { display: 'flex', gap: 10, flexWrap: 'wrap' }
 const ghostButtonStyle: CSSProperties = { minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.035)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 900 }
-const primaryButtonStyle: CSSProperties = { ...ghostButtonStyle, border: '1px solid rgba(77,162,255,0.45)', background: '#4DA2FF', color: '#02040A' }
+const primaryButtonStyle: CSSProperties = { ...ghostButtonStyle, border: '1px solid rgba(214,168,95,0.42)', background: '#F5F7FB', color: '#02040A' }
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }
 const statStyle: CSSProperties = { borderRadius: 22, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.035)', padding: 16 }
 const statValueStyle: CSSProperties = { display: 'block', color: '#F5F7FB', fontSize: 34, lineHeight: 1, marginTop: 10 }
@@ -400,11 +400,11 @@ const cardStyle: CSSProperties = { borderRadius: 22, border: '1px solid rgba(255
 const cardTopStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }
 const pillStyle: CSSProperties = { display: 'inline-flex', borderRadius: 999, border: '1px solid rgba(255,255,255,0.10)', padding: '5px 9px', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
 const scoreStyle: CSSProperties = { color: '#F5F7FB', fontSize: 13 }
-const smallCapsStyle: CSSProperties = { margin: '12px 0 0', color: '#A9D0FF', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
+const smallCapsStyle: CSSProperties = { margin: '12px 0 0', color: '#C6CBD6', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
 const cardTitleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 20, lineHeight: 1.2 }
 const issueListStyle: CSSProperties = { margin: '12px 0 0', paddingLeft: 18, color: '#95A0B8', fontSize: 13, lineHeight: 1.65 }
-const goodTextStyle: CSSProperties = { margin: '12px 0 0', color: '#2DE2E6', fontSize: 13, lineHeight: 1.6 }
+const goodTextStyle: CSSProperties = { margin: '12px 0 0', color: '#D6A85F', fontSize: 13, lineHeight: 1.6 }
 const cardActionsStyle: CSSProperties = { display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 14 }
-const inlineLinkStyle: CSSProperties = { color: '#A9D0FF', textDecoration: 'none', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.2 }
+const inlineLinkStyle: CSSProperties = { color: '#F0D099', textDecoration: 'none', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.2 }
 const emptyStyle: CSSProperties = { borderRadius: 18, border: '1px dashed rgba(255,255,255,0.14)', padding: 18, color: '#95A0B8' }
 const errorStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: 14 }

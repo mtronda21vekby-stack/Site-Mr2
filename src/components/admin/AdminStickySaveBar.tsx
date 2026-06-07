@@ -29,10 +29,12 @@ export default function AdminStickySaveBar({
           flexWrap: 'wrap',
           padding: 14,
           borderRadius: 18,
-          border: '1px solid rgba(77,162,255,0.18)',
-          background: 'rgba(11,16,32,0.96)',
+          border: '1px solid rgba(214,168,95,0.22)',
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.072), rgba(255,255,255,0.032)), rgba(8,9,13,0.96)',
           backdropFilter: 'blur(12px)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
+          boxShadow:
+            '0 18px 54px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.06)',
         }}
       >
         <div style={{ display: 'grid', gap: 4 }}>
@@ -58,8 +60,9 @@ export default function AdminStickySaveBar({
             minHeight: 46,
             padding: '0 16px',
             borderRadius: 12,
-            border: 'none',
-            background: '#4DA2FF',
+            border: '1px solid rgba(245,247,251,0.22)',
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,1), rgba(223,226,232,1))',
             color: '#05070B',
             fontWeight: 800,
             fontSize: 15,

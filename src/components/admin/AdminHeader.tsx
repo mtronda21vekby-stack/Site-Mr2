@@ -51,7 +51,9 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
           borderRadius: 12,
           textDecoration: 'none',
           color: '#05070B',
-          background: '#4DA2FF',
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,1), rgba(223,226,232,1))',
+          border: '1px solid rgba(245,247,251,0.24)',
           fontWeight: 700,
         }}
       >

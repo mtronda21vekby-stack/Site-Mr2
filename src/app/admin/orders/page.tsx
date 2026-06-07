@@ -253,28 +253,28 @@ function StatBlock({ title, value }: { title: string; value: string }) {
 
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
 const panelStyle: CSSProperties = { borderRadius: 26, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.035)', padding: 20 }
-const heroStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap', background: 'radial-gradient(circle at 0% 0%, rgba(45,226,230,0.14), transparent 320px), rgba(255,255,255,0.035)' }
-const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
+const heroStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap', background: 'linear-gradient(180deg, rgba(214,168,95,0.10), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)' }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#D6A85F', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
 const titleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 'clamp(34px, 6vw, 58px)', lineHeight: 0.96, letterSpacing: -2.2 }
 const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', fontSize: 14, lineHeight: 1.7 }
-const refreshButtonStyle: CSSProperties = { minHeight: 46, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(77,162,255,0.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.3 }
+const refreshButtonStyle: CSSProperties = { minHeight: 46, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(214,168,95,0.42)', background: '#F5F7FB', color: '#02040A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.3 }
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }
 const statStyle: CSSProperties = { borderRadius: 22, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(17,25,46,0.82), rgba(5,7,11,0.72))', padding: 16 }
 const filtersStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }
 const inputStyle: CSSProperties = { width: '100%', minHeight: 48, borderRadius: 14, border: '1px solid rgba(255,255,255,0.11)', background: 'rgba(7,11,20,0.82)', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
 const textAreaStyle: CSSProperties = { ...inputStyle, minHeight: 110, padding: '12px 14px', resize: 'vertical' }
 const messageErrorStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
-const messageSuccessStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(45,226,230,0.25)', background: 'rgba(45,226,230,0.08)', color: '#2DE2E6', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
+const messageSuccessStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(214,168,95,0.24)', background: 'rgba(214,168,95,0.08)', color: '#D6A85F', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
 const listStyle: CSSProperties = { display: 'grid', gap: 14 }
 const orderCardStyle: CSSProperties = { borderRadius: 24, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(11,16,32,0.86), rgba(5,7,11,0.78))', padding: 18, display: 'grid', gap: 16 }
 const orderHeadStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }
 const orderTitleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 22, lineHeight: 1.15, wordBreak: 'break-word' }
 const detailsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }
 const infoStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.028)', padding: 12, display: 'grid', gap: 5 }
-const clientMessageStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(77,162,255,0.16)', background: 'rgba(77,162,255,0.07)', padding: 14, color: '#F5F7FB', fontSize: 14, lineHeight: 1.65, wordBreak: 'break-word' }
+const clientMessageStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(214,168,95,0.16)', background: 'rgba(214,168,95,0.07)', padding: 14, color: '#F5F7FB', fontSize: 14, lineHeight: 1.65, wordBreak: 'break-word' }
 const editGridStyle: CSSProperties = { display: 'grid', gap: 12 }
 const fieldStyle: CSSProperties = { display: 'grid', gap: 8 }
 const labelStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, fontWeight: 800 }
 function deleteButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 40, padding: '0 13px', borderRadius: 999, border: '1px solid rgba(255,122,122,0.28)', background: 'rgba(255,122,122,0.06)', color: '#FF9A9A', fontWeight: 900, opacity: disabled ? 0.65 : 1 } }
-function saveButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 48, borderRadius: 999, border: '1px solid rgba(77,162,255,0.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1.2, opacity: disabled ? 0.65 : 1 } }
+function saveButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 48, borderRadius: 999, border: '1px solid rgba(214,168,95,0.42)', background: '#F5F7FB', color: '#02040A', fontWeight: 900, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1.2, opacity: disabled ? 0.65 : 1 } }
 const emptyStyle: CSSProperties = { borderRadius: 22, border: '1px dashed rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.025)', padding: 18, color: '#95A0B8', fontSize: 14, lineHeight: 1.7 }

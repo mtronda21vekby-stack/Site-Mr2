@@ -310,33 +310,33 @@ export default function AdminPhotosPage() {
 
   if (isBooting) {
     return (
-      <main className="min-h-screen bg-black px-5 py-8 text-white">
-        <div className="mx-auto max-w-6xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-6">Загрузка...</div>
+      <main className="min-w-0 text-white">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-[0_18px_54px_rgba(0,0,0,0.20)]">Загрузка...</div>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-white">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-8 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl">
-          <p className="text-xs font-black uppercase tracking-[0.28em] text-accent-cyan">Админ фото</p>
+    <main className="min-w-0 text-white">
+      <div className="grid gap-5">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-[0_18px_54px_rgba(0,0,0,0.20)] backdrop-blur-xl">
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-[#D6A85F]">Media CMS</p>
           <h1 className="mt-2 text-3xl font-black md:text-5xl">Загрузка и редактирование фотографий</h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">Фото теперь загружаются напрямую через Supabase Storage и сохраняются в таблицу site_images через Supabase Auth. Без отдельного ADMIN_PASSWORD API.</p>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-2">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl">
+          <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.18)] backdrop-blur-xl">
             <h2 className="text-xl font-black">Одиночное фото</h2>
             <input type="file" accept={ACCEPTED_IMAGE_TYPES} onChange={onSelect} className="mt-5 block w-full text-sm text-white/70" />
             <input placeholder="Название" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <textarea placeholder="Alt текст / описание" value={alt} onChange={(e) => setAlt(e.target.value)} className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <input placeholder="Категория: gallery / services / before / after / logo" value={category} onChange={(e) => setCategory(e.target.value)} className="mt-3 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             {preview && <img src={preview} alt="Превью" className="mt-4 max-h-64 w-full rounded-2xl bg-black/50 object-contain" />}
-            <button onClick={upload} disabled={!file || loading} className="mt-5 rounded-full border border-accent-cyan/35 bg-accent-cyan/10 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">Загрузить фото</button>
+            <button onClick={upload} disabled={!file || loading} className="mt-5 rounded-full border border-[#D6A85F]/40 bg-[#D6A85F]/10 px-5 py-3 text-xs font-black uppercase tracking-[0.16em] text-[#F0D099] disabled:opacity-40">Загрузить фото</button>
           </section>
 
-          <section className="rounded-3xl border border-accent-cyan/20 bg-accent-cyan/[0.055] p-5 shadow-2xl backdrop-blur-xl">
+          <section className="rounded-3xl border border-[#D6A85F]/25 bg-[#D6A85F]/[0.07] p-5 shadow-[0_18px_54px_rgba(0,0,0,0.18)] backdrop-blur-xl">
             <h2 className="text-xl font-black">Кейс до / после</h2>
             <input placeholder="Название кейса" value={caseTitle} onChange={(e) => setCaseTitle(e.target.value)} className="mt-4 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
             <textarea placeholder="Описание кейса" value={caseAlt} onChange={(e) => setCaseAlt(e.target.value)} className="mt-3 min-h-24 w-full rounded-xl border border-white/10 bg-black/70 px-3 py-3 text-white" />
@@ -344,7 +344,7 @@ export default function AdminPhotosPage() {
               <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">До</span><input type="file" accept={ACCEPTED_IMAGE_TYPES} onChange={(e) => onPairSelect('before', e)} className="mt-3 block w-full text-xs" />{beforePreview && <img src={beforePreview} alt="До" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
               <label className="rounded-2xl border border-white/10 bg-black/35 p-4"><span className="block text-xs font-black uppercase tracking-[0.18em] text-white/55">После</span><input type="file" accept={ACCEPTED_IMAGE_TYPES} onChange={(e) => onPairSelect('after', e)} className="mt-3 block w-full text-xs" />{afterPreview && <img src={afterPreview} alt="После" className="mt-3 h-44 w-full rounded-xl object-cover" />}</label>
             </div>
-            <button onClick={uploadPair} disabled={!beforeFile || !afterFile || loading} className="mt-5 rounded-full border border-accent-cyan/45 bg-accent-cyan/15 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white disabled:opacity-40">Загрузить кейс</button>
+            <button onClick={uploadPair} disabled={!beforeFile || !afterFile || loading} className="mt-5 rounded-full border border-[#D6A85F]/45 bg-[#D6A85F]/15 px-5 py-3 text-xs font-black uppercase tracking-[0.16em] text-[#F0D099] disabled:opacity-40">Загрузить кейс</button>
           </section>
         </div>
 
@@ -354,7 +354,7 @@ export default function AdminPhotosPage() {
           {photos.map((p) => {
             const edit = edits[p.id] || { title: '', alt: '', category: 'gallery', sortOrder: 0, isPublished: true }
             return (
-              <article key={p.id} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] shadow-2xl backdrop-blur-xl">
+              <article key={p.id} className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] shadow-[0_18px_54px_rgba(0,0,0,0.18)] backdrop-blur-xl">
                 <img src={p.image_url} alt={p.alt || 'Фото сайта'} className="h-64 w-full object-cover" />
                 <div className="space-y-3 p-4">
                   <input value={edit.title} onChange={(e) => updateEdit(p.id, 'title', e.target.value)} placeholder="Название" className="w-full rounded-xl border border-white/10 bg-black/70 px-3 py-2 text-sm text-white" />
@@ -365,7 +365,7 @@ export default function AdminPhotosPage() {
                   </div>
                   <label className="flex items-center gap-2 text-sm text-white/70"><input type="checkbox" checked={edit.isPublished} onChange={(e) => updateEdit(p.id, 'isPublished', e.target.checked)} /> Опубликовано</label>
                   <div className="flex gap-2">
-                    <button onClick={() => savePhoto(p.id)} className="rounded-full border border-accent-cyan/35 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-accent-cyan">Сохранить</button>
+                    <button onClick={() => savePhoto(p.id)} className="rounded-full border border-[#D6A85F]/40 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-[#F0D099]">Сохранить</button>
                     <button onClick={() => remove(p.id)} className="rounded-full border border-red-400/30 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-red-300">Удалить</button>
                   </div>
                 </div>

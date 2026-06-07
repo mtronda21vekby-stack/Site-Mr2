@@ -306,17 +306,25 @@ function TextField({ label, value, onChange }: { label: string; value: string; o
 }
 
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
-const panelStyle: CSSProperties = { border: '1px solid rgba(255,255,255,.12)', borderRadius: 20, padding: 20, color: '#F5F7FB' }
+const panelStyle: CSSProperties = {
+  border: '1px solid rgba(255,255,255,.12)',
+  borderRadius: 22,
+  padding: 20,
+  color: '#F5F7FB',
+  background:
+    'linear-gradient(180deg, rgba(255,255,255,0.052), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)',
+  boxShadow: '0 18px 54px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.055)',
+}
 const headerStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }
-const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#D6A85F', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
 const titleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 42, lineHeight: 1 }
 const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', lineHeight: 1.6, maxWidth: 760 }
 const actionsStyle: CSSProperties = { display: 'flex', gap: 10, flexWrap: 'wrap' }
-const buttonStyle: CSSProperties = { minHeight: 42, borderRadius: 999, border: '1px solid rgba(77,162,255,.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, padding: '0 16px' }
+const buttonStyle: CSSProperties = { minHeight: 42, borderRadius: 999, border: '1px solid rgba(245,247,251,.24)', background: '#F5F7FB', color: '#02040A', fontWeight: 900, padding: '0 16px' }
 const dangerStyle: CSSProperties = { ...buttonStyle, background: 'rgba(255,122,122,.08)', color: '#FF9A9A', borderColor: 'rgba(255,122,122,.3)', justifySelf: 'start' }
-const tabStyle = (active: boolean): CSSProperties => ({ ...buttonStyle, background: active ? 'rgba(45,226,230,.16)' : 'rgba(255,255,255,.04)', color: active ? '#2DE2E6' : '#F5F7FB', borderColor: active ? 'rgba(45,226,230,.5)' : 'rgba(255,255,255,.12)' })
+const tabStyle = (active: boolean): CSSProperties => ({ ...buttonStyle, background: active ? 'rgba(214,168,95,.12)' : 'rgba(255,255,255,.04)', color: active ? '#D6A85F' : '#F5F7FB', borderColor: active ? 'rgba(214,168,95,.42)' : 'rgba(255,255,255,.12)' })
 const listStyle: CSSProperties = { display: 'grid', gap: 14 }
-const cardStyle: CSSProperties = { ...panelStyle, display: 'grid', gap: 14, background: 'rgba(255,255,255,.035)' }
+const cardStyle: CSSProperties = { ...panelStyle, display: 'grid', gap: 14, background: 'rgba(255,255,255,.028)' }
 const cardHeaderStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', color: '#F5F7FB' }
 const gridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
 const fieldStyle: CSSProperties = { display: 'grid', gap: 6, minWidth: 0 }
@@ -325,4 +333,4 @@ const inputStyle: CSSProperties = { width: '100%', minHeight: 46, boxSizing: 'bo
 const textareaStyle: CSSProperties = { ...inputStyle, minHeight: 110, padding: 12, resize: 'vertical' }
 const checkStyle: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 8, color: '#F5F7FB', fontWeight: 800 }
 const errorStyle: CSSProperties = { ...panelStyle, color: '#FF9A9A', borderColor: 'rgba(255,122,122,.3)' }
-const successStyle: CSSProperties = { ...panelStyle, color: '#2DE2E6', borderColor: 'rgba(45,226,230,.3)' }
+const successStyle: CSSProperties = { ...panelStyle, color: '#D6A85F', borderColor: 'rgba(214,168,95,.28)' }

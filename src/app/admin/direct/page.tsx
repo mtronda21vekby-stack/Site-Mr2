@@ -42,14 +42,14 @@ const initialMetrics: Metrics = {
 }
 
 const modules: ModuleLink[] = [
-  { title: 'Фото', href: '/admin/photos', description: 'Загрузка фотографий, галерея, кейсы до/после, редактирование данных.', accent: '#2DE2E6' },
-  { title: 'Заявки', href: '/admin/orders', description: 'Новые обращения клиентов, статусы, заметки и история работы.', accent: '#4DA2FF' },
-  { title: 'Контент', href: '/admin/content-blocks', description: 'Секции сайта, CTA-блоки, текстовые блоки и карточки.', accent: '#2DE2E6' },
-  { title: 'Главная', href: '/admin/home', description: 'Первый экран, заголовки, конверсионные блоки и описания.', accent: '#2DE2E6' },
-  { title: 'Услуги', href: '/admin/services', description: 'Страницы услуг, SEO-поля, публикация и структура.', accent: '#2DE2E6' },
+  { title: 'Фото', href: '/admin/photos', description: 'Загрузка фотографий, галерея, кейсы до/после, редактирование данных.', accent: '#D6A85F' },
+  { title: 'Заявки', href: '/admin/orders', description: 'Новые обращения клиентов, статусы, заметки и история работы.', accent: '#F5F7FB' },
+  { title: 'Контент', href: '/admin/content-blocks', description: 'Секции сайта, CTA-блоки, текстовые блоки и карточки.', accent: '#D6A85F' },
+  { title: 'Главная', href: '/admin/home', description: 'Первый экран, заголовки, конверсионные блоки и описания.', accent: '#D6A85F' },
+  { title: 'Услуги', href: '/admin/services', description: 'Страницы услуг, SEO-поля, публикация и структура.', accent: '#D6A85F' },
   { title: 'Города', href: '/admin/areas', description: 'Локальные страницы покрытия и сервисные зоны.', accent: '#D6A85F' },
   { title: 'Отзывы', href: '/admin/reviews', description: 'Отзывы клиентов и proof-блоки доверия.', accent: '#D6A85F' },
-  { title: 'FAQ', href: '/admin/faq', description: 'Ответы на частые вопросы клиентов.', accent: '#4DA2FF' },
+  { title: 'FAQ', href: '/admin/faq', description: 'Ответы на частые вопросы клиентов.', accent: '#F5F7FB' },
   { title: 'Настройки', href: '/admin/settings', description: 'Телефон, бренд, email, часы работы и маршрутизация.', accent: '#D6A85F' },
   { title: 'Аудит', href: '/admin/audit', description: 'Проверка качества контента, SEO и готовности страниц.', accent: '#FF9A9A' },
 ]
@@ -166,7 +166,7 @@ export default function ControlPanelPage() {
         </div>
 
         <div style={heroActionsStyle}>
-          <a href="/admin/photos" style={primaryLinkStyle}>📸 Фото</a>
+          <a href="/admin/photos" style={primaryLinkStyle}>Media</a>
           <a href="/admin/orders" style={secondaryLinkStyle}>Заявки</a>
           <a href="/en" style={secondaryLinkStyle}>Открыть сайт</a>
           <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={refreshButtonStyle(isRefreshing)}>
@@ -229,7 +229,7 @@ export default function ControlPanelPage() {
           <div style={moduleGridStyle}>
             {modules.map((item) => (
               <a key={item.href} href={item.href} style={moduleCardStyle(item.accent)}>
-                <span style={moduleOrbStyle(item.accent)} />
+                <span style={moduleAccentStyle(item.accent)} />
                 <strong style={moduleTitleStyle}>{item.title}</strong>
                 <p style={moduleDescriptionStyle}>{item.description}</p>
                 <span style={moduleCtaStyle}>Открыть →</span>
@@ -265,7 +265,7 @@ export default function ControlPanelPage() {
 }
 
 function QualityCard({ title, href, status, note }: { title: string; href: string; status: 'good' | 'warn'; note: string }) {
-  const color = status === 'good' ? '#2DE2E6' : '#D6A85F'
+  const color = status === 'good' ? '#6EE7B7' : '#D6A85F'
 
   return (
     <a href={href} style={{ ...qualityCardStyle, borderColor: `${color}55` }}>
@@ -283,45 +283,45 @@ const heroStyle: CSSProperties = {
   gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
   gap: 20,
   alignItems: 'end',
-  border: '1px solid rgba(77,162,255,0.22)',
-  borderRadius: 28,
+  border: '1px solid rgba(214,168,95,0.24)',
+  borderRadius: 24,
   padding: 24,
-  background: 'radial-gradient(circle at 12% 0%, rgba(77,162,255,0.18), transparent 320px), linear-gradient(145deg, rgba(17,25,46,0.82), rgba(3,5,11,0.9))',
-  boxShadow: '0 28px 90px rgba(0,0,0,0.26)',
+  background: 'linear-gradient(180deg, rgba(255,255,255,0.065), rgba(255,255,255,0.024)), rgba(255,255,255,0.018)',
+  boxShadow: '0 18px 54px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.055)',
 }
-const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 3 }
-const smallLabelStyle: CSSProperties = { margin: 0, color: '#A9D0FF', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#D6A85F', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
+const smallLabelStyle: CSSProperties = { margin: 0, color: '#F0D099', fontSize: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
 const loadingTitleStyle: CSSProperties = { margin: '10px 0 0', color: '#F5F7FB', fontSize: 34 }
-const heroTitleStyle: CSSProperties = { margin: '12px 0 0', color: '#F5F7FB', fontSize: 'clamp(36px, 6vw, 72px)', lineHeight: 0.94, letterSpacing: -2.8 }
-const heroTextStyle: CSSProperties = { maxWidth: 740, margin: '18px 0 0', color: '#95A0B8', fontSize: 15, lineHeight: 1.8 }
+const heroTitleStyle: CSSProperties = { margin: '12px 0 0', color: '#F5F7FB', fontSize: 'clamp(36px, 6vw, 68px)', lineHeight: 0.96, letterSpacing: -1.1 }
+const heroTextStyle: CSSProperties = { maxWidth: 740, margin: '18px 0 0', color: '#9CA3AF', fontSize: 15, lineHeight: 1.75 }
 const heroActionsStyle: CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
-const primaryLinkStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(45,226,230,0.5)', background: 'rgba(45,226,230,0.15)', color: '#2DE2E6', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.6 }
-const secondaryLinkStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.035)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.6 }
-function refreshButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 46, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(77,162,255,0.32)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.6, opacity: disabled ? 0.7 : 1 } }
+const primaryLinkStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(214,168,95,0.42)', background: 'rgba(214,168,95,0.14)', color: '#F0D099', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
+const secondaryLinkStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.028)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.4 }
+function refreshButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 46, padding: '0 18px', borderRadius: 999, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, opacity: disabled ? 0.7 : 1 } }
 const errorStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '14px 16px', fontSize: 14, lineHeight: 1.5 }
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14 }
-const panelStyle: CSSProperties = { background: 'linear-gradient(145deg, rgba(11,16,32,0.78), rgba(5,7,11,0.82))', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 26, padding: 18, minWidth: 0, boxShadow: '0 24px 70px rgba(0,0,0,0.22)' }
-const photoPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 18, alignItems: 'end', border: '1px solid rgba(45,226,230,0.24)', background: 'radial-gradient(circle at 10% 0%, rgba(45,226,230,0.16), transparent 340px), linear-gradient(145deg, rgba(7,25,32,0.82), rgba(3,5,11,0.88))' }
+const panelStyle: CSSProperties = { background: 'linear-gradient(180deg, rgba(255,255,255,0.052), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 22, padding: 18, minWidth: 0, boxShadow: '0 18px 54px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,0.055)' }
+const photoPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 18, alignItems: 'end', border: '1px solid rgba(214,168,95,0.28)', background: 'linear-gradient(180deg, rgba(214,168,95,0.10), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)' }
 const sectionTitleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.1, letterSpacing: -0.7 }
-const sectionTextStyle: CSSProperties = { margin: '12px 0 0', color: '#95A0B8', fontSize: 14, lineHeight: 1.7 }
-const widePrimaryLinkStyle: CSSProperties = { minHeight: 54, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 22px', borderRadius: 999, border: '1px solid rgba(45,226,230,0.5)', background: '#2DE2E6', color: '#02040A', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.6, whiteSpace: 'nowrap' }
+const sectionTextStyle: CSSProperties = { margin: '12px 0 0', color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }
+const widePrimaryLinkStyle: CSSProperties = { minHeight: 54, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 22px', borderRadius: 999, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, whiteSpace: 'nowrap' }
 const panelHeaderStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }
-const statusPillStyle: CSSProperties = { minHeight: 30, display: 'inline-flex', alignItems: 'center', borderRadius: 999, border: '1px solid rgba(45,226,230,0.22)', background: 'rgba(45,226,230,0.08)', color: '#2DE2E6', padding: '0 11px', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.6 }
+const statusPillStyle: CSSProperties = { minHeight: 30, display: 'inline-flex', alignItems: 'center', borderRadius: 999, border: '1px solid rgba(214,168,95,0.28)', background: 'rgba(214,168,95,0.10)', color: '#F0D099', padding: '0 11px', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
 const qualityGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12, marginTop: 16 }
-const qualityCardStyle: CSSProperties = { display: 'block', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 20, background: 'rgba(255,255,255,0.035)', padding: 16, textDecoration: 'none', color: '#F5F7FB' }
+const qualityCardStyle: CSSProperties = { display: 'block', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 18, background: 'rgba(255,255,255,0.024)', padding: 16, textDecoration: 'none', color: '#F5F7FB' }
 const qualityStatusStyle: CSSProperties = { display: 'inline-flex', marginBottom: 10, fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.8 }
 const qualityTitleStyle: CSSProperties = { display: 'block', fontSize: 18 }
-const twoColumnStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(280px, 0.75fr)', gap: 14, minWidth: 0 }
+const twoColumnStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 14, minWidth: 0 }
 const moduleGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginTop: 16 }
-function moduleCardStyle(accent: string): CSSProperties { return { position: 'relative', overflow: 'hidden', display: 'block', border: `1px solid ${accent}44`, borderRadius: 20, background: 'rgba(17,25,46,0.62)', padding: 16, color: '#F5F7FB', textDecoration: 'none' } }
-function moduleOrbStyle(accent: string): CSSProperties { return { position: 'absolute', right: -28, top: -28, width: 88, height: 88, borderRadius: 999, border: `1px solid ${accent}55`, background: `${accent}10` } }
+function moduleCardStyle(accent: string): CSSProperties { return { position: 'relative', overflow: 'hidden', display: 'block', border: `1px solid ${accent}3d`, borderRadius: 18, background: 'rgba(255,255,255,0.024)', padding: 16, color: '#F5F7FB', textDecoration: 'none' } }
+function moduleAccentStyle(accent: string): CSSProperties { return { position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: accent } }
 const moduleTitleStyle: CSSProperties = { display: 'block', fontSize: 18 }
-const moduleDescriptionStyle: CSSProperties = { margin: '8px 0 0', color: '#95A0B8', fontSize: 13, lineHeight: 1.6 }
-const moduleCtaStyle: CSSProperties = { display: 'inline-flex', marginTop: 14, color: '#A9D0FF', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.7 }
-const textLinkStyle: CSSProperties = { color: '#A9D0FF', textDecoration: 'none', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
+const moduleDescriptionStyle: CSSProperties = { margin: '8px 0 0', color: '#9CA3AF', fontSize: 13, lineHeight: 1.6 }
+const moduleCtaStyle: CSSProperties = { display: 'inline-flex', marginTop: 14, color: '#F0D099', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5 }
+const textLinkStyle: CSSProperties = { color: '#F0D099', textDecoration: 'none', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
 const ordersListStyle: CSSProperties = { display: 'grid', gap: 10, marginTop: 16 }
-const orderCardStyle: CSSProperties = { display: 'block', textDecoration: 'none', color: '#F5F7FB', background: 'rgba(17,25,46,0.62)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 18, padding: 14 }
+const orderCardStyle: CSSProperties = { display: 'block', textDecoration: 'none', color: '#F5F7FB', background: 'rgba(255,255,255,0.024)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 16, padding: 14 }
 const orderTitleStyle: CSSProperties = { display: 'block', fontSize: 16, wordBreak: 'break-word' }
-const mutedLineStyle: CSSProperties = { margin: '6px 0 0', color: '#95A0B8', fontSize: 13, lineHeight: 1.5, wordBreak: 'break-word' }
-const statusTextStyle: CSSProperties = { margin: '8px 0 0', color: '#A9D0FF', fontSize: 11, lineHeight: 1.5, textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: 900 }
-const emptyStateStyle: CSSProperties = { color: '#95A0B8', fontSize: 14, lineHeight: 1.7, border: '1px dashed rgba(255,255,255,0.14)', borderRadius: 18, padding: 16 }
+const mutedLineStyle: CSSProperties = { margin: '6px 0 0', color: '#9CA3AF', fontSize: 13, lineHeight: 1.5, wordBreak: 'break-word' }
+const statusTextStyle: CSSProperties = { margin: '8px 0 0', color: '#F0D099', fontSize: 11, lineHeight: 1.5, textTransform: 'uppercase', letterSpacing: 1.4, fontWeight: 900 }
+const emptyStateStyle: CSSProperties = { color: '#9CA3AF', fontSize: 14, lineHeight: 1.7, border: '1px dashed rgba(255,255,255,0.14)', borderRadius: 16, padding: 16 }
