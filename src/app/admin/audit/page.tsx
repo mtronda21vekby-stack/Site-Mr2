@@ -18,6 +18,18 @@ type AuditItem = {
 }
 
 type SelectResult = { rows: any[]; error: string }
+type SystemStatus = {
+  supabase?: {
+    configured?: boolean
+  }
+  emailNotifications?: {
+    enabled?: boolean
+    recipientConfigured?: boolean
+    senderConfigured?: boolean
+    recipientSource?: string
+    senderSource?: string
+  }
+}
 
 const typeLabels: Record<AuditType, string> = {
   home: 'Главная',
@@ -64,12 +76,13 @@ export default function AdminAuditPage() {
       try {
         setErrorMessage('')
         const sessionResult = await supabase.auth.getSession()
-        if (!sessionResult?.data?.session) {
+        const session = sessionResult?.data?.session
+        if (!session) {
           router.replace('/admin/login')
           return
         }
 
-        const [home, settings, services, areas, blocks, images, orders, reviews, faq] = await Promise.all([
+        const [home, settings, services, areas, blocks, images, orders, reviews, faq, systemStatus] = await Promise.all([
           safeSelect(supabase, 'home_pages', 'id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, emergency_title, emergency_text, contact_title, contact_text, faq_title'),
           safeSelect(supabase, 'site_settings', 'id, brand_name, logo_url, logo_alt, phone_primary, phone_display, email, service_hours'),
           safeSelect(supabase, 'services', 'id, locale, slug, title, excerpt, intro, seo_title, seo_description, is_published'),
@@ -79,6 +92,7 @@ export default function AdminAuditPage() {
           safeSelect(supabase, 'orders', 'id, name, phone, service_needed, status, created_at'),
           safeSelect(supabase, 'reviews', 'id, locale, name, quote, rating, is_published'),
           safeSelect(supabase, 'faq_items', 'id, locale, question, answer, is_published'),
+          safeFetchSystemStatus(session.access_token),
         ])
 
         const tableResults: Record<string, SelectResult> = {
@@ -95,6 +109,7 @@ export default function AdminAuditPage() {
 
         const nextItems: AuditItem[] = [
           auditInfra(tableResults),
+          auditSystemStatus(systemStatus),
           ...auditHomeRows(home.rows, home.error),
           auditSettingsRow(settings.rows[0], settings.error),
           ...auditServiceRows(services.rows, services.error),
@@ -198,11 +213,35 @@ async function safeSelect(supabase: any, table: string, select: string): Promise
   }
 }
 
+async function safeFetchSystemStatus(accessToken: string): Promise<{ data: SystemStatus | null; error: string }> {
+  try {
+    const response = await fetch('/api/admin/system-status', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+
+    if (!response.ok) return { data: null, error: `System status API: ${response.status}` }
+    const data = await response.json()
+    return { data, error: '' }
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error.message : 'System status API недоступен' }
+  }
+}
+
 function auditInfra(results: Record<string, SelectResult>): AuditItem {
   const issues = requiredTables.flatMap((table) => results[table]?.error ? [`${table}: ${results[table].error}`] : [])
   const emptyCritical = ['site_settings', 'home_pages'].filter((table) => !results[table]?.error && !results[table]?.rows.length)
   issues.push(...emptyCritical.map((table) => `${table}: нет данных`))
   return makeItem('infra', 'Supabase CMS foundation', '/admin/audit', undefined, issues)
+}
+
+function auditSystemStatus(result: { data: SystemStatus | null; error: string }): AuditItem {
+  const issues: string[] = []
+  if (result.error) issues.push(result.error)
+  if (!result.data?.supabase?.configured) issues.push('Supabase env не подтверждены')
+  if (!result.data?.emailNotifications?.enabled) issues.push('RESEND_API_KEY не задан: email-уведомления по заявкам не отправятся')
+  if (!result.data?.emailNotifications?.recipientConfigured) issues.push('CONTACT_TO_EMAIL или ADMIN_EMAIL не задан: используется fallback получателя')
+  if (!result.data?.emailNotifications?.senderConfigured) issues.push('CONTACT_FROM_EMAIL не задан: нужен verified sender/domain в Resend')
+  return makeItem('infra', 'Production почта и env', '/admin/audit', undefined, issues)
 }
 
 function auditHomeRows(rows: any[], tableError: string): AuditItem[] {
