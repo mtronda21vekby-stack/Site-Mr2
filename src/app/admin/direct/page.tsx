@@ -31,6 +31,19 @@ type ModuleLink = {
   accent: string
 }
 
+type SystemStatus = {
+  supabase?: {
+    configured?: boolean
+  }
+  emailNotifications?: {
+    enabled?: boolean
+    recipientConfigured?: boolean
+    senderConfigured?: boolean
+    recipientSource?: string
+    senderSource?: string
+  }
+}
+
 const initialMetrics: Metrics = {
   newOrders: 0,
   activeOrders: 0,
@@ -61,6 +74,7 @@ export default function ControlPanelPage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
@@ -116,6 +130,19 @@ export default function ControlPanelPage() {
       }
     }
 
+    async function loadSystemStatus(accessToken: string) {
+      try {
+        const response = await fetch('/api/admin/system-status', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        if (mounted) setSystemStatus(data)
+      } catch {
+        if (mounted) setSystemStatus(null)
+      }
+    }
+
     async function boot() {
       const {
         data: { session },
@@ -127,7 +154,7 @@ export default function ControlPanelPage() {
       }
 
       if (mounted) setIsChecking(false)
-      await loadDashboard()
+      await Promise.all([loadDashboard(), loadSystemStatus(session.access_token)])
     }
 
     boot()
@@ -146,12 +173,15 @@ export default function ControlPanelPage() {
     )
   }
 
+  const emailReady = Boolean(systemStatus?.emailNotifications?.enabled)
+  const emailSenderReady = Boolean(systemStatus?.emailNotifications?.senderConfigured)
+  const emailRecipientReady = Boolean(systemStatus?.emailNotifications?.recipientConfigured)
   const readyItems = [
     metrics.services >= 6,
     metrics.areas >= 6,
     metrics.faq >= 8,
     metrics.reviews >= 6,
-    true,
+    emailReady,
   ].filter(Boolean).length
   const readinessScore = Math.round((readyItems / 5) * 100)
   const liveLoad = metrics.newOrders + metrics.activeOrders
@@ -230,6 +260,20 @@ export default function ControlPanelPage() {
           <QualityCard title="Города" href="/admin/areas" status={metrics.areas >= 6 ? 'good' : 'warn'} note={metrics.areas >= 6 ? 'Локальное покрытие хорошее.' : 'Добавьте больше городских страниц.'} />
           <QualityCard title="FAQ" href="/admin/faq" status={metrics.faq >= 8 ? 'good' : 'warn'} note={metrics.faq >= 8 ? 'FAQ база сильная.' : 'Добавьте вопросы про цену, ключи и сроки.'} />
           <QualityCard title="Отзывы" href="/admin/reviews" status={metrics.reviews >= 6 ? 'good' : 'warn'} note={metrics.reviews >= 6 ? 'Доверие сильное.' : 'Добавьте больше отзывов.'} />
+          <QualityCard title="Email заявки" href="/admin/audit" status={emailReady ? 'good' : 'warn'} note={emailReady ? 'Resend уведомления включены.' : 'Заявки сохраняются, но email требует RESEND_API_KEY.'} />
+        </div>
+      </section>
+
+      <section style={systemPanelStyle}>
+        <div>
+          <p style={smallLabelStyle}>Launch systems</p>
+          <h2 style={sectionTitleStyle}>Почта и production-настройки</h2>
+          <p style={sectionTextStyle}>Форма заявок сохраняет обращения в Supabase. Email-уведомления работают только после настройки Resend env в Cloudflare Worker.</p>
+        </div>
+        <div style={systemGridStyle}>
+          <SystemCard title="Resend API" isReady={emailReady} note={emailReady ? 'RESEND_API_KEY найден.' : 'Добавьте RESEND_API_KEY в production secrets.'} />
+          <SystemCard title="Получатель" isReady={emailRecipientReady} note={emailRecipientReady ? `Источник: ${systemStatus?.emailNotifications?.recipientSource}` : 'Используется fallback email из настроек сайта.'} />
+          <SystemCard title="Отправитель" isReady={emailSenderReady} note={emailSenderReady ? `Источник: ${systemStatus?.emailNotifications?.senderSource}` : 'Нужен CONTACT_FROM_EMAIL с verified domain в Resend.'} />
         </div>
       </section>
 
@@ -294,6 +338,18 @@ function QualityCard({ title, href, status, note }: { title: string; href: strin
   )
 }
 
+function SystemCard({ title, isReady, note }: { title: string; isReady: boolean; note: string }) {
+  const color = isReady ? '#6EE7B7' : '#D6A85F'
+
+  return (
+    <article style={{ ...systemCardStyle, borderColor: `${color}55` }}>
+      <span style={{ ...qualityStatusStyle, color }}>{isReady ? 'Готово' : 'Настроить'}</span>
+      <strong style={moduleTitleStyle}>{title}</strong>
+      <p style={moduleDescriptionStyle}>{note}</p>
+    </article>
+  )
+}
+
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
 const heroStyle: CSSProperties = {
   display: 'grid',
@@ -325,6 +381,9 @@ const errorStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(25
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14 }
 const panelStyle: CSSProperties = { background: 'linear-gradient(155deg, rgba(255,255,255,0.070), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)', border: '1px solid rgba(255,255,255,0.105)', borderRadius: 24, padding: 18, minWidth: 0, boxShadow: '0 22px 68px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.066)' }
 const photoPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 18, alignItems: 'end', border: '1px solid rgba(214,168,95,0.28)', background: 'linear-gradient(180deg, rgba(214,168,95,0.10), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)' }
+const systemPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gap: 18, border: '1px solid rgba(110,231,183,0.20)', background: 'linear-gradient(135deg, rgba(110,231,183,0.060), rgba(214,168,95,0.055) 55%, rgba(255,255,255,0.020)), rgba(255,255,255,0.018)' }
+const systemGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
+const systemCardStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.026)', padding: 16, minWidth: 0 }
 const sectionTitleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.1, letterSpacing: -0.7 }
 const sectionTextStyle: CSSProperties = { margin: '12px 0 0', color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }
 const widePrimaryLinkStyle: CSSProperties = { minHeight: 54, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 22px', borderRadius: 999, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, whiteSpace: 'nowrap' }
