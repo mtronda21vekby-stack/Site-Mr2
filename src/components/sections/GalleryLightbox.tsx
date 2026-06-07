@@ -56,11 +56,12 @@ export default function GalleryLightbox({ images }: { images: GalleryImage[] }) 
             <span className={`block overflow-hidden bg-[#EEF3FA] ${index === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
               <ResilientSupabaseImage
                 src={image.image_url}
-                widthHint={index === 0 ? 1200 : 760}
-                quality={76}
+                widthHint={index === 0 ? 1100 : 680}
+                quality={72}
                 resize="contain"
                 alt={image.alt || image.title || 'Planet Locksmiths service photo'}
-                loading={index <= 2 ? 'eager' : 'lazy'}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={index === 0 ? 'high' : 'low'}
                 decoding="async"
                 className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.015]"
               />

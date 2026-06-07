@@ -16,11 +16,8 @@ function normalizeIndex(index: number, length: number) {
   return ((index % length) + length) % length
 }
 
-function shouldPrioritizeImage(index: number, activeIndex: number, length: number) {
-  if (length <= 3) return true
-  const previous = normalizeIndex(activeIndex - 1, length)
-  const next = normalizeIndex(activeIndex + 1, length)
-  return index === activeIndex || index === previous || index === next || index <= 1
+function shouldPrioritizeImage(index: number) {
+  return index === 0
 }
 
 export default function MobileScrollSpinGallery({ images }: { images: GalleryImage[] }) {
@@ -28,6 +25,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
   const [activeIndex, setActiveIndex] = useState(0)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
+  const frameRef = useRef<number | null>(null)
 
   const current = lightboxIndex === null ? null : visibleImages[lightboxIndex]
 
@@ -36,13 +34,24 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
     if (!track) return
 
     const onScroll = () => {
-      const cardWidth = track.clientWidth
-      if (!cardWidth) return
-      setActiveIndex(normalizeIndex(Math.round(track.scrollLeft / cardWidth), visibleImages.length))
+      if (frameRef.current !== null) return
+      frameRef.current = window.requestAnimationFrame(() => {
+        frameRef.current = null
+        const cardWidth = track.clientWidth
+        if (!cardWidth) return
+        const nextIndex = normalizeIndex(Math.round(track.scrollLeft / cardWidth), visibleImages.length)
+        setActiveIndex((currentIndex) => currentIndex === nextIndex ? currentIndex : nextIndex)
+      })
     }
 
     track.addEventListener('scroll', onScroll, { passive: true })
-    return () => track.removeEventListener('scroll', onScroll)
+    return () => {
+      track.removeEventListener('scroll', onScroll)
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current)
+        frameRef.current = null
+      }
+    }
   }, [visibleImages.length])
 
   useEffect(() => {
@@ -72,7 +81,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
           className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {visibleImages.map((image, index) => {
-            const prioritizeImage = shouldPrioritizeImage(index, activeIndex, visibleImages.length)
+            const prioritizeImage = shouldPrioritizeImage(index)
 
             return (
               <button
@@ -85,8 +94,8 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                 <span className="block overflow-hidden rounded-[1.25rem] border border-[#0B1F4D]/10 bg-white">
                   <ResilientSupabaseImage
                     src={image.image_url}
-                    widthHint={900}
-                    quality={74}
+                    widthHint={720}
+                    quality={68}
                     resize="contain"
                     alt={image.alt || image.title || 'Planet Locksmiths service photo'}
                     loading={prioritizeImage ? 'eager' : 'lazy'}

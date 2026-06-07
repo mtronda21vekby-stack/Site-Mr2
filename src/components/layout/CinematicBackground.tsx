@@ -20,6 +20,12 @@ type BackgroundState = {
   mobilePosition: string
 }
 
+type CachedBackgroundAssets = {
+  timestamp: number
+  background: BackgroundState
+  decorImages: DecorImage[]
+}
+
 type CardSlot = {
   left: string
   top: string
@@ -41,6 +47,9 @@ const defaultBackground: BackgroundState = {
   desktopPosition: 'center center',
   mobilePosition: 'center center',
 }
+
+const backgroundCacheKey = 'planet-locksmiths-background-assets-v1'
+const backgroundCacheTtl = 1000 * 60 * 2
 
 const desktopSlots: CardSlot[] = [
   { left: '-8%', top: '5%', width: '19rem', height: '27rem', rotate: '-8deg', opacity: 0.34, zIndex: 1, driftX: '14px', driftY: '-10px', duration: '20s', delay: '0s' },
@@ -92,16 +101,40 @@ function imageForSlot(images: DecorImage[], index: number) {
   return images[index % images.length]
 }
 
+function readCachedBackgroundAssets(viewport: ViewportMode): CachedBackgroundAssets | null {
+  try {
+    const raw = window.sessionStorage.getItem(`${backgroundCacheKey}-${viewport}`)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as CachedBackgroundAssets
+    if (!parsed?.timestamp || Date.now() - parsed.timestamp > backgroundCacheTtl) return null
+    if (!parsed.background || !Array.isArray(parsed.decorImages)) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function writeCachedBackgroundAssets(viewport: ViewportMode, background: BackgroundState, decorImages: DecorImage[]) {
+  try {
+    window.sessionStorage.setItem(
+      `${backgroundCacheKey}-${viewport}`,
+      JSON.stringify({ timestamp: Date.now(), background, decorImages }),
+    )
+  } catch {
+    // Session storage is optional; rendering should not depend on it.
+  }
+}
+
 function optimizeImageUrl(value: string, viewport: ViewportMode, purpose: 'background' | 'decor') {
   const rawUrl = value.trim()
   if (!rawUrl || !isBrowserSupportedImageUrl(rawUrl)) return ''
 
   const width = purpose === 'background'
-    ? viewport === 'mobile' ? 720 : 1800
-    : viewport === 'mobile' ? 360 : 720
+    ? viewport === 'mobile' ? 640 : 1600
+    : viewport === 'mobile' ? 280 : 640
   const quality = purpose === 'background'
-    ? viewport === 'mobile' ? 48 : 62
-    : viewport === 'mobile' ? 44 : 58
+    ? viewport === 'mobile' ? 42 : 58
+    : viewport === 'mobile' ? 38 : 54
 
   return getOptimizedSupabaseImageUrl(rawUrl, { width, quality, resize: 'cover' })
 }
@@ -135,6 +168,13 @@ export default function CinematicBackground() {
     const activeViewport = viewport
 
     async function loadBackgroundAssets() {
+      const cachedAssets = readCachedBackgroundAssets(activeViewport)
+      if (cachedAssets) {
+        setBackground(cachedAssets.background)
+        setDecorImages(cachedAssets.decorImages)
+        return
+      }
+
       setDecorImages([])
 
       try {
@@ -157,32 +197,35 @@ export default function CinematicBackground() {
 
         if (!mounted) return
 
+        let nextBackground = defaultBackground
+        let nextDecorImages: DecorImage[] = []
+
         if (!settingsResult.error && settingsResult.data) {
           const desktopUrl = String(settingsResult.data.background_image_url || '')
           const mobileUrl = String(settingsResult.data.background_mobile_image_url || '')
 
-          setBackground({
+          nextBackground = {
             desktopUrl: optimizeImageUrl(desktopUrl, 'desktop', 'background'),
             mobileUrl: optimizeImageUrl(mobileUrl, 'mobile', 'background'),
             opacity: normalizeOpacity(settingsResult.data.background_opacity),
             desktopPosition: normalizePosition(settingsResult.data.background_position, defaultBackground.desktopPosition),
             mobilePosition: normalizePosition(settingsResult.data.background_mobile_position, defaultBackground.mobilePosition),
-          })
-        } else {
-          setBackground(defaultBackground)
+          }
         }
 
         if (!imagesResult.error && Array.isArray(imagesResult.data)) {
-          setDecorImages(
-            uniqueDecorImages(
-              imagesResult.data.map((image: any) => ({
-                id: String(image.id),
-                imageUrl: optimizeImageUrl(String(image.image_url || ''), activeViewport, 'decor'),
-                alt: normalizeDecorAlt(image.alt),
-              })),
-            ),
+          nextDecorImages = uniqueDecorImages(
+            imagesResult.data.map((image: any) => ({
+              id: String(image.id),
+              imageUrl: optimizeImageUrl(String(image.image_url || ''), activeViewport, 'decor'),
+              alt: normalizeDecorAlt(image.alt),
+            })),
           )
         }
+
+        setBackground(nextBackground)
+        setDecorImages(nextDecorImages)
+        writeCachedBackgroundAssets(activeViewport, nextBackground, nextDecorImages)
       } catch {
         if (!mounted) return
         setBackground(defaultBackground)
