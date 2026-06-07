@@ -37,9 +37,11 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
       <style jsx>{`
         .control-shell {
+          width: 100%;
+          max-width: 100vw;
           min-height: 100vh;
           position: relative;
-          overflow-x: clip;
+          overflow-x: hidden;
           background:
             linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 280px),
             linear-gradient(132deg, #06070b 0%, #0f121b 36%, #090d12 66%, #030406 100%);
@@ -116,6 +118,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
         .control-shell__main {
           min-width: 0;
+          max-width: 100%;
           padding: 22px;
           box-sizing: border-box;
         }
@@ -165,12 +168,18 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           }
 
           .control-shell__main {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
             padding: calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
           }
 
           .control-shell__mobileHead {
             display: grid;
             gap: 10px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
             position: sticky;
             top: calc(8px + env(safe-area-inset-top));
             z-index: 40;
@@ -179,6 +188,10 @@ export default function AdminShell({ children }: { children: ReactNode }) {
 
           .control-shell__mobileTopbar,
           .control-shell__mobileNav {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
             border: 1px solid rgba(255, 255, 255, 0.10);
             border-radius: 20px;
             background:
@@ -189,14 +202,18 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           }
 
           .control-shell__mobileTopbar {
-            padding: 14px;
+            padding: 12px;
           }
 
           .control-shell__mobileNav {
-            padding: 10px;
+            overflow: hidden;
+            padding: 9px;
           }
 
           .control-shell__workspace {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
             min-height: auto;
             border-radius: 24px;
           }
@@ -215,8 +232,17 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             display: none;
           }
 
+          .control-shell__main {
+            padding-right: calc(8px + env(safe-area-inset-right));
+            padding-left: calc(8px + env(safe-area-inset-left));
+          }
+
+          .control-shell__workspace {
+            border-radius: 20px;
+          }
+
           .control-shell__content {
-            padding: 12px;
+            padding: 10px;
           }
         }
       `}</style>

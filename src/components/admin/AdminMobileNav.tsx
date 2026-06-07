@@ -42,12 +42,17 @@ export default function AdminMobileNav() {
       <style jsx>{`
         .mobile-nav {
           display: flex;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
           gap: 8px;
           overflow-x: auto;
+          overflow-y: hidden;
           padding: 0 0 4px;
           scrollbar-width: none;
           -webkit-overflow-scrolling: touch;
           scroll-snap-type: x proximity;
+          overscroll-behavior-x: contain;
         }
 
         .mobile-nav::-webkit-scrollbar {
@@ -56,6 +61,7 @@ export default function AdminMobileNav() {
 
         .mobile-nav__link {
           flex: 0 0 auto;
+          max-width: min(210px, 72vw);
           min-height: 38px;
           display: inline-flex;
           align-items: center;
@@ -75,6 +81,14 @@ export default function AdminMobileNav() {
           scroll-snap-align: start;
         }
 
+        .mobile-nav__link strong {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 13px;
+          font-weight: 860;
+        }
+
         .mobile-nav__link span {
           width: 26px;
           height: 25px;
@@ -88,11 +102,6 @@ export default function AdminMobileNav() {
           font-weight: 950;
         }
 
-        .mobile-nav__link strong {
-          font-size: 13px;
-          font-weight: 860;
-        }
-
         .mobile-nav__link--active {
           border-color: rgba(214, 168, 95, 0.48);
           background: rgba(214, 168, 95, 0.16);
@@ -103,6 +112,30 @@ export default function AdminMobileNav() {
           border-color: rgba(214, 168, 95, 0.38);
           background: rgba(214, 168, 95, 0.18);
           color: #f0d099;
+        }
+
+        @media (max-width: 430px) {
+          .mobile-nav {
+            gap: 7px;
+          }
+
+          .mobile-nav__link {
+            min-height: 36px;
+            gap: 7px;
+            padding: 0 10px 0 7px;
+            border-radius: 13px;
+          }
+
+          .mobile-nav__link span {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            font-size: 8px;
+          }
+
+          .mobile-nav__link strong {
+            font-size: 12px;
+          }
         }
       `}</style>
     </div>

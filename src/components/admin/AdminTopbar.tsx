@@ -73,10 +73,13 @@ export default function AdminTopbar() {
       <style jsx>{`
         .topbar {
           display: flex;
+          width: 100%;
+          min-width: 0;
           justify-content: space-between;
           align-items: center;
           gap: 18px;
           flex-wrap: wrap;
+          box-sizing: border-box;
         }
 
         .topbar__titleBlock {
@@ -126,6 +129,7 @@ export default function AdminTopbar() {
 
         .topbar__actions {
           display: flex;
+          min-width: 0;
           align-items: center;
           justify-content: flex-end;
           gap: 10px;
@@ -166,6 +170,7 @@ export default function AdminTopbar() {
         }
 
         .topbar__button {
+          min-width: 0;
           min-height: 42px;
           display: inline-flex;
           align-items: center;
@@ -219,15 +224,28 @@ export default function AdminTopbar() {
         @media (max-width: 720px) {
           .topbar {
             display: grid;
+            gap: 12px;
+            overflow: hidden;
           }
 
           .topbar__actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             justify-content: stretch;
+            gap: 8px;
+            width: 100%;
+            min-width: 0;
           }
 
           .topbar__session {
             max-width: none;
             width: 100%;
+            min-width: 0;
+            height: auto;
+            min-height: 48px;
+            grid-column: 1 / -1;
+            border-radius: 16px;
+            padding: 9px 12px;
           }
 
           .topbar__session strong {
@@ -235,7 +253,49 @@ export default function AdminTopbar() {
           }
 
           .topbar__button {
-            flex: 1 1 auto;
+            width: 100%;
+            min-height: 44px;
+            padding: 0 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            white-space: normal;
+            text-align: center;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .topbar__status {
+            font-size: 10px;
+            letter-spacing: 1.35px;
+          }
+
+          h1 {
+            font-size: 26px;
+          }
+
+          p {
+            font-size: 12px;
+          }
+
+          .topbar__session {
+            min-height: 46px;
+          }
+
+          .topbar__session span {
+            font-size: 8px;
+            letter-spacing: 1.35px;
+          }
+
+          .topbar__session strong {
+            font-size: 11px;
+          }
+
+          .topbar__button {
+            min-height: 42px;
+            padding: 0 8px;
+            font-size: 10px;
+            letter-spacing: 0.85px;
           }
         }
       `}</style>
