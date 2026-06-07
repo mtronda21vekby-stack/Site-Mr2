@@ -24,17 +24,22 @@ npm run deploy
 
 ## Contact form email notifications
 
-The contact form always writes service requests to Supabase `orders`. Email notifications are optional and use Resend through the server route.
+The contact form writes service requests to Supabase `orders`. On the server route, `SUPABASE_SERVICE_ROLE_KEY` is preferred for reliable inserts; if it is missing, the route falls back to `NEXT_PUBLIC_SUPABASE_ANON_KEY` and depends on the table RLS policy.
 
 Set these Cloudflare Worker environment variables/secrets:
 
 ```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
 RESEND_API_KEY=...
 CONTACT_TO_EMAIL=planetlocksmits@gmail.com
 CONTACT_FROM_EMAIL="Planet Locksmiths <mail@your-verified-domain.com>"
 ```
 
-`CONTACT_FROM_EMAIL` should use a Resend-verified sender/domain. If `RESEND_API_KEY` is missing, the form still succeeds and the request remains available in the admin orders page.
+Email notifications are optional and use Resend through the server route. `CONTACT_FROM_EMAIL` should use a Resend-verified sender/domain. If `RESEND_API_KEY` is missing, the form still succeeds and the request remains available in the admin orders page.
+
+Recipient fallback order is `CONTACT_TO_EMAIL`, then `ADMIN_EMAIL`, then `site_settings.email`, then `planetlocksmits@gmail.com`.
 
 ## Notes
 
