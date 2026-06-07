@@ -20,7 +20,7 @@ export default function ReviewsSection({ title, items }: ReviewsSectionProps) {
         <div className="mb-9 grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
           <div className="max-w-4xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-accent-cyan">Customer reviews</p>
-            <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-text sm:text-5xl lg:text-6xl">{title}</h2>
+            <h2 className="text-balance text-4xl font-semibold tracking-normal text-text sm:text-5xl lg:text-6xl">{title}</h2>
           </div>
           <div className="premium-panel premium-hairline rounded-[1.25rem] p-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-accent-gold">Trust</p>

@@ -82,20 +82,20 @@ export default async function SiteGallery() {
   if (!images.length) return null
 
   return (
-    <section className="relative border-y border-[#0B1F4D]/10 bg-white px-4 py-12 sm:px-6 sm:py-18 lg:px-8">
+    <section className="relative border-y border-[#0B1F4D]/10 bg-white px-4 py-14 sm:px-6 sm:py-18 lg:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(18,58,115,0.06),transparent_32rem),linear-gradient(180deg,#FFFFFF_0%,#F7FAFF_100%)]" />
       <div className="relative mx-auto max-w-7xl">
         <div className="mb-8 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
           <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-[#123A73]">Job photos</p>
-            <h2 className="mt-4 text-balance text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D] md:text-5xl">
-              Photos from recent locksmith service calls
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-[#123A73]">Recent work</p>
+            <h2 className="mt-4 text-balance text-3xl font-semibold tracking-normal text-[#0B1F4D] md:text-5xl">
+              Locksmith service photos from the field
             </h2>
             <p className="mt-4 text-base leading-7 text-[#42526E]">
-              Uploaded work photos are shown in a clean layout so details stay visible on mobile and desktop.
+              Real service photos are displayed without heavy cropping so lock, key, vehicle, and access details stay visible.
             </p>
           </div>
-          <a href="#request-service" className="inline-flex w-fit items-center rounded-full border border-[#0B1F4D]/25 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition hover:-translate-y-0.5 hover:border-[#0B1F4D]/45 hover:bg-[#F3F7FF]">
+          <a href="#request-service" className="inline-flex w-fit items-center rounded-full border border-[#0B1F4D]/25 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition hover:-translate-y-0.5 hover:border-[#0B1F4D]/45 hover:bg-[#F3F7FF]">
             Request service
           </a>
         </div>

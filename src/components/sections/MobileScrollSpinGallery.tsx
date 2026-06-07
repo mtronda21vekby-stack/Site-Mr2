@@ -75,7 +75,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
 
   return (
     <>
-      <div className="overflow-hidden rounded-[1.75rem] border border-[#0B1F4D]/12 bg-white shadow-[0_28px_90px_rgba(11,31,77,0.12)]">
+      <div className="overflow-hidden rounded-[1.5rem] border border-[#0B1F4D]/12 bg-white shadow-[0_24px_72px_rgba(11,31,77,0.10)]">
         <div
           ref={trackRef}
           className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -89,9 +89,9 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                 type="button"
                 onClick={() => setLightboxIndex(index)}
                 aria-label="Open service photo"
-                className="w-full min-w-full snap-center bg-[#F3F7FF] p-3 text-left outline-none"
+                className="w-full min-w-full snap-center bg-[#F3F7FF] p-2.5 text-left outline-none"
               >
-                <span className="block overflow-hidden rounded-[1.25rem] border border-[#0B1F4D]/10 bg-white">
+                <span className="block overflow-hidden rounded-[1.15rem] border border-[#0B1F4D]/10 bg-white">
                   <ResilientSupabaseImage
                     src={image.image_url}
                     widthHint={720}
@@ -101,7 +101,7 @@ export default function MobileScrollSpinGallery({ images }: { images: GalleryIma
                     loading={prioritizeImage ? 'eager' : 'lazy'}
                     fetchPriority={prioritizeImage ? 'high' : 'low'}
                     decoding="async"
-                    className="h-[21rem] w-full bg-[#EEF3FA] object-contain"
+                    className="h-[19.5rem] w-full bg-[#EEF3FA] object-contain"
                     draggable="false"
                   />
                 </span>

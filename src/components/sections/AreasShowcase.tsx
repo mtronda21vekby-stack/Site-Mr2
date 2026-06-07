@@ -36,7 +36,7 @@ export default function AreasShowcase({
         <PremiumReveal className="mb-9 grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
           <div className="max-w-4xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-accent-cyan">{eyebrow}</p>
-            <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-text sm:text-5xl lg:text-6xl">{title}</h2>
+            <h2 className="text-balance text-4xl font-semibold tracking-normal text-text sm:text-5xl lg:text-6xl">{title}</h2>
             <p className="mt-5 max-w-3xl text-sm leading-7 text-muted sm:text-base sm:leading-8">{body}</p>
           </div>
 
@@ -56,7 +56,7 @@ export default function AreasShowcase({
                   <div className="pointer-events-none absolute -right-16 -top-16 h-32 w-32 rounded-full bg-accent-blue/0 blur-3xl transition duration-500 group-hover:bg-accent-blue/12" />
                   <div className="relative z-10 flex h-full flex-col">
                     <p className="mb-5 text-[0.65rem] font-black uppercase tracking-[0.22em] text-accent-gold">Area {String(index + 1).padStart(2, '0')}</p>
-                    <h3 className="text-balance text-2xl font-semibold tracking-[-0.035em] text-text">{area.title}</h3>
+                    <h3 className="text-balance text-2xl font-semibold tracking-normal text-text">{area.title}</h3>
                     {location ? <p className="mt-2 text-sm font-semibold text-accent-cyan/80">{location}</p> : null}
                     <p className="mt-4 flex-1 text-sm leading-7 text-muted">{area.intro}</p>
                     <span className="mt-6 inline-flex items-center text-xs font-black uppercase tracking-[0.18em] text-accent-blue transition group-hover:text-accent-cyan">{ctaLabel}<span className="ml-2 transition duration-300 group-hover:translate-x-1">→</span></span>

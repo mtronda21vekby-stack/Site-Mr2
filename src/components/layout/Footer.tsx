@@ -37,7 +37,7 @@ export default async function Footer({ locale }: FooterProps) {
                 <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/18 bg-white/[0.075] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_28px_rgba(77,162,255,0.16)] backdrop-blur-2xl">
                   <span className="h-3 w-3 rounded-full bg-accent-blue shadow-[0_0_22px_rgba(77,162,255,0.95)]" />
                 </span>
-                <h2 className="notranslate text-xl font-black tracking-[-0.03em] text-text" translate="no">{brandName}</h2>
+                <h2 className="notranslate text-xl font-black tracking-normal text-text" translate="no">{brandName}</h2>
               </div>
               <p className="max-w-2xl text-sm leading-7">{brandBlock?.body || labels.description}</p>
               <p className="mt-4 max-w-2xl text-sm leading-7">{brandBlock?.items[0] || labels.serviceNote}</p>

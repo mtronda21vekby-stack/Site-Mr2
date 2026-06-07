@@ -80,7 +80,7 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
       <div className="relative mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.76fr_1.24fr] lg:px-8">
         <div>
           <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Book mobile locksmith service</p>
-          <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-[#0B1F4D] sm:text-5xl lg:text-6xl">{title}</h2>
+          <h2 className="text-balance text-4xl font-semibold tracking-normal text-[#0B1F4D] sm:text-5xl lg:text-6xl">{title}</h2>
           <p className="mt-5 max-w-xl text-base leading-8 text-[#42526E]">{text}</p>
 
           <div className="premium-panel mt-7 rounded-[1.35rem] p-5">
@@ -130,7 +130,7 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
 
           <div className="relative z-10 mb-6 border-b border-[#0B1F4D]/10 pb-6">
             <p className="text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Service form</p>
-            <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D]">Service details</h3>
+            <h3 className="mt-2 text-3xl font-semibold tracking-normal text-[#0B1F4D]">Service details</h3>
             <p className="mt-3 text-sm leading-7 text-[#42526E]">Required: phone and service. Vehicle fields are optional; for home, business, safe, or access-control work, use Extra Details.</p>
           </div>
 

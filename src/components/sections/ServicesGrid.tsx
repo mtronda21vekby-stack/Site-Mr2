@@ -50,7 +50,7 @@ export default function ServicesGrid({ services, locale }: { services: Service[]
         <PremiumReveal className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-4xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">{copy.eyebrow}</p>
-            <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-[#0B1F4D] sm:text-5xl lg:text-6xl">{copy.title}</h2>
+            <h2 className="text-balance text-4xl font-semibold tracking-normal text-[#0B1F4D] sm:text-5xl lg:text-6xl">{copy.title}</h2>
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#42526E]">{copy.intro}</p>
           </div>
           <Link href={`/${locale}/services`} className="inline-flex w-fit items-center rounded-full border border-[#0B1F4D]/25 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.17em] text-[#0B1F4D] shadow-[0_16px_42px_rgba(11,31,77,0.10)] transition duration-300 hover:-translate-y-0.5 hover:border-[#0B1F4D]/45 hover:bg-[#F3F7FF] active:scale-[0.985]">
@@ -71,7 +71,7 @@ export default function ServicesGrid({ services, locale }: { services: Service[]
                   <span className="inline-flex h-9 w-14 items-center justify-center rounded-full border border-[#0B1F4D]/12 bg-white text-xs font-black uppercase tracking-[0.18em] text-[#123A73]/80 shadow-[0_10px_24px_rgba(11,31,77,0.05)]">{String(index + 1).padStart(2, '0')}</span>
 
                   <span className="min-w-0">
-                    <span className="block text-balance text-2xl font-semibold leading-tight tracking-[-0.04em] text-[#0B1F4D] transition duration-300 group-hover:text-[#123A73] sm:text-3xl">
+                    <span className="block text-balance text-2xl font-semibold leading-tight tracking-normal text-[#0B1F4D] transition duration-300 group-hover:text-[#123A73] sm:text-3xl">
                       {service.title}
                     </span>
                     <span className="mt-0 block max-h-0 overflow-hidden text-sm leading-7 text-[#42526E] opacity-0 transition-all duration-500 group-hover:mt-4 group-hover:max-h-48 group-hover:opacity-100 group-focus-visible:mt-4 group-focus-visible:max-h-48 group-focus-visible:opacity-100 max-md:mt-4 max-md:max-h-64 max-md:opacity-100">

@@ -16,7 +16,7 @@ export default function FaqSection({ title, items }: FaqSectionProps) {
       <div className="mx-auto grid max-w-7xl gap-9 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <div>
           <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-accent-gold">FAQ</p>
-          <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-text sm:text-5xl lg:text-6xl">{title}</h2>
+          <h2 className="text-balance text-4xl font-semibold tracking-normal text-text sm:text-5xl lg:text-6xl">{title}</h2>
           <p className="mt-5 text-sm leading-7 text-muted sm:text-base sm:leading-8">Clear answers about lockouts, replacement keys, programming, coverage, authorization, and service requests.</p>
         </div>
 

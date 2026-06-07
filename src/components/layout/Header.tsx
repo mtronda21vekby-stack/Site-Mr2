@@ -237,7 +237,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
             )}
           </Link>
           <span className="min-w-0 leading-none">
-            <Link href={`/${activeLocale}`} className="block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] transition duration-300 hover:text-[#123A73] sm:text-lg">{visibleBrandName}</Link>
+            <Link href={`/${activeLocale}`} className="block truncate text-[0.95rem] font-black tracking-normal text-[#0B1F4D] transition duration-300 hover:text-[#123A73] sm:text-lg">{visibleBrandName}</Link>
             <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile locksmith response</span>
             <a
               href={`tel:${phonePrimary}`}

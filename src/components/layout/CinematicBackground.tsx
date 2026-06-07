@@ -60,9 +60,9 @@ const desktopSlots: CardSlot[] = [
 ]
 
 const mobileSlots: CardSlot[] = [
-  { left: '-28%', top: '8%', width: '10.5rem', height: '14.8rem', rotate: '-7deg', opacity: 0.18, zIndex: 1, driftX: '0px', driftY: '0px', duration: '1s', delay: '0s' },
-  { left: '66%', top: '12%', width: '10.8rem', height: '15.4rem', rotate: '7deg', opacity: 0.18, zIndex: 2, driftX: '0px', driftY: '0px', duration: '1s', delay: '0s' },
-  { left: '18%', top: '48%', width: '9.5rem', height: '13.6rem', rotate: '3deg', opacity: 0.12, zIndex: 0, driftX: '0px', driftY: '0px', duration: '1s', delay: '0s' },
+  { left: '-31%', top: '10%', width: '9.8rem', height: '13.8rem', rotate: '-7deg', opacity: 0.11, zIndex: 1, driftX: '0px', driftY: '0px', duration: '1s', delay: '0s' },
+  { left: '70%', top: '14%', width: '9.9rem', height: '14rem', rotate: '7deg', opacity: 0.10, zIndex: 2, driftX: '0px', driftY: '0px', duration: '1s', delay: '0s' },
+  { left: '24%', top: '54%', width: '8.4rem', height: '12rem', rotate: '3deg', opacity: 0.06, zIndex: 0, driftX: '0px', driftY: '0px', duration: '1s', delay: '0s' },
 ]
 
 function normalizeOpacity(value: unknown) {
@@ -130,11 +130,11 @@ function optimizeImageUrl(value: string, viewport: ViewportMode, purpose: 'backg
   if (!rawUrl || !isBrowserSupportedImageUrl(rawUrl)) return ''
 
   const width = purpose === 'background'
-    ? viewport === 'mobile' ? 640 : 1600
-    : viewport === 'mobile' ? 280 : 640
+    ? viewport === 'mobile' ? 560 : 1600
+    : viewport === 'mobile' ? 220 : 640
   const quality = purpose === 'background'
-    ? viewport === 'mobile' ? 42 : 58
-    : viewport === 'mobile' ? 38 : 54
+    ? viewport === 'mobile' ? 36 : 58
+    : viewport === 'mobile' ? 34 : 54
 
   return getOptimizedSupabaseImageUrl(rawUrl, { width, quality, resize: 'cover' })
 }
@@ -179,7 +179,7 @@ export default function CinematicBackground() {
 
       try {
         const supabase = getSupabaseClient() as any
-        const imageLimit = activeViewport === 'mobile' ? mobileSlots.length : desktopSlots.length
+        const imageLimit = activeViewport === 'mobile' ? 2 : desktopSlots.length
 
         const [settingsResult, imagesResult] = await Promise.all([
           (supabase.from('site_settings') as any)
@@ -289,12 +289,12 @@ export default function CinematicBackground() {
               style={{
                 backgroundImage: `url(${mobileBackgroundUrl})`,
                 backgroundPosition: background.mobilePosition,
-                opacity: Math.min(0.22, background.opacity),
+                opacity: Math.min(0.16, background.opacity),
               }}
             />
           ) : null}
 
-          <div className="absolute inset-0 bg-white/72 backdrop-blur-[1px] max-md:bg-white/82 max-md:backdrop-blur-0" />
+          <div className="absolute inset-0 bg-white/72 backdrop-blur-[1px] max-md:bg-white/86 max-md:backdrop-blur-0" />
         </>
       ) : null}
 
