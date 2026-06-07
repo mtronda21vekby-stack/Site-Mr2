@@ -106,8 +106,6 @@ export default async function LocaleHome({
           primaryCtaHref={`tel:${global.phonePrimary}`}
           secondaryCtaLabel={home.heroSecondaryCta}
           secondaryCtaHref={`/${locale}/contact#request-service`}
-          phoneNumber={global.phonePrimary}
-          phoneDisplay={global.phoneDisplay}
         />
 
         <SiteGallery />
