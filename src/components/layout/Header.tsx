@@ -213,9 +213,9 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   return (
     <header translate="no" className="notranslate sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
-      <div className="relative mx-auto flex h-[4.75rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.5rem] sm:gap-3 sm:px-6 lg:px-8">
-        <Link href={`/${activeLocale}`} className="group flex min-w-0 items-center gap-2.5 sm:gap-3" aria-label={`${visibleBrandName} home`}>
-          <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
+      <div className="relative mx-auto flex h-[5.15rem] max-w-7xl items-center justify-between gap-2.5 px-4 py-3 sm:h-[4.75rem] sm:gap-3 sm:px-6 lg:px-8">
+        <div className="group flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <Link href={`/${activeLocale}`} className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24" aria-label={`${visibleBrandName} home`}>
             {shouldShowImageLogo ? (
               <img
                 ref={logoImageRef}
@@ -235,12 +235,20 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
             ) : (
               <FallbackLogoMark />
             )}
-          </span>
+          </Link>
           <span className="min-w-0 leading-none">
-            <span className="block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] sm:text-lg">{visibleBrandName}</span>
+            <Link href={`/${activeLocale}`} className="block truncate text-[0.95rem] font-black tracking-[-0.035em] text-[#0B1F4D] transition duration-300 hover:text-[#123A73] sm:text-lg">{visibleBrandName}</Link>
             <span className="mt-0.5 block truncate text-[0.48rem] font-black uppercase tracking-[0.16em] text-[#42526E] sm:text-[0.62rem] sm:tracking-[0.22em]">Mobile locksmith response</span>
+            <a
+              href={`tel:${phonePrimary}`}
+              className="notranslate mt-1 inline-flex max-w-full items-center truncate rounded-full border border-[#0B1F4D]/12 bg-[#F7FAFF] px-2.5 py-1 text-[0.62rem] font-black tracking-[0.04em] text-[#0B1F4D] shadow-[0_8px_18px_rgba(11,31,77,0.06)] sm:text-[0.72rem]"
+              translate="no"
+              aria-label={`${labels.call} ${phoneDisplay}`}
+            >
+              {phoneDisplay}
+            </a>
           </span>
-        </Link>
+        </div>
 
         <nav className="hidden items-center rounded-full border border-[#0B1F4D]/14 bg-white p-1.5 shadow-[0_12px_32px_rgba(11,31,77,0.07)] backdrop-blur-2xl md:flex">
           {navItems.map((item) => (
