@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
+import { getDefaultAreas } from '@/lib/site-defaults'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
 type Locale = 'en' | 'es' | 'ru'
-type PublishFilter = 'all' | 'published' | 'draft'
 
-type AreaFormRow = {
+type AreaRow = {
   id: string
   locale: Locale
   slug: string
@@ -26,14 +26,9 @@ type AreaFormRow = {
 
 const locales: Locale[] = ['en', 'es', 'ru']
 const FORM_ID = 'admin-areas-form'
+const labels: Record<Locale, string> = { en: 'English', es: 'Español', ru: 'Русский' }
 
-const localeLabels: Record<Locale, string> = {
-  en: 'English',
-  es: 'Español',
-  ru: 'Русский',
-}
-
-function createEmptyRow(locale: Locale, sortOrder = 0): AreaFormRow {
+function blank(locale: Locale, sortOrder = 0): AreaRow {
   return {
     id: '',
     locale,
@@ -51,16 +46,51 @@ function createEmptyRow(locale: Locale, sortOrder = 0): AreaFormRow {
   }
 }
 
+function presets(locale: Locale): AreaRow[] {
+  return getDefaultAreas(locale).map((area, index) => ({
+    id: '',
+    locale,
+    slug: area.slug,
+    city: area.city,
+    state: area.state,
+    title: area.title,
+    intro: area.intro,
+    highlightsText: area.highlights.join('\n'),
+    supportedServicesText: area.supportedServices.join('\n'),
+    seoTitle: area.seoTitle,
+    seoDescription: area.seoDescription,
+    sortOrder: index,
+    isPublished: true,
+  }))
+}
+
+function presetSlugs(locale: Locale) {
+  return new Set(getDefaultAreas(locale).map((area) => area.slug))
+}
+
+function mergeWithPresets(locale: Locale, rows: AreaRow[]) {
+  const bySlug = new Map<string, AreaRow>()
+  for (const row of rows) {
+    const slug = row.slug.trim()
+    if (slug && !bySlug.has(slug)) bySlug.set(slug, row)
+  }
+  const presetRows = presets(locale)
+  const slugs = presetSlugs(locale)
+  const customRows = rows.filter((row) => row.slug.trim() && !slugs.has(row.slug.trim()))
+  return [...presetRows.map((row) => bySlug.get(row.slug) ?? row), ...customRows].sort((a, b) => a.sortOrder - b.sortOrder)
+}
+
 export default function AdminAreasPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
-  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, AreaFormRow[]>>({ en: [], es: [], ru: [] })
+  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, AreaRow[]>>({
+    en: presets('en'),
+    es: presets('es'),
+    ru: presets('ru'),
+  })
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
-  const [publishFilter, setPublishFilter] = useState<PublishFilter>('all')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -69,12 +99,11 @@ export default function AdminAreasPage() {
 
     async function boot() {
       try {
-        setErrorMessage('')
-        setSuccessMessage('')
-
         const sessionResult = await supabase.auth.getSession()
-        const session = sessionResult?.data?.session
-        if (!session) { router.replace('/admin/login'); return }
+        if (!sessionResult?.data?.session) {
+          router.replace('/admin/login')
+          return
+        }
 
         const result = await (supabase.from('areas') as any)
           .select('id, locale, slug, city, state, title, intro, highlights, supported_services, seo_title, seo_description, sort_order, is_published')
@@ -82,10 +111,8 @@ export default function AdminAreasPage() {
 
         if (result.error) throw new Error(result.error.message)
 
-        const nextRows: Record<Locale, AreaFormRow[]> = { en: [], es: [], ru: [] }
-        const rows = Array.isArray(result.data) ? result.data : []
-
-        for (const row of rows) {
+        const nextRows: Record<Locale, AreaRow[]> = { en: [], es: [], ru: [] }
+        for (const row of Array.isArray(result.data) ? result.data : []) {
           const locale = row.locale as Locale
           if (!locales.includes(locale)) continue
           nextRows[locale].push({
@@ -105,11 +132,10 @@ export default function AdminAreasPage() {
           })
         }
 
-        if (!mounted) return
-        setRowsByLocale(nextRows)
+        for (const locale of locales) nextRows[locale] = mergeWithPresets(locale, nextRows[locale])
+        if (mounted) setRowsByLocale(nextRows)
       } catch (error) {
-        if (!mounted) return
-        setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить города')
+        if (mounted) setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить города')
       } finally {
         if (mounted) setIsBooting(false)
       }
@@ -119,80 +145,67 @@ export default function AdminAreasPage() {
     return () => { mounted = false }
   }, [router, supabase])
 
-  function updateRow(index: number, patch: Partial<AreaFormRow>) {
-    setRowsByLocale((prev) => {
-      const copy = [...prev[activeLocale]]
-      copy[index] = { ...copy[index], ...patch }
-      return { ...prev, [activeLocale]: copy }
+  function setRow(index: number, patch: Partial<AreaRow>) {
+    setRowsByLocale((previous) => {
+      const rows = [...previous[activeLocale]]
+      rows[index] = { ...rows[index], ...patch }
+      return { ...previous, [activeLocale]: rows }
     })
   }
 
   function addRow() {
-    setRowsByLocale((prev) => {
-      const current = prev[activeLocale]
-      const maxSort = current.length ? Math.max(...current.map((item) => item.sortOrder)) : -1
-      return { ...prev, [activeLocale]: [...current, createEmptyRow(activeLocale, maxSort + 1)] }
+    setRowsByLocale((previous) => {
+      const rows = previous[activeLocale]
+      const sortOrder = rows.length ? Math.max(...rows.map((row) => row.sortOrder)) + 1 : 0
+      return { ...previous, [activeLocale]: [...rows, blank(activeLocale, sortOrder)] }
     })
   }
 
   async function deleteRow(index: number) {
-    setErrorMessage('')
-    setSuccessMessage('')
     const row = rowsByLocale[activeLocale][index]
     if (!row) return
+    setErrorMessage('')
+    setSuccessMessage('')
 
     if (!row.id) {
-      setRowsByLocale((prev) => {
-        const copy = [...prev[activeLocale]]
-        copy.splice(index, 1)
-        return { ...prev, [activeLocale]: copy }
+      if (presetSlugs(row.locale).has(row.slug)) {
+        setRow(index, { isPublished: false })
+        setSuccessMessage('Preset-город переведён в черновик. Сохрани форму, чтобы скрыть его на сайте.')
+        return
+      }
+      setRowsByLocale((previous) => {
+        const rows = [...previous[activeLocale]]
+        rows.splice(index, 1)
+        return { ...previous, [activeLocale]: rows }
       })
-      setSuccessMessage('Новый город удалён из формы')
+      setSuccessMessage('Город удалён из формы')
       return
     }
 
-    const ok = window.confirm('Удалить этот город навсегда?')
-    if (!ok) return
-    setDeletingId(row.id)
-
-    try {
-      const result = await (supabase.from('areas') as any).delete().eq('id', row.id)
-      if (result.error) throw new Error(result.error.message)
-      setRowsByLocale((prev) => {
-        const copy = [...prev[activeLocale]]
-        copy.splice(index, 1)
-        return { ...prev, [activeLocale]: copy }
-      })
-      setSuccessMessage('Город удалён')
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Не удалось удалить город')
-    } finally {
-      setDeletingId(null)
+    if (!window.confirm('Удалить этот город навсегда?')) return
+    const result = await (supabase.from('areas') as any).delete().eq('id', row.id)
+    if (result.error) {
+      setErrorMessage(result.error.message)
+      return
     }
+    setRowsByLocale((previous) => ({ ...previous, [activeLocale]: previous[activeLocale].filter((item) => item.id !== row.id) }))
+    setSuccessMessage('Город удалён')
   }
 
-  async function handleSave(event: React.FormEvent<HTMLFormElement>) {
+  async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setIsSaving(true)
     setErrorMessage('')
     setSuccessMessage('')
-    setIsSaving(true)
 
     try {
-      const currentRows = rowsByLocale[activeLocale]
-
-      for (const row of currentRows) {
-        const slug = row.slug.trim()
-        const city = row.city.trim()
+      for (const row of rowsByLocale[activeLocale]) {
         const highlights = row.highlightsText.split('\n').map((item) => item.trim()).filter(Boolean)
         const supportedServices = row.supportedServicesText.split('\n').map((item) => item.trim()).filter(Boolean)
-
-        if (!slug && !city && !row.title.trim() && !row.intro.trim()) continue
-        if (!slug) throw new Error('Для сохранения города нужен slug. Остальные поля можно заполнять свободно.')
-
         const payload = {
           locale: row.locale,
-          slug,
-          city,
+          slug: row.slug.trim(),
+          city: row.city.trim(),
           state: row.state.trim(),
           title: row.title.trim(),
           intro: row.intro.trim(),
@@ -204,17 +217,17 @@ export default function AdminAreasPage() {
           is_published: row.isPublished,
         }
 
-        if (row.id) {
-          const result = await (supabase.from('areas') as any).update(payload).eq('id', row.id)
-          if (result.error) throw new Error(result.error.message)
-        } else {
-          const result = await (supabase.from('areas') as any).insert(payload).select('id').single()
-          if (result.error) throw new Error(result.error.message)
-          row.id = result.data?.id ?? ''
-        }
+        if (!payload.slug && !payload.city && !payload.title) continue
+        if (!payload.slug) throw new Error('Для города нужен slug')
+
+        const result = row.id
+          ? await (supabase.from('areas') as any).update(payload).eq('id', row.id)
+          : await (supabase.from('areas') as any).insert(payload).select('id').single()
+        if (result.error) throw new Error(result.error.message)
+        if (!row.id) row.id = result.data?.id ?? ''
       }
 
-      setSuccessMessage(`Города сохранены: ${localeLabels[activeLocale]}`)
+      setSuccessMessage(`Города сохранены: ${labels[activeLocale]}`)
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Не удалось сохранить города')
     } finally {
@@ -222,146 +235,94 @@ export default function AdminAreasPage() {
     }
   }
 
-  const currentRows = rowsByLocale[activeLocale]
-  const filteredRows = currentRows.filter((row) => {
-    const q = search.trim().toLowerCase()
-    const matchesSearch = !q || row.slug.toLowerCase().includes(q) || row.city.toLowerCase().includes(q) || row.state.toLowerCase().includes(q) || row.title.toLowerCase().includes(q)
-    const matchesPublish = publishFilter === 'all' ? true : publishFilter === 'published' ? row.isPublished : !row.isPublished
-    return matchesSearch && matchesPublish
-  })
+  const rows = rowsByLocale[activeLocale]
 
-  const publishedCount = currentRows.filter((row) => row.isPublished).length
-  const draftCount = currentRows.length - publishedCount
-
-  if (isBooting) return <div style={panelStyle}><p style={eyebrowStyle}>Города</p><h1 style={titleStyle}>Загрузка...</h1></div>
+  if (isBooting) return <section style={panelStyle}>Загрузка городов...</section>
 
   return (
     <div style={pageStyle}>
-      <section style={heroStyle}>
+      <header style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>Контент / локальные страницы</p>
-          <h1 style={titleStyle}>Города</h1>
-          <p style={mutedStyle}>Редактирование страниц покрытия по городам и районам. Эти страницы помогают локальному SEO и объясняют клиенту, где доступен сервис.</p>
+          <p style={eyebrowStyle}>Service areas</p>
+          <h1 style={titleStyle}>Areas CMS</h1>
+          <p style={mutedStyle}>Production preset уже даёт Philadelphia coverage. Сохрани строки, чтобы управлять городами, SEO, услугами и публикацией из Supabase.</p>
         </div>
-        <div style={heroActionsStyle}>
-          {locales.map((locale) => <button key={locale} type="button" onClick={() => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} style={localeButtonStyle(activeLocale === locale)}>{locale.toUpperCase()}</button>)}
-          <a href={`/${activeLocale}/areas`} target="_blank" rel="noreferrer" style={secondaryLinkStyle}>Открыть</a>
-          <button type="button" onClick={addRow} style={primaryButtonStyle}>+ Город</button>
+        <div style={actionsStyle}>
+          {locales.map((locale) => (
+            <button key={locale} type="button" onClick={() => setActiveLocale(locale)} style={tabStyle(activeLocale === locale)}>{locale.toUpperCase()}</button>
+          ))}
+          <button type="button" onClick={addRow} style={buttonStyle}>+ город</button>
         </div>
-      </section>
+      </header>
 
-      <section style={statsGridStyle}>
-        <InfoCard title="Язык" value={localeLabels[activeLocale]} note="Текущая версия контента." />
-        <InfoCard title="Всего" value={String(currentRows.length)} note="Города в выбранном языке." />
-        <InfoCard title="Опубликовано" value={String(publishedCount)} note="Показываются на сайте." />
-        <InfoCard title="Черновики" value={String(draftCount)} note="Скрыты с сайта." />
-      </section>
+      {errorMessage ? <div style={errorStyle}>{errorMessage}</div> : null}
+      {successMessage ? <div style={successStyle}>{successMessage}</div> : null}
 
-      <section style={guideStyle}>
-        <p style={eyebrowStyle}>Подсказка</p>
-        <p style={mutedStyle}>Slug нужен для ссылки страницы. Highlights и Supported Services вводятся построчно. Жёстких лимитов по длине текста нет.</p>
-      </section>
-
-      <section style={filtersStyle}>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Поиск: slug, город, штат, заголовок" style={inputStyle} />
-        <select value={publishFilter} onChange={(e) => setPublishFilter(e.target.value as PublishFilter)} style={inputStyle}>
-          <option value="all">Все города</option>
-          <option value="published">Опубликованные</option>
-          <option value="draft">Черновики</option>
-        </select>
-      </section>
-
-      {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
-      {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
-
-      <form id={FORM_ID} onSubmit={handleSave} style={formStyle}>
-        {filteredRows.map((row) => {
-          const realIndex = currentRows.indexOf(row)
-          return (
-            <article key={row.id || `${row.locale}-${realIndex}`} style={cardStyle}>
-              <div style={cardHeaderStyle}>
-                <div style={{ minWidth: 0 }}>
-                  <p style={eyebrowStyle}>Город #{realIndex + 1}</p>
-                  <h2 style={cardTitleStyle}>{row.city || row.title || row.slug || 'Новый город'}</h2>
-                  {row.slug ? <a href={`/${activeLocale}/areas/${row.slug}`} target="_blank" rel="noreferrer" style={previewLinkStyle}>/{activeLocale}/areas/{row.slug}</a> : null}
-                </div>
-                <button type="button" onClick={() => deleteRow(realIndex)} disabled={deletingId === row.id} style={dangerButtonStyle}>{deletingId === row.id ? 'Удаление...' : 'Удалить'}</button>
-              </div>
-
-              <div style={fieldGridStyle}>
-                <Field label="Slug" value={row.slug} onChange={(value) => updateRow(realIndex, { slug: value })} />
-                <Field label="Город" value={row.city} onChange={(value) => updateRow(realIndex, { city: value })} />
-                <Field label="Штат" value={row.state} onChange={(value) => updateRow(realIndex, { state: value })} />
-                <Field label="Порядок" value={String(row.sortOrder)} onChange={(value) => updateRow(realIndex, { sortOrder: Number(value || 0) })} />
-              </div>
-
-              <Field label="Заголовок" value={row.title} onChange={(value) => updateRow(realIndex, { title: value })} />
-              <TextAreaField label="Основной текст" value={row.intro} onChange={(value) => updateRow(realIndex, { intro: value })} />
-              <TextAreaField label="Преимущества / заметки по району — по одному пункту в строке" value={row.highlightsText} onChange={(value) => updateRow(realIndex, { highlightsText: value })} />
-              <TextAreaField label="Доступные услуги — по одной услуге в строке" value={row.supportedServicesText} onChange={(value) => updateRow(realIndex, { supportedServicesText: value })} />
-              <Field label="SEO title" value={row.seoTitle} onChange={(value) => updateRow(realIndex, { seoTitle: value })} />
-              <TextAreaField label="SEO description" value={row.seoDescription} onChange={(value) => updateRow(realIndex, { seoDescription: value })} />
-
-              <label style={switchStyle}>
-                <input type="checkbox" checked={row.isPublished} onChange={(event) => updateRow(realIndex, { isPublished: event.target.checked })} />
-                <span>{row.isPublished ? 'Опубликовано' : 'Черновик'}</span>
-              </label>
-            </article>
-          )
-        })}
-
-        {!filteredRows.length ? <div style={emptyStateStyle}>Нет городов под текущий фильтр.</div> : null}
+      <form id={FORM_ID} onSubmit={save} style={listStyle}>
+        {rows.map((row, index) => (
+          <article key={row.id || `${row.locale}-${row.slug}-${index}`} style={cardStyle}>
+            <div style={cardHeaderStyle}>
+              <strong>#{index + 1} {row.city || row.slug || 'Новый город'}</strong>
+              <label style={checkStyle}><input type="checkbox" checked={row.isPublished} onChange={(event) => setRow(index, { isPublished: event.target.checked })} /> published</label>
+            </div>
+            <div style={gridStyle}>
+              <Field label="Slug" value={row.slug} onChange={(value) => setRow(index, { slug: value })} />
+              <Field label="City" value={row.city} onChange={(value) => setRow(index, { city: value })} />
+              <Field label="State" value={row.state} onChange={(value) => setRow(index, { state: value })} />
+              <Field label="Title" value={row.title} onChange={(value) => setRow(index, { title: value })} />
+              <Field label="SEO title" value={row.seoTitle} onChange={(value) => setRow(index, { seoTitle: value })} />
+              <Field label="Порядок" value={String(row.sortOrder)} onChange={(value) => setRow(index, { sortOrder: Number(value || 0) })} />
+            </div>
+            <TextField label="Intro" value={row.intro} onChange={(value) => setRow(index, { intro: value })} />
+            <TextField label="Highlights, по одному в строке" value={row.highlightsText} onChange={(value) => setRow(index, { highlightsText: value })} />
+            <TextField label="Supported services, по одному в строке" value={row.supportedServicesText} onChange={(value) => setRow(index, { supportedServicesText: value })} />
+            <TextField label="SEO description" value={row.seoDescription} onChange={(value) => setRow(index, { seoDescription: value })} />
+            <button type="button" onClick={() => deleteRow(index)} style={dangerStyle}>Удалить</button>
+          </article>
+        ))}
       </form>
 
-      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label="Сохранить города" note={`Сохраняется только текущий язык: ${localeLabels[activeLocale]}.`} />
+      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label="Сохранить города" note={`Язык: ${labels[activeLocale]}. Published города доступны на публичном сайте.`} />
     </div>
   )
 }
 
-function InfoCard({ title, value, note }: { title: string; value: string; note: string }) {
-  return <article style={infoCardStyle}><p style={eyebrowStyle}>{title}</p><strong style={infoValueStyle}>{value}</strong><span style={infoNoteStyle}>{note}</span></article>
-}
-
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label>
+  return (
+    <label style={fieldStyle}>
+      <span style={labelStyle}>{label}</span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} />
+    </label>
+  )
 }
 
-function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label>
-}
-
-function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) {
-  return <div style={type === 'error' ? messageErrorStyle : messageSuccessStyle}>{children}</div>
+function TextField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <label style={fieldStyle}>
+      <span style={labelStyle}>{label}</span>
+      <textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textareaStyle} />
+    </label>
+  )
 }
 
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
-const panelStyle: CSSProperties = { borderRadius: 26, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.035)', padding: 20 }
-const heroStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap', background: 'radial-gradient(circle at 0% 0%, rgba(45,226,230,0.14), transparent 320px), rgba(255,255,255,0.035)' }
-const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
-const titleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 'clamp(34px, 6vw, 58px)', lineHeight: 0.96, letterSpacing: -2.2 }
-const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', fontSize: 14, lineHeight: 1.7, maxWidth: 760 }
-const heroActionsStyle: CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
-function localeButtonStyle(active: boolean): CSSProperties { return { minHeight: 44, padding: '0 15px', borderRadius: 999, border: active ? '1px solid rgba(45,226,230,0.5)' : '1px solid rgba(255,255,255,0.12)', background: active ? 'rgba(45,226,230,0.16)' : 'rgba(255,255,255,0.035)', color: active ? '#2DE2E6' : '#F5F7FB', fontWeight: 900 } }
-const primaryButtonStyle: CSSProperties = { minHeight: 44, padding: '0 16px', borderRadius: 999, border: '1px solid rgba(77,162,255,0.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.1 }
-const secondaryLinkStyle: CSSProperties = { minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 16px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.035)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.1 }
-const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
-const infoCardStyle: CSSProperties = { borderRadius: 22, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(17,25,46,0.82), rgba(5,7,11,0.72))', padding: 16, display: 'grid', gap: 8, minWidth: 0 }
-const infoValueStyle: CSSProperties = { color: '#F5F7FB', fontSize: 20, lineHeight: 1.15, wordBreak: 'break-word' }
-const infoNoteStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, lineHeight: 1.5 }
-const guideStyle: CSSProperties = { ...panelStyle, padding: 16 }
-const filtersStyle: CSSProperties = { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }
-const formStyle: CSSProperties = { display: 'grid', gap: 16 }
-const cardStyle: CSSProperties = { borderRadius: 24, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(11,16,32,0.86), rgba(5,7,11,0.78))', padding: 18, display: 'grid', gap: 14 }
-const cardHeaderStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }
-const cardTitleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.12, wordBreak: 'break-word' }
-const previewLinkStyle: CSSProperties = { display: 'inline-flex', marginTop: 8, color: '#A9D0FF', fontSize: 13, textDecoration: 'none', wordBreak: 'break-word' }
-const fieldGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12 }
-const fieldStyle: CSSProperties = { display: 'grid', gap: 8 }
+const panelStyle: CSSProperties = { border: '1px solid rgba(255,255,255,.12)', borderRadius: 20, padding: 20, color: '#F5F7FB' }
+const headerStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
+const titleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 42, lineHeight: 1 }
+const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', lineHeight: 1.6, maxWidth: 760 }
+const actionsStyle: CSSProperties = { display: 'flex', gap: 10, flexWrap: 'wrap' }
+const buttonStyle: CSSProperties = { minHeight: 42, borderRadius: 999, border: '1px solid rgba(77,162,255,.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, padding: '0 16px' }
+const dangerStyle: CSSProperties = { ...buttonStyle, background: 'rgba(255,122,122,.08)', color: '#FF9A9A', borderColor: 'rgba(255,122,122,.3)', justifySelf: 'start' }
+const tabStyle = (active: boolean): CSSProperties => ({ ...buttonStyle, background: active ? 'rgba(45,226,230,.16)' : 'rgba(255,255,255,.04)', color: active ? '#2DE2E6' : '#F5F7FB', borderColor: active ? 'rgba(45,226,230,.5)' : 'rgba(255,255,255,.12)' })
+const listStyle: CSSProperties = { display: 'grid', gap: 14 }
+const cardStyle: CSSProperties = { ...panelStyle, display: 'grid', gap: 14, background: 'rgba(255,255,255,.035)' }
+const cardHeaderStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', color: '#F5F7FB' }
+const gridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
+const fieldStyle: CSSProperties = { display: 'grid', gap: 6, minWidth: 0 }
 const labelStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, fontWeight: 800 }
-const inputStyle: CSSProperties = { width: '100%', minHeight: 50, borderRadius: 15, border: '1px solid rgba(255,255,255,0.11)', background: 'rgba(7,11,20,0.82)', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
-const textAreaStyle: CSSProperties = { ...inputStyle, minHeight: 120, padding: '12px 14px', resize: 'vertical' }
-const switchStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', gap: 10, color: '#F5F7FB', fontWeight: 800 }
-const dangerButtonStyle: CSSProperties = { minHeight: 40, padding: '0 13px', borderRadius: 999, border: '1px solid rgba(255,122,122,0.28)', background: 'rgba(255,122,122,0.06)', color: '#FF9A9A', fontWeight: 900 }
-const messageErrorStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
-const messageSuccessStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(45,226,230,0.25)', background: 'rgba(45,226,230,0.08)', color: '#2DE2E6', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
-const emptyStateStyle: CSSProperties = { borderRadius: 22, border: '1px dashed rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.025)', padding: 18, color: '#95A0B8', fontSize: 14, lineHeight: 1.7 }
+const inputStyle: CSSProperties = { width: '100%', minHeight: 46, boxSizing: 'border-box', borderRadius: 14, border: '1px solid rgba(255,255,255,.12)', background: 'rgba(7,11,20,.82)', color: '#F5F7FB', padding: '0 12px' }
+const textareaStyle: CSSProperties = { ...inputStyle, minHeight: 110, padding: 12, resize: 'vertical' }
+const checkStyle: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 8, color: '#F5F7FB', fontWeight: 800 }
+const errorStyle: CSSProperties = { ...panelStyle, color: '#FF9A9A', borderColor: 'rgba(255,122,122,.3)' }
+const successStyle: CSSProperties = { ...panelStyle, color: '#2DE2E6', borderColor: 'rgba(45,226,230,.3)' }

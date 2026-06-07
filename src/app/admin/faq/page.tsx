@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { getDefaultFaqItems } from '@/lib/site-defaults'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -30,11 +31,48 @@ function createEmptyRow(locale: Locale, sortOrder = 0): FaqFormRow {
   return { id: '', locale, question: '', answer: '', sortOrder, isPublished: true }
 }
 
+function createPresetRows(locale: Locale): FaqFormRow[] {
+  return getDefaultFaqItems(locale).map((item, index) => ({
+    id: '',
+    locale,
+    question: item.question,
+    answer: item.answer,
+    sortOrder: index,
+    isPublished: true,
+  }))
+}
+
+function normalizeQuestionKey(question: string) {
+  return question.trim().replace(/\s+/g, ' ').toLowerCase()
+}
+
+function mergeRowsWithPresets(locale: Locale, rows: FaqFormRow[]) {
+  const rowsByQuestion = new Map<string, FaqFormRow>()
+  for (const row of rows) {
+    const key = normalizeQuestionKey(row.question)
+    if (key && !rowsByQuestion.has(key)) rowsByQuestion.set(key, row)
+  }
+
+  const presets = createPresetRows(locale)
+  const presetKeys = new Set(presets.map((row) => normalizeQuestionKey(row.question)).filter(Boolean))
+  const merged = presets.map((preset) => rowsByQuestion.get(normalizeQuestionKey(preset.question)) ?? preset)
+  const customRows = rows.filter((row) => {
+    const key = normalizeQuestionKey(row.question)
+    return key && !presetKeys.has(key)
+  })
+
+  return [...merged, ...customRows].sort((a, b) => a.sortOrder - b.sortOrder)
+}
+
 export default function AdminFaqPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
-  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, FaqFormRow[]>>({ en: [], es: [], ru: [] })
+  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, FaqFormRow[]>>({
+    en: createPresetRows('en'),
+    es: createPresetRows('es'),
+    ru: createPresetRows('ru'),
+  })
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -75,6 +113,10 @@ export default function AdminFaqPage() {
             sortOrder: Number(row.sort_order ?? 0),
             isPublished: Boolean(row.is_published ?? true),
           })
+        }
+
+        for (const locale of locales) {
+          nextRows[locale] = mergeRowsWithPresets(locale, nextRows[locale])
         }
 
         if (!mounted) return
@@ -119,7 +161,7 @@ export default function AdminFaqPage() {
         copy.splice(index, 1)
         return { ...prev, [activeLocale]: copy }
       })
-      setSuccessMessage('Новый вопрос удалён из формы')
+      setSuccessMessage('Вопрос удалён из формы. Если это стандартный preset, он вернётся после перезагрузки, пока не сохранён свой список.')
       return
     }
 
@@ -203,7 +245,7 @@ export default function AdminFaqPage() {
         <div>
           <p style={eyebrowStyle}>Контент / частые вопросы</p>
           <h1 style={titleStyle}>FAQ</h1>
-          <p style={mutedStyle}>Управление вопросами и ответами для публичного сайта. FAQ помогает клиенту быстрее понять цену, сроки, услуги и процесс работы.</p>
+          <p style={mutedStyle}>Управление вопросами и ответами для публичного сайта. FAQ помогает клиенту быстрее понять emergency, residential, commercial, automotive, rekey, smart lock, safe и access-control услуги.</p>
         </div>
         <div style={heroActionsStyle}>
           {locales.map((locale) => <button key={locale} type="button" onClick={() => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} style={localeButtonStyle(activeLocale === locale)}>{locale.toUpperCase()}</button>)}
@@ -220,7 +262,7 @@ export default function AdminFaqPage() {
 
       <section style={guideStyle}>
         <p style={eyebrowStyle}>Подсказка</p>
-        <p style={mutedStyle}>Пишите вопросы так, как их задаёт клиент: цена, время приезда, программирование ключа, emergency lockout, район обслуживания. Жёстких лимитов по длине нет.</p>
+        <p style={mutedStyle}>Стандартный full-service locksmith FAQ уже подставлен в форму. Сохрани страницу, чтобы записать недостающие вопросы в Supabase; после этого сайт будет брать FAQ из админки.</p>
       </section>
 
       <section style={filtersStyle}>

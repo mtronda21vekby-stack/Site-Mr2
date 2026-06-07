@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
+import { getDefaultReviews } from '@/lib/site-defaults'
+import { getSupabaseClient } from '@/lib/supabase/client'
 
 type Locale = 'en' | 'es' | 'ru'
-type PublishFilter = 'all' | 'published' | 'draft'
 
-type ReviewFormRow = {
+type ReviewRow = {
   id: string
   locale: Locale
   name: string
@@ -22,27 +22,53 @@ type ReviewFormRow = {
 
 const locales: Locale[] = ['en', 'es', 'ru']
 const FORM_ID = 'admin-reviews-form'
+const labels: Record<Locale, string> = { en: 'English', es: 'Español', ru: 'Русский' }
 
-const localeLabels: Record<Locale, string> = {
-  en: 'English',
-  es: 'Español',
-  ru: 'Русский',
+function blank(locale: Locale, sortOrder = 0): ReviewRow {
+  return { id: '', locale, name: '', rating: 5, quote: '', date: '', city: '', sortOrder, isPublished: true }
 }
 
-function createEmptyRow(locale: Locale, sortOrder = 0): ReviewFormRow {
-  return { id: '', locale, name: '', rating: 5, quote: '', date: '', city: '', sortOrder, isPublished: true }
+function presets(locale: Locale): ReviewRow[] {
+  return getDefaultReviews(locale).map((review, index) => ({
+    id: '',
+    locale,
+    name: review.name,
+    rating: review.rating,
+    quote: review.quote,
+    date: review.date || '',
+    city: review.city || '',
+    sortOrder: index,
+    isPublished: true,
+  }))
+}
+
+function keyOf(row: Pick<ReviewRow, 'name' | 'quote'>) {
+  return `${row.name} ${row.quote}`.trim().replace(/\s+/g, ' ').toLowerCase()
+}
+
+function mergeWithPresets(locale: Locale, rows: ReviewRow[]) {
+  const byKey = new Map<string, ReviewRow>()
+  for (const row of rows) {
+    const key = keyOf(row)
+    if (key && !byKey.has(key)) byKey.set(key, row)
+  }
+  const presetRows = presets(locale)
+  const presetKeys = new Set(presetRows.map(keyOf))
+  const customRows = rows.filter((row) => keyOf(row) && !presetKeys.has(keyOf(row)))
+  return [...presetRows.map((row) => byKey.get(keyOf(row)) ?? row), ...customRows].sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
 export default function AdminReviewsPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
   const [activeLocale, setActiveLocale] = useState<Locale>('en')
-  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, ReviewFormRow[]>>({ en: [], es: [], ru: [] })
+  const [rowsByLocale, setRowsByLocale] = useState<Record<Locale, ReviewRow[]>>({
+    en: presets('en'),
+    es: presets('es'),
+    ru: presets('ru'),
+  })
   const [isBooting, setIsBooting] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
-  const [publishFilter, setPublishFilter] = useState<PublishFilter>('all')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
@@ -51,11 +77,11 @@ export default function AdminReviewsPage() {
 
     async function boot() {
       try {
-        setErrorMessage('')
-        setSuccessMessage('')
         const sessionResult = await supabase.auth.getSession()
-        const session = sessionResult?.data?.session
-        if (!session) { router.replace('/admin/login'); return }
+        if (!sessionResult?.data?.session) {
+          router.replace('/admin/login')
+          return
+        }
 
         const result = await (supabase.from('reviews') as any)
           .select('id, locale, name, rating, quote, date, city, sort_order, is_published')
@@ -63,10 +89,8 @@ export default function AdminReviewsPage() {
 
         if (result.error) throw new Error(result.error.message)
 
-        const nextRows: Record<Locale, ReviewFormRow[]> = { en: [], es: [], ru: [] }
-        const rows = Array.isArray(result.data) ? result.data : []
-
-        for (const row of rows) {
+        const nextRows: Record<Locale, ReviewRow[]> = { en: [], es: [], ru: [] }
+        for (const row of Array.isArray(result.data) ? result.data : []) {
           const locale = row.locale as Locale
           if (!locales.includes(locale)) continue
           nextRows[locale].push({
@@ -82,11 +106,10 @@ export default function AdminReviewsPage() {
           })
         }
 
-        if (!mounted) return
-        setRowsByLocale(nextRows)
+        for (const locale of locales) nextRows[locale] = mergeWithPresets(locale, nextRows[locale])
+        if (mounted) setRowsByLocale(nextRows)
       } catch (error) {
-        if (!mounted) return
-        setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить отзывы')
+        if (mounted) setErrorMessage(error instanceof Error ? error.message : 'Не удалось загрузить отзывы')
       } finally {
         if (mounted) setIsBooting(false)
       }
@@ -96,96 +119,76 @@ export default function AdminReviewsPage() {
     return () => { mounted = false }
   }, [router, supabase])
 
-  function updateRow(index: number, patch: Partial<ReviewFormRow>) {
-    setRowsByLocale((prev) => {
-      const copy = [...prev[activeLocale]]
-      copy[index] = { ...copy[index], ...patch }
-      return { ...prev, [activeLocale]: copy }
+  function setRow(index: number, patch: Partial<ReviewRow>) {
+    setRowsByLocale((previous) => {
+      const rows = [...previous[activeLocale]]
+      rows[index] = { ...rows[index], ...patch }
+      return { ...previous, [activeLocale]: rows }
     })
   }
 
   function addRow() {
-    setRowsByLocale((prev) => {
-      const current = prev[activeLocale]
-      const maxSort = current.length ? Math.max(...current.map((item) => item.sortOrder)) : -1
-      return { ...prev, [activeLocale]: [...current, createEmptyRow(activeLocale, maxSort + 1)] }
+    setRowsByLocale((previous) => {
+      const rows = previous[activeLocale]
+      const sortOrder = rows.length ? Math.max(...rows.map((row) => row.sortOrder)) + 1 : 0
+      return { ...previous, [activeLocale]: [...rows, blank(activeLocale, sortOrder)] }
     })
   }
 
   async function deleteRow(index: number) {
-    setErrorMessage('')
-    setSuccessMessage('')
     const row = rowsByLocale[activeLocale][index]
     if (!row) return
+    setErrorMessage('')
+    setSuccessMessage('')
 
     if (!row.id) {
-      setRowsByLocale((prev) => {
-        const copy = [...prev[activeLocale]]
-        copy.splice(index, 1)
-        return { ...prev, [activeLocale]: copy }
+      setRowsByLocale((previous) => {
+        const rows = [...previous[activeLocale]]
+        rows.splice(index, 1)
+        return { ...previous, [activeLocale]: rows }
       })
-      setSuccessMessage('Новый отзыв удалён из формы')
+      setSuccessMessage('Отзыв удалён из формы')
       return
     }
 
-    const ok = window.confirm('Удалить этот отзыв навсегда?')
-    if (!ok) return
-    setDeletingId(row.id)
-
-    try {
-      const result = await (supabase.from('reviews') as any).delete().eq('id', row.id)
-      if (result.error) throw new Error(result.error.message)
-      setRowsByLocale((prev) => {
-        const copy = [...prev[activeLocale]]
-        copy.splice(index, 1)
-        return { ...prev, [activeLocale]: copy }
-      })
-      setSuccessMessage('Отзыв удалён')
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Не удалось удалить отзыв')
-    } finally {
-      setDeletingId(null)
+    if (!window.confirm('Удалить этот отзыв навсегда?')) return
+    const result = await (supabase.from('reviews') as any).delete().eq('id', row.id)
+    if (result.error) {
+      setErrorMessage(result.error.message)
+      return
     }
+    setRowsByLocale((previous) => ({ ...previous, [activeLocale]: previous[activeLocale].filter((item) => item.id !== row.id) }))
+    setSuccessMessage('Отзыв удалён')
   }
 
-  async function handleSave(event: React.FormEvent<HTMLFormElement>) {
+  async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setIsSaving(true)
     setErrorMessage('')
     setSuccessMessage('')
-    setIsSaving(true)
 
     try {
-      const currentRows = rowsByLocale[activeLocale]
-
-      for (const row of currentRows) {
-        const name = row.name.trim()
-        const quote = row.quote.trim()
-        const rating = Math.max(1, Math.min(5, Number(row.rating || 5)))
-
-        if (!name && !quote && !row.city.trim()) continue
-
+      for (const row of rowsByLocale[activeLocale]) {
         const payload = {
           locale: row.locale,
-          name,
-          rating,
-          quote,
+          name: row.name.trim(),
+          rating: Math.max(1, Math.min(5, Number(row.rating || 5))),
+          quote: row.quote.trim(),
           date: row.date.trim() || null,
           city: row.city.trim() || null,
           sort_order: Number(row.sortOrder || 0),
           is_published: row.isPublished,
         }
+        if (!payload.name && !payload.quote && !payload.city) continue
 
-        if (row.id) {
-          const result = await (supabase.from('reviews') as any).update(payload).eq('id', row.id)
-          if (result.error) throw new Error(result.error.message)
-        } else {
-          const result = await (supabase.from('reviews') as any).insert(payload).select('id').single()
-          if (result.error) throw new Error(result.error.message)
-          row.id = result.data?.id ?? ''
-        }
+        const result = row.id
+          ? await (supabase.from('reviews') as any).update(payload).eq('id', row.id)
+          : await (supabase.from('reviews') as any).insert(payload).select('id').single()
+        if (result.error) throw new Error(result.error.message)
+        if (!row.id) row.id = result.data?.id ?? ''
       }
 
-      setSuccessMessage(`Отзывы сохранены: ${localeLabels[activeLocale]}`)
+      setSuccessMessage(`Отзывы сохранены: ${labels[activeLocale]}`)
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Не удалось сохранить отзывы')
     } finally {
@@ -193,141 +196,84 @@ export default function AdminReviewsPage() {
     }
   }
 
-  const currentRows = rowsByLocale[activeLocale]
-  const filteredRows = currentRows.filter((row) => {
-    const q = search.trim().toLowerCase()
-    const matchesSearch = !q || row.name.toLowerCase().includes(q) || row.city.toLowerCase().includes(q) || row.quote.toLowerCase().includes(q)
-    const matchesPublish = publishFilter === 'all' ? true : publishFilter === 'published' ? row.isPublished : !row.isPublished
-    return matchesSearch && matchesPublish
-  })
+  const rows = rowsByLocale[activeLocale]
 
-  const publishedCount = currentRows.filter((row) => row.isPublished).length
-  const draftCount = currentRows.length - publishedCount
-  const averageRating = currentRows.length ? (currentRows.reduce((sum, row) => sum + Number(row.rating || 0), 0) / currentRows.length).toFixed(1) : '0.0'
-
-  if (isBooting) return <div style={panelStyle}><p style={eyebrowStyle}>Отзывы</p><h1 style={titleStyle}>Загрузка...</h1></div>
+  if (isBooting) return <section style={panelStyle}>Загрузка отзывов...</section>
 
   return (
     <div style={pageStyle}>
-      <section style={heroStyle}>
+      <header style={headerStyle}>
         <div>
-          <p style={eyebrowStyle}>Доверие / отзывы клиентов</p>
-          <h1 style={titleStyle}>Отзывы</h1>
-          <p style={mutedStyle}>Управление отзывами для публичного сайта. Можно добавлять реальные отзывы клиентов, указывать город, дату, рейтинг и порядок вывода.</p>
+          <p style={eyebrowStyle}>Отзывы клиентов</p>
+          <h1 style={titleStyle}>Reviews CMS</h1>
+          <p style={mutedStyle}>Стандартные отзывы широкого locksmith scope уже подставлены. Отредактируй текст и сохрани, чтобы они управлялись из Supabase.</p>
         </div>
-        <div style={heroActionsStyle}>
-          {locales.map((locale) => <button key={locale} type="button" onClick={() => { setSuccessMessage(''); setErrorMessage(''); setActiveLocale(locale) }} style={localeButtonStyle(activeLocale === locale)}>{locale.toUpperCase()}</button>)}
-          <button type="button" onClick={addRow} style={primaryButtonStyle}>+ Отзыв</button>
+        <div style={actionsStyle}>
+          {locales.map((locale) => (
+            <button key={locale} type="button" onClick={() => setActiveLocale(locale)} style={tabStyle(activeLocale === locale)}>{locale.toUpperCase()}</button>
+          ))}
+          <button type="button" onClick={addRow} style={buttonStyle}>+ отзыв</button>
         </div>
-      </section>
+      </header>
 
-      <section style={statsGridStyle}>
-        <InfoCard title="Язык" value={localeLabels[activeLocale]} note="Текущая версия отзывов." />
-        <InfoCard title="Всего" value={String(currentRows.length)} note="Отзывы в выбранном языке." />
-        <InfoCard title="Опубликовано" value={String(publishedCount)} note="Показываются на сайте." />
-        <InfoCard title="Средний рейтинг" value={averageRating} note="Среднее значение по списку." />
-        <InfoCard title="Черновики" value={String(draftCount)} note="Скрыты с сайта." />
-      </section>
+      {errorMessage ? <div style={errorStyle}>{errorMessage}</div> : null}
+      {successMessage ? <div style={successStyle}>{successMessage}</div> : null}
 
-      <section style={guideStyle}>
-        <p style={eyebrowStyle}>Подсказка</p>
-        <p style={mutedStyle}>Используйте только реальные отзывы. Рейтинг автоматически ограничивается от 1 до 5. Жёстких лимитов на длину текста нет.</p>
-      </section>
-
-      <section style={filtersStyle}>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Поиск: имя, город, текст отзыва" style={inputStyle} />
-        <select value={publishFilter} onChange={(e) => setPublishFilter(e.target.value as PublishFilter)} style={inputStyle}>
-          <option value="all">Все отзывы</option>
-          <option value="published">Опубликованные</option>
-          <option value="draft">Черновики</option>
-        </select>
-      </section>
-
-      {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
-      {successMessage ? <MessageBox type="success">{successMessage}</MessageBox> : null}
-
-      <form id={FORM_ID} onSubmit={handleSave} style={formStyle}>
-        {filteredRows.map((row) => {
-          const realIndex = currentRows.indexOf(row)
-          return (
-            <article key={row.id || `${row.locale}-${realIndex}`} style={cardStyle}>
-              <div style={cardHeaderStyle}>
-                <div style={{ minWidth: 0 }}>
-                  <p style={eyebrowStyle}>Отзыв #{realIndex + 1}</p>
-                  <h2 style={cardTitleStyle}>{row.name || row.city || 'Новый отзыв'}</h2>
-                  <p style={mutedStyle}>{'★'.repeat(Math.max(1, Math.min(5, Number(row.rating || 5))))}</p>
-                </div>
-                <button type="button" onClick={() => deleteRow(realIndex)} disabled={deletingId === row.id} style={dangerButtonStyle}>{deletingId === row.id ? 'Удаление...' : 'Удалить'}</button>
-              </div>
-
-              <div style={fieldGridStyle}>
-                <Field label="Имя клиента" value={row.name} onChange={(value) => updateRow(realIndex, { name: value })} />
-                <Field label="Город" value={row.city} onChange={(value) => updateRow(realIndex, { city: value })} />
-                <Field label="Дата" value={row.date} onChange={(value) => updateRow(realIndex, { date: value })} />
-                <Field label="Рейтинг 1–5" value={String(row.rating)} onChange={(value) => updateRow(realIndex, { rating: Number(value || 5) })} />
-                <Field label="Порядок" value={String(row.sortOrder)} onChange={(value) => updateRow(realIndex, { sortOrder: Number(value || 0) })} />
-              </div>
-
-              <TextAreaField label="Текст отзыва" value={row.quote} onChange={(value) => updateRow(realIndex, { quote: value })} />
-
-              <label style={switchStyle}>
-                <input type="checkbox" checked={row.isPublished} onChange={(event) => updateRow(realIndex, { isPublished: event.target.checked })} />
-                <span>{row.isPublished ? 'Опубликовано' : 'Черновик'}</span>
-              </label>
-            </article>
-          )
-        })}
-
-        {!filteredRows.length ? <div style={emptyStateStyle}>Нет отзывов под текущий фильтр.</div> : null}
+      <form id={FORM_ID} onSubmit={save} style={listStyle}>
+        {rows.map((row, index) => (
+          <article key={row.id || `${row.locale}-${index}`} style={cardStyle}>
+            <div style={cardHeaderStyle}>
+              <strong>#{index + 1} {row.name || 'Новый отзыв'}</strong>
+              <label style={checkStyle}><input type="checkbox" checked={row.isPublished} onChange={(event) => setRow(index, { isPublished: event.target.checked })} /> published</label>
+            </div>
+            <div style={gridStyle}>
+              <Field label="Имя" value={row.name} onChange={(value) => setRow(index, { name: value })} />
+              <Field label="Город" value={row.city} onChange={(value) => setRow(index, { city: value })} />
+              <Field label="Дата" value={row.date} onChange={(value) => setRow(index, { date: value })} />
+              <Field label="Рейтинг" value={String(row.rating)} onChange={(value) => setRow(index, { rating: Number(value || 5) })} />
+              <Field label="Порядок" value={String(row.sortOrder)} onChange={(value) => setRow(index, { sortOrder: Number(value || 0) })} />
+            </div>
+            <label style={fieldStyle}>
+              <span style={labelStyle}>Текст отзыва</span>
+              <textarea value={row.quote} onChange={(event) => setRow(index, { quote: event.target.value })} rows={4} style={textareaStyle} />
+            </label>
+            <button type="button" onClick={() => deleteRow(index)} style={dangerStyle}>Удалить</button>
+          </article>
+        ))}
       </form>
 
-      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label="Сохранить отзывы" note={`Сохраняется только текущий язык: ${localeLabels[activeLocale]}.`} />
+      <AdminStickySaveBar formId={FORM_ID} isSaving={isSaving} label="Сохранить отзывы" note={`Язык: ${labels[activeLocale]}. Опубликованные отзывы идут на публичный сайт.`} />
     </div>
   )
 }
 
-function InfoCard({ title, value, note }: { title: string; value: string; note: string }) {
-  return <article style={infoCardStyle}><p style={eyebrowStyle}>{title}</p><strong style={infoValueStyle}>{value}</strong><span style={infoNoteStyle}>{note}</span></article>
-}
-
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} /></label>
-}
-
-function TextAreaField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return <label style={fieldStyle}><span style={labelStyle}>{label}</span><textarea value={value} onChange={(event) => onChange(event.target.value)} rows={4} style={textAreaStyle} /></label>
-}
-
-function MessageBox({ type, children }: { type: 'error' | 'success'; children: ReactNode }) {
-  return <div style={type === 'error' ? messageErrorStyle : messageSuccessStyle}>{children}</div>
+  return (
+    <label style={fieldStyle}>
+      <span style={labelStyle}>{label}</span>
+      <input value={value} onChange={(event) => onChange(event.target.value)} style={inputStyle} />
+    </label>
+  )
 }
 
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
-const panelStyle: CSSProperties = { borderRadius: 26, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.035)', padding: 20 }
-const heroStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap', background: 'radial-gradient(circle at 0% 0%, rgba(45,226,230,0.14), transparent 320px), rgba(255,255,255,0.035)' }
-const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2.4 }
-const titleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 'clamp(34px, 6vw, 58px)', lineHeight: 0.96, letterSpacing: -2.2 }
-const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', fontSize: 14, lineHeight: 1.7, maxWidth: 760 }
-const heroActionsStyle: CSSProperties = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
-function localeButtonStyle(active: boolean): CSSProperties { return { minHeight: 44, padding: '0 15px', borderRadius: 999, border: active ? '1px solid rgba(45,226,230,0.5)' : '1px solid rgba(255,255,255,0.12)', background: active ? 'rgba(45,226,230,0.16)' : 'rgba(255,255,255,0.035)', color: active ? '#2DE2E6' : '#F5F7FB', fontWeight: 900 } }
-const primaryButtonStyle: CSSProperties = { minHeight: 44, padding: '0 16px', borderRadius: 999, border: '1px solid rgba(77,162,255,0.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.1 }
-const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }
-const infoCardStyle: CSSProperties = { borderRadius: 22, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(17,25,46,0.82), rgba(5,7,11,0.72))', padding: 16, display: 'grid', gap: 8, minWidth: 0 }
-const infoValueStyle: CSSProperties = { color: '#F5F7FB', fontSize: 20, lineHeight: 1.15, wordBreak: 'break-word' }
-const infoNoteStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, lineHeight: 1.5 }
-const guideStyle: CSSProperties = { ...panelStyle, padding: 16 }
-const filtersStyle: CSSProperties = { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }
-const formStyle: CSSProperties = { display: 'grid', gap: 16 }
-const cardStyle: CSSProperties = { borderRadius: 24, border: '1px solid rgba(255,255,255,0.10)', background: 'linear-gradient(145deg, rgba(11,16,32,0.86), rgba(5,7,11,0.78))', padding: 18, display: 'grid', gap: 14 }
-const cardHeaderStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }
-const cardTitleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.12, wordBreak: 'break-word' }
-const fieldGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12 }
-const fieldStyle: CSSProperties = { display: 'grid', gap: 8 }
+const panelStyle: CSSProperties = { border: '1px solid rgba(255,255,255,.12)', borderRadius: 20, padding: 20, color: '#F5F7FB' }
+const headerStyle: CSSProperties = { ...panelStyle, display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }
+const eyebrowStyle: CSSProperties = { margin: 0, color: '#2DE2E6', fontSize: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }
+const titleStyle: CSSProperties = { margin: '6px 0 0', color: '#F5F7FB', fontSize: 42, lineHeight: 1 }
+const mutedStyle: CSSProperties = { margin: '10px 0 0', color: '#95A0B8', lineHeight: 1.6, maxWidth: 760 }
+const actionsStyle: CSSProperties = { display: 'flex', gap: 10, flexWrap: 'wrap' }
+const buttonStyle: CSSProperties = { minHeight: 42, borderRadius: 999, border: '1px solid rgba(77,162,255,.45)', background: '#4DA2FF', color: '#02040A', fontWeight: 900, padding: '0 16px' }
+const dangerStyle: CSSProperties = { ...buttonStyle, background: 'rgba(255,122,122,.08)', color: '#FF9A9A', borderColor: 'rgba(255,122,122,.3)', justifySelf: 'start' }
+const tabStyle = (active: boolean): CSSProperties => ({ ...buttonStyle, background: active ? 'rgba(45,226,230,.16)' : 'rgba(255,255,255,.04)', color: active ? '#2DE2E6' : '#F5F7FB', borderColor: active ? 'rgba(45,226,230,.5)' : 'rgba(255,255,255,.12)' })
+const listStyle: CSSProperties = { display: 'grid', gap: 14 }
+const cardStyle: CSSProperties = { ...panelStyle, display: 'grid', gap: 14, background: 'rgba(255,255,255,.035)' }
+const cardHeaderStyle: CSSProperties = { display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', color: '#F5F7FB' }
+const gridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
+const fieldStyle: CSSProperties = { display: 'grid', gap: 6, minWidth: 0 }
 const labelStyle: CSSProperties = { color: '#95A0B8', fontSize: 13, fontWeight: 800 }
-const inputStyle: CSSProperties = { width: '100%', minHeight: 50, borderRadius: 15, border: '1px solid rgba(255,255,255,0.11)', background: 'rgba(7,11,20,0.82)', color: '#F5F7FB', padding: '0 14px', outline: 'none', fontSize: 16, boxSizing: 'border-box', WebkitAppearance: 'none' }
-const textAreaStyle: CSSProperties = { ...inputStyle, minHeight: 120, padding: '12px 14px', resize: 'vertical' }
-const switchStyle: CSSProperties = { minHeight: 46, display: 'inline-flex', alignItems: 'center', gap: 10, color: '#F5F7FB', fontWeight: 800 }
-const dangerButtonStyle: CSSProperties = { minHeight: 40, padding: '0 13px', borderRadius: 999, border: '1px solid rgba(255,122,122,0.28)', background: 'rgba(255,122,122,0.06)', color: '#FF9A9A', fontWeight: 900 }
-const messageErrorStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
-const messageSuccessStyle: CSSProperties = { borderRadius: 16, border: '1px solid rgba(45,226,230,0.25)', background: 'rgba(45,226,230,0.08)', color: '#2DE2E6', padding: '12px 14px', fontSize: 14, lineHeight: 1.5 }
-const emptyStateStyle: CSSProperties = { borderRadius: 22, border: '1px dashed rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.025)', padding: 18, color: '#95A0B8', fontSize: 14, lineHeight: 1.7 }
+const inputStyle: CSSProperties = { width: '100%', minHeight: 46, boxSizing: 'border-box', borderRadius: 14, border: '1px solid rgba(255,255,255,.12)', background: 'rgba(7,11,20,.82)', color: '#F5F7FB', padding: '0 12px' }
+const textareaStyle: CSSProperties = { ...inputStyle, minHeight: 110, padding: 12, resize: 'vertical' }
+const checkStyle: CSSProperties = { display: 'inline-flex', alignItems: 'center', gap: 8, color: '#F5F7FB', fontWeight: 800 }
+const errorStyle: CSSProperties = { ...panelStyle, color: '#FF9A9A', borderColor: 'rgba(255,122,122,.3)' }
+const successStyle: CSSProperties = { ...panelStyle, color: '#2DE2E6', borderColor: 'rgba(45,226,230,.3)' }

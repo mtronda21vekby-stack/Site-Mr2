@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
+import { getDefaultHomePreset } from '@/lib/site-defaults'
 import AdminStickySaveBar from '@/components/admin/AdminStickySaveBar'
 
 type Locale = 'en' | 'es' | 'ru'
@@ -34,17 +35,12 @@ const localeLabels: Record<Locale, string> = {
 const emptyForm = (locale: Locale): HomePageForm => ({
   id: '',
   locale,
-  heroTitle: '',
-  heroSubtitle: '',
-  heroPrimaryCta: '',
-  heroSecondaryCta: '',
-  emergencyTitle: '',
-  emergencyText: '',
-  reviewsTitle: '',
-  faqTitle: '',
-  contactTitle: '',
-  contactText: '',
+  ...getDefaultHomePreset(locale),
 })
+
+function withFallback(value: string | null | undefined, fallback: string) {
+  return String(value || '').trim() || fallback
+}
 
 export default function AdminHomePage() {
   const router = useRouter()
@@ -78,19 +74,20 @@ export default function AdminHomePage() {
         for (const row of rows) {
           const locale = row.locale as Locale
           if (!locales.includes(locale)) continue
+          const fallback = emptyForm(locale)
           nextForms[locale] = {
             id: row.id ?? '',
             locale,
-            heroTitle: row.hero_title ?? '',
-            heroSubtitle: row.hero_subtitle ?? '',
-            heroPrimaryCta: row.hero_primary_cta ?? '',
-            heroSecondaryCta: row.hero_secondary_cta ?? '',
-            emergencyTitle: row.emergency_title ?? '',
-            emergencyText: row.emergency_text ?? '',
-            reviewsTitle: row.reviews_title ?? '',
-            faqTitle: row.faq_title ?? '',
-            contactTitle: row.contact_title ?? '',
-            contactText: row.contact_text ?? '',
+            heroTitle: withFallback(row.hero_title, fallback.heroTitle),
+            heroSubtitle: withFallback(row.hero_subtitle, fallback.heroSubtitle),
+            heroPrimaryCta: withFallback(row.hero_primary_cta, fallback.heroPrimaryCta),
+            heroSecondaryCta: withFallback(row.hero_secondary_cta, fallback.heroSecondaryCta),
+            emergencyTitle: withFallback(row.emergency_title, fallback.emergencyTitle),
+            emergencyText: withFallback(row.emergency_text, fallback.emergencyText),
+            reviewsTitle: withFallback(row.reviews_title, fallback.reviewsTitle),
+            faqTitle: withFallback(row.faq_title, fallback.faqTitle),
+            contactTitle: withFallback(row.contact_title, fallback.contactTitle),
+            contactText: withFallback(row.contact_text, fallback.contactText),
           }
         }
 
@@ -179,7 +176,7 @@ export default function AdminHomePage() {
 
       <section style={guideStyle}>
         <p style={eyebrowStyle}>Подсказка</p>
-        <p style={mutedStyle}>Главная должна быстро объяснять: кто вы, какие авто-услуги делаете, где работаете, как быстро можно связаться и что клиент получит после заявки.</p>
+        <p style={mutedStyle}>Главная должна быстро объяснять: кто вы, какие emergency, residential, commercial и automotive locksmith-услуги делаете, где работаете, как быстро можно связаться и что клиент получит после заявки.</p>
       </section>
 
       {errorMessage ? <MessageBox type="error">{errorMessage}</MessageBox> : null}
