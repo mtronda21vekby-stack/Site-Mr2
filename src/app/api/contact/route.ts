@@ -14,19 +14,28 @@ type ContactRequest = {
   message: string
 }
 
+type NotificationResult = {
+  sent: boolean
+  reason: string
+}
+
 const defaultContactEmail = 'planetlocksmits@gmail.com'
 const defaultFromEmail = 'Planet Locksmiths <onboarding@resend.dev>'
 const resendEndpoint = 'https://api.resend.com/emails'
+const maxFieldLength = 500
+const maxMessageLength = 2000
 
 function getSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  if (!url || !anonKey) {
+  if (!url || !key) {
     throw new Error('Supabase environment variables are missing')
   }
 
-  return createClient(url, anonKey)
+  return createClient(url, key, {
+    auth: { persistSession: false },
+  })
 }
 
 function escapeHtml(value: string) {
@@ -40,6 +49,20 @@ function escapeHtml(value: string) {
 
 function clean(value: string) {
   return value.trim() || '-'
+}
+
+function normalizeText(value: unknown, maxLength = maxFieldLength) {
+  if (typeof value !== 'string') return ''
+  return value.replace(/\s+/g, ' ').trim().slice(0, maxLength)
+}
+
+function normalizeMultilineText(value: unknown, maxLength = maxMessageLength) {
+  if (typeof value !== 'string') return ''
+  return value.replace(/\r\n/g, '\n').replace(/\n{4,}/g, '\n\n\n').trim().slice(0, maxLength)
+}
+
+function hasSpamHoneypot(body: Record<string, unknown>) {
+  return Boolean(normalizeText(body.company) || normalizeText(body.website) || normalizeText(body.fax))
 }
 
 function isLikelyEmail(value: string) {
@@ -100,7 +123,7 @@ async function getSettingsContactEmail(supabase: any) {
   }
 }
 
-async function sendContactNotification(contact: ContactRequest, settingsEmail = '') {
+async function sendContactNotification(contact: ContactRequest, settingsEmail = ''): Promise<NotificationResult> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
     return { sent: false, reason: 'missing_resend_api_key' }
@@ -108,7 +131,7 @@ async function sendContactNotification(contact: ContactRequest, settingsEmail = 
 
   const to = (process.env.CONTACT_TO_EMAIL || process.env.ADMIN_EMAIL || settingsEmail || defaultContactEmail).trim()
   const from = (process.env.CONTACT_FROM_EMAIL || defaultFromEmail).trim()
-  const subjectParts = ['New locksmith request', contact.serviceNeeded, contact.urgency === 'asap' ? 'ASAP' : '']
+  const subjectParts = ['Planet Locksmiths request', contact.serviceNeeded, contact.urgency === 'asap' ? 'ASAP' : contact.urgency]
   const subject = subjectParts.filter(Boolean).join(' - ')
   const payload: Record<string, unknown> = {
     from,
@@ -155,49 +178,58 @@ export async function POST(request: Request) {
   }
 
   try {
-    const name = typeof body.name === 'string' ? body.name.trim() : ''
-    const phone = typeof body.phone === 'string' ? body.phone.trim() : ''
-    const email = typeof body.email === 'string' ? body.email.trim() : ''
+    if (hasSpamHoneypot(body)) {
+      return NextResponse.json({ success: true, notificationSent: false })
+    }
+
+    const name = normalizeText(body.name)
+    const phone = normalizeText(body.phone, 80)
+    const email = normalizeText(body.email, 254).toLowerCase()
     const serviceNeeded =
       typeof body.service_needed === 'string'
-        ? body.service_needed.trim()
+        ? normalizeText(body.service_needed)
         : typeof body.service === 'string'
-          ? body.service.trim()
+          ? normalizeText(body.service)
           : ''
 
     const vehicleMake =
-      typeof body.vehicle_make === 'string' ? body.vehicle_make.trim() : ''
+      normalizeText(body.vehicle_make)
 
     const vehicleModel =
-      typeof body.vehicle_model === 'string' ? body.vehicle_model.trim() : ''
+      normalizeText(body.vehicle_model)
 
     const vehicleMakeModel =
-      typeof body.vehicle_make_model === 'string' && body.vehicle_make_model.trim()
-        ? body.vehicle_make_model.trim()
+      typeof body.vehicle_make_model === 'string' && normalizeText(body.vehicle_make_model)
+        ? normalizeText(body.vehicle_make_model)
         : [vehicleMake, vehicleModel].filter(Boolean).join(' ')
 
     const vehicleYear =
-      typeof body.vehicle_year === 'string' ? body.vehicle_year.trim() : ''
+      normalizeText(body.vehicle_year, 20)
 
     const location =
-      typeof body.location === 'string' ? body.location.trim() : ''
+      normalizeText(body.location)
 
     const urgency =
-      typeof body.urgency === 'string' && body.urgency.trim()
-        ? body.urgency.trim()
+      typeof body.urgency === 'string' && normalizeText(body.urgency, 40)
+        ? normalizeText(body.urgency, 40)
         : 'normal'
 
     const preferredTime =
-      typeof body.preferred_time === 'string'
-        ? body.preferred_time.trim()
-        : ''
+      normalizeText(body.preferred_time)
 
     const message =
-      typeof body.message === 'string' ? body.message.trim() : ''
+      normalizeMultilineText(body.message)
 
     if (!phone || !serviceNeeded) {
       return NextResponse.json(
         { error: 'Phone and service are required.' },
+        { status: 400 }
+      )
+    }
+
+    if (email && !isLikelyEmail(email)) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address or leave it blank.' },
         { status: 400 }
       )
     }
