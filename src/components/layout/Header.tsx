@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CallButton from '@/components/ui/CallButton'
 import { isBrowserSupportedImageUrl } from '@/lib/images'
 import { getSupabaseClient } from '@/lib/supabase/client'
@@ -91,6 +91,7 @@ function normalizeLogoAlt(value: string | null | undefined, brandName: string) {
 export default function Header({ locale, phoneDisplay, phonePrimary, brandName = 'Planet Locksmiths', logoUrl = '', logoAlt }: HeaderProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const logoImageRef = useRef<HTMLImageElement | null>(null)
   const [logoFailed, setLogoFailed] = useState(false)
   const [staticLogoFailed, setStaticLogoFailed] = useState(false)
   const [fallbackAttempted, setFallbackAttempted] = useState(false)
@@ -109,6 +110,19 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
   const renderedLogoUrl = !logoFailed && visibleLogoUrl ? visibleLogoUrl : staticLogoFailed ? '' : staticLogoUrl
   const renderedLogoAlt = renderedLogoUrl === staticLogoUrl ? 'Planet Locksmiths' : visibleLogoAlt
   const shouldShowImageLogo = Boolean(renderedLogoUrl)
+
+  function markRenderedLogoFailed(sourceUrl = renderedLogoUrl) {
+    if (sourceUrl === staticLogoUrl) {
+      setStaticLogoFailed(true)
+    } else {
+      setLogoFailed(true)
+    }
+  }
+
+  function validateRenderedLogo(image: HTMLImageElement) {
+    if (image.naturalWidth > 0 && image.naturalHeight > 0) return
+    markRenderedLogoFailed(image.currentSrc || image.src || renderedLogoUrl)
+  }
 
   useEffect(() => {
     setLogoFailed(false)
@@ -184,6 +198,18 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
     }
   }, [brandName, fallbackAttempted, logoAlt, logoFailed, visibleLogoUrl])
 
+  useEffect(() => {
+    if (!shouldShowImageLogo) return
+
+    const timeout = window.setTimeout(() => {
+      const image = logoImageRef.current
+      if (!image || !image.complete) return
+      validateRenderedLogo(image)
+    }, 0)
+
+    return () => window.clearTimeout(timeout)
+  }, [renderedLogoUrl, shouldShowImageLogo])
+
   return (
     <header translate="no" className="notranslate sticky top-0 z-50 border-b border-[#0B1F4D]/10 bg-white/88 shadow-[0_14px_54px_rgba(11,31,77,0.08)] backdrop-blur-[30px] supports-[backdrop-filter]:bg-white/80">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0B1F4D]/18 to-transparent" />
@@ -192,6 +218,7 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
           <span className="relative flex h-[3.45rem] w-[4.7rem] shrink-0 items-center justify-center overflow-visible transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:h-16 sm:w-24">
             {shouldShowImageLogo ? (
               <img
+                ref={logoImageRef}
                 src={renderedLogoUrl}
                 alt={renderedLogoAlt}
                 width="160"
@@ -199,22 +226,9 @@ export default function Header({ locale, phoneDisplay, phonePrimary, brandName =
                 decoding="async"
                 loading="eager"
                 fetchPriority="high"
-                onError={() => {
-                  if (renderedLogoUrl === staticLogoUrl) {
-                    setStaticLogoFailed(true)
-                  } else {
-                    setLogoFailed(true)
-                  }
-                }}
+                onError={() => markRenderedLogoFailed()}
                 onLoad={(event) => {
-                  const image = event.currentTarget
-                  if (image.naturalWidth > 0 && image.naturalHeight > 0) return
-
-                  if (renderedLogoUrl === staticLogoUrl) {
-                    setStaticLogoFailed(true)
-                  } else {
-                    setLogoFailed(true)
-                  }
+                  validateRenderedLogo(event.currentTarget)
                 }}
                 className="block h-full w-full object-contain drop-shadow-[0_10px_22px_rgba(11,31,77,0.16)]"
               />
