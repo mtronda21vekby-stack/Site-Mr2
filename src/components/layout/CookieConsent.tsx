@@ -137,8 +137,8 @@ export default function CookieConsent() {
   if (!visible) return null
 
   return (
-    <div className="fixed inset-x-0 bottom-[5.25rem] z-[70] px-3 sm:bottom-6 sm:px-4" role="dialog" aria-live="polite" aria-label={t.title}>
-      <div className="mx-auto max-w-4xl overflow-hidden rounded-[1.25rem] border border-[#0B1F4D]/16 bg-white/95 p-3 text-[#0B1F4D] shadow-[0_18px_58px_rgba(11,31,77,0.16)] backdrop-blur-[28px] sm:rounded-[1.75rem] sm:p-5">
+    <div className="fixed inset-x-0 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-[70] px-3 sm:bottom-6 sm:px-4" role="dialog" aria-live="polite" aria-label={t.title}>
+      <div className="mx-auto max-h-[calc(100dvh-7rem)] max-w-4xl overflow-y-auto rounded-[1.25rem] border border-[#0B1F4D]/16 bg-white/95 p-3 text-[#0B1F4D] shadow-[0_18px_58px_rgba(11,31,77,0.16)] backdrop-blur-[28px] sm:max-h-none sm:overflow-hidden sm:rounded-[1.75rem] sm:p-5">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(11,31,77,0.055),transparent_42%,rgba(18,58,115,0.04))]" />
         <div className="relative grid gap-3 sm:gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
           <div>
