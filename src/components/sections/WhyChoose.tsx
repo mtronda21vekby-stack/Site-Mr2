@@ -17,8 +17,8 @@ export default function WhyChoose({ items }: WhyChooseProps) {
 
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {items.map((reason, idx) => (
-              <li key={idx} className="premium-panel rounded-[1.35rem] p-5 transition duration-300 hover:-translate-y-1 hover:border-accent-gold/30">
-                <div className="flex gap-4">
+              <li key={idx} className="premium-panel premium-hairline rounded-[1.35rem] p-5 transition duration-300 hover:-translate-y-1 hover:border-accent-gold/30 hover:shadow-[0_24px_78px_rgba(11,31,77,0.12)]">
+                <div className="relative z-10 flex gap-4">
                   <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent-gold/25 bg-accent-gold/10 text-xs font-black text-accent-gold">{String(idx + 1).padStart(2, '0')}</span>
                   <span className="text-sm leading-7 text-muted">{reason}</span>
                 </div>

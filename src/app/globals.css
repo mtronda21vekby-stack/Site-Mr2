@@ -28,6 +28,7 @@ body {
   background: #ffffff;
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 h1, h2, h3, h4, h5, h6 { @apply font-heading; }
@@ -38,6 +39,7 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   position: relative;
   isolation: isolate;
   overflow-x: clip;
+  color-scheme: light;
   background:
     radial-gradient(circle at 20% -10%, rgba(18, 58, 115, 0.08), transparent 34rem),
     radial-gradient(circle at 100% 18%, rgba(11, 31, 77, 0.05), transparent 28rem),
@@ -73,16 +75,18 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
 .premium-panel {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(11, 31, 77, 0.18);
+  border: 1px solid rgba(11, 31, 77, 0.16);
   background:
-    linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(247,250,255,0.88) 42%, rgba(255,255,255,0.78) 100%),
+    linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(247,250,255,0.90) 44%, rgba(255,255,255,0.84) 100%),
     rgba(255, 255, 255, 0.88);
   box-shadow:
-    0 28px 90px rgba(11, 31, 77, 0.10),
+    0 22px 70px rgba(11, 31, 77, 0.09),
+    0 8px 24px rgba(11, 31, 77, 0.045),
     inset 0 1px 0 rgba(255, 255, 255, 0.90),
     inset 0 -1px 0 rgba(11, 31, 77, 0.055);
   backdrop-filter: blur(30px) saturate(1.2);
   -webkit-backdrop-filter: blur(30px) saturate(1.2);
+  transition: border-color 280ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1), transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .premium-panel::after {
@@ -93,7 +97,7 @@ h1, h2, h3, h4, h5, h6 { @apply font-heading; }
   background:
     linear-gradient(115deg, rgba(255,255,255,0.48), transparent 23%, transparent 70%, rgba(11,31,77,0.035)),
     radial-gradient(circle at 18% 0%, rgba(18,58,115,0.055), transparent 28rem);
-  opacity: 0.62;
+  opacity: 0.52;
   mix-blend-mode: multiply;
 }
 

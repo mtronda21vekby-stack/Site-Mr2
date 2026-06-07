@@ -58,7 +58,7 @@ export default function ServicesGrid({ services, locale }: { services: Service[]
           </Link>
         </PremiumReveal>
 
-        <div className="overflow-hidden rounded-[2rem] border border-[#0B1F4D]/16 bg-white shadow-[0_28px_90px_rgba(11,31,77,0.10)]">
+        <div className="overflow-hidden rounded-[2rem] border border-[#0B1F4D]/16 bg-white/95 shadow-[0_28px_90px_rgba(11,31,77,0.10),inset_0_1px_0_rgba(255,255,255,0.88)]">
           {services.map((service, index) => {
             const description = service.intro || service.excerpt
 
@@ -66,12 +66,12 @@ export default function ServicesGrid({ services, locale }: { services: Service[]
               <PremiumReveal key={service.slug} delay={Math.min(index * 0.035, 0.16)}>
                 <Link
                   href={`/${locale}/services/${service.slug}`}
-                  className="group relative grid gap-4 border-b border-[#0B1F4D]/10 px-5 py-5 transition duration-300 last:border-b-0 hover:bg-[#F3F7FF] focus-visible:bg-[#F3F7FF] focus-visible:outline-none sm:px-7 sm:py-6 lg:grid-cols-[7rem_1fr_9rem] lg:items-start"
+                  className="group relative isolate grid gap-4 border-b border-[#0B1F4D]/10 px-5 py-5 transition duration-300 before:absolute before:inset-y-3 before:left-0 before:w-1 before:rounded-r-full before:bg-[#0B1F4D] before:opacity-0 before:transition-opacity last:border-b-0 hover:bg-[#F3F7FF] hover:before:opacity-100 focus-visible:bg-[#F3F7FF] focus-visible:outline-none focus-visible:before:opacity-100 sm:px-7 sm:py-6 lg:grid-cols-[7rem_1fr_9rem] lg:items-start"
                 >
-                  <span className="text-xs font-black uppercase tracking-[0.24em] text-[#123A73]/70">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="inline-flex h-9 w-14 items-center justify-center rounded-full border border-[#0B1F4D]/12 bg-white text-xs font-black uppercase tracking-[0.18em] text-[#123A73]/80 shadow-[0_10px_24px_rgba(11,31,77,0.05)]">{String(index + 1).padStart(2, '0')}</span>
 
                   <span className="min-w-0">
-                    <span className="block text-balance text-2xl font-semibold tracking-[-0.04em] text-[#0B1F4D] transition duration-300 group-hover:text-[#123A73] sm:text-3xl">
+                    <span className="block text-balance text-2xl font-semibold leading-tight tracking-[-0.04em] text-[#0B1F4D] transition duration-300 group-hover:text-[#123A73] sm:text-3xl">
                       {service.title}
                     </span>
                     <span className="mt-0 block max-h-0 overflow-hidden text-sm leading-7 text-[#42526E] opacity-0 transition-all duration-500 group-hover:mt-4 group-hover:max-h-48 group-hover:opacity-100 group-focus-visible:mt-4 group-focus-visible:max-h-48 group-focus-visible:opacity-100 max-md:mt-4 max-md:max-h-64 max-md:opacity-100">
@@ -79,7 +79,7 @@ export default function ServicesGrid({ services, locale }: { services: Service[]
                     </span>
                   </span>
 
-                  <span className="inline-flex items-center text-xs font-black uppercase tracking-[0.18em] text-[#0B1F4D] transition group-hover:text-[#123A73] lg:justify-end">
+                  <span className="inline-flex h-10 items-center text-xs font-black uppercase tracking-[0.16em] text-[#0B1F4D] transition group-hover:text-[#123A73] lg:justify-end">
                     {copy.cta}<span className="ml-2 transition duration-300 group-hover:translate-x-1">→</span>
                   </span>
                 </Link>

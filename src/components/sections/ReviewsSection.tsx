@@ -22,7 +22,7 @@ export default function ReviewsSection({ title, items }: ReviewsSectionProps) {
             <p className="mb-3 text-xs font-black uppercase tracking-[0.26em] text-accent-cyan">Customer reviews</p>
             <h2 className="text-balance text-4xl font-semibold tracking-[-0.055em] text-text sm:text-5xl lg:text-6xl">{title}</h2>
           </div>
-          <div className="premium-panel rounded-[1.25rem] p-4">
+          <div className="premium-panel premium-hairline rounded-[1.25rem] p-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-accent-gold">Trust</p>
             <p className="mt-2 text-sm leading-6 text-muted">Reviews help customers understand communication, timing, and service quality before they call.</p>
           </div>
@@ -30,8 +30,9 @@ export default function ReviewsSection({ title, items }: ReviewsSectionProps) {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((review, idx) => (
-            <article key={idx} className="premium-panel relative flex h-full min-h-[15rem] flex-col rounded-[1.5rem] p-6 transition duration-300 hover:-translate-y-1 hover:border-accent-blue/35">
-              <div className="mb-5 flex items-start justify-between gap-4">
+            <article key={idx} className="premium-panel premium-hairline relative flex h-full min-h-[15rem] flex-col rounded-[1.5rem] p-6 transition duration-300 hover:-translate-y-1 hover:border-accent-blue/35 hover:shadow-[0_28px_90px_rgba(11,31,77,0.13)]">
+              <span aria-hidden="true" className="pointer-events-none absolute right-5 top-4 text-6xl font-semibold leading-none text-[#0B1F4D]/[0.06]">“</span>
+              <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
                 <div>
                   <h3 className="font-semibold text-text">{review.name}</h3>
                   {(review.city || review.date) ? (
@@ -48,7 +49,7 @@ export default function ReviewsSection({ title, items }: ReviewsSectionProps) {
                 </span>
               </div>
 
-              <p className="flex-1 text-sm leading-7 text-muted">“{review.quote}”</p>
+              <p className="relative z-10 flex-1 text-sm leading-7 text-muted">“{review.quote}”</p>
             </article>
           ))}
         </div>

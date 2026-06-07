@@ -22,12 +22,12 @@ export default function FaqSection({ title, items }: FaqSectionProps) {
 
         <div className="space-y-3">
           {items.map((faq, idx) => (
-            <details key={idx} className="group premium-panel overflow-hidden rounded-[1.25rem] p-5 transition duration-300 open:border-accent-blue/30 open:bg-white/[0.045]">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-text marker:hidden">
+            <details key={idx} className="group premium-panel premium-hairline overflow-hidden rounded-[1.25rem] p-5 transition duration-300 open:border-accent-blue/30 open:shadow-[0_24px_78px_rgba(11,31,77,0.12)]">
+              <summary className="relative z-10 flex cursor-pointer list-none items-center justify-between gap-4 text-left text-sm font-semibold text-text marker:hidden">
                 <span className="text-base leading-7">{faq.question}</span>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-black/20 text-accent-blue transition duration-300 group-open:rotate-45 group-open:border-accent-blue/35 group-open:bg-accent-blue/10">+</span>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#0B1F4D]/16 bg-white text-[#0B1F4D] shadow-[0_10px_24px_rgba(11,31,77,0.07)] transition duration-300 group-open:rotate-45 group-open:border-accent-blue/35 group-open:bg-[#F3F7FF]">+</span>
               </summary>
-              <p className="mt-4 border-t border-white/10 pt-4 text-sm leading-7 text-muted">{faq.answer}</p>
+              <p className="relative z-10 mt-4 border-t border-[#0B1F4D]/10 pt-4 text-sm leading-7 text-muted">{faq.answer}</p>
             </details>
           ))}
         </div>

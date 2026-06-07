@@ -28,29 +28,30 @@ export default function Hero(props: HeroProps) {
   const secondaryHref = secondaryCtaHref || '#request-service'
 
   return (
-    <section className="relative overflow-hidden bg-transparent px-4 pb-10 pt-8 sm:px-6 md:pb-14 md:pt-12 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center">
-        <PremiumReveal className="relative z-10 flex min-h-[15rem] flex-col justify-center text-center lg:min-h-[22rem] lg:text-left">
-          <div className="mb-5 inline-flex max-w-full items-center self-center gap-3 rounded-full border border-[#0B1F4D]/16 bg-white px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.18em] text-[#123A73] shadow-[0_12px_34px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:text-[0.68rem] sm:tracking-[0.24em] lg:self-start">
+    <section className="relative overflow-hidden bg-transparent px-4 pb-12 pt-9 sm:px-6 md:pb-16 md:pt-12 lg:px-8">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-[radial-gradient(circle_at_50%_0%,rgba(11,31,77,0.075),transparent_30rem)]" />
+      <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_25.5rem] lg:items-center">
+        <PremiumReveal className="relative z-10 flex min-h-[16rem] flex-col justify-center text-center lg:min-h-[23rem] lg:text-left">
+          <div className="mb-6 inline-flex max-w-full items-center self-center gap-3 rounded-full border border-[#0B1F4D]/16 bg-white/95 px-4 py-2 text-[0.62rem] font-black uppercase tracking-[0.17em] text-[#123A73] shadow-[0_12px_34px_rgba(11,31,77,0.08)] backdrop-blur-2xl sm:text-[0.68rem] sm:tracking-[0.24em] lg:self-start">
             <span className="h-2 w-2 shrink-0 rounded-full bg-[#0B1F4D] shadow-[0_0_16px_rgba(11,31,77,0.24)]" />
             <span className="truncate">24/7 Emergency Locksmith Service</span>
           </div>
 
           {hasTitle ? (
-            <h1 className="mx-auto max-w-6xl text-balance text-[clamp(2.65rem,13vw,6.9rem)] font-semibold leading-[0.9] tracking-[-0.065em] text-[#0B1F4D] sm:text-[clamp(3.4rem,8.6vw,6.9rem)] lg:mx-0">
+            <h1 className="mx-auto max-w-6xl text-balance text-[clamp(2.75rem,11.8vw,6.75rem)] font-semibold leading-[0.92] tracking-[-0.055em] text-[#0B1F4D] sm:text-[clamp(3.4rem,7.15vw,6.1rem)] sm:leading-[0.9] lg:mx-0">
               {title}
             </h1>
           ) : null}
 
           {hasSubtitle ? (
-            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-8 text-[#42526E] sm:text-lg lg:mx-0">
+            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-8 text-[#42526E] sm:text-lg lg:mx-0 lg:max-w-3xl">
               {subtitle}
             </p>
           ) : null}
 
           <div className={`${hasTitle || hasSubtitle ? 'mt-7' : 'mt-2'} flex flex-wrap justify-center gap-2.5 lg:justify-start`}>
             {(visibleBadges.length ? visibleBadges : fallbackBadges).map((badge) => (
-              <span key={badge} className="rounded-full border border-[#0B1F4D]/14 bg-white px-4 py-2 text-xs font-semibold text-[#0B1F4D]/82 shadow-[0_10px_28px_rgba(11,31,77,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-[#0B1F4D]/28 hover:bg-[#F3F7FF]">
+              <span key={badge} className="inline-flex min-h-9 items-center rounded-full border border-[#0B1F4D]/14 bg-white/95 px-4 py-2 text-xs font-semibold text-[#0B1F4D]/82 shadow-[0_10px_28px_rgba(11,31,77,0.06)] transition duration-300 hover:-translate-y-0.5 hover:border-[#0B1F4D]/28 hover:bg-[#F3F7FF]">
                 {badge}
               </span>
             ))}
@@ -73,7 +74,7 @@ export default function Hero(props: HeroProps) {
           </div>
         </PremiumReveal>
 
-        <PremiumReveal delay={0.12} className="premium-panel premium-hairline relative rounded-[1.6rem] p-5 transition duration-500 hover:-translate-y-1 hover:border-[#0B1F4D]/28 hover:shadow-[0_28px_90px_rgba(11,31,77,0.14)] sm:rounded-[2rem] sm:p-6">
+        <PremiumReveal delay={0.12} className="premium-panel premium-hairline relative rounded-[1.6rem] p-5 transition duration-500 hover:-translate-y-1 hover:border-[#0B1F4D]/28 hover:shadow-[0_28px_90px_rgba(11,31,77,0.14)] sm:rounded-[2rem] sm:p-6 lg:min-h-[22rem]">
           <div className="relative z-10">
             <div className="mb-5">
               <p className="text-[0.66rem] font-black uppercase tracking-[0.22em] text-[#123A73] sm:text-xs sm:tracking-[0.24em]">Dispatch panel</p>
@@ -82,10 +83,13 @@ export default function Hero(props: HeroProps) {
 
             <p className="text-sm leading-7 text-[#42526E]">Send the service type, location, urgency, and access details. For vehicle jobs, add make, model, and year so the request can be routed faster.</p>
 
-            <div className="mt-6 divide-y divide-[#0B1F4D]/10 border-y border-[#0B1F4D]/10">
-              {['Select service', 'Add job details', 'Confirm location'].map((label) => (
-                <div key={label} className="flex items-center justify-between gap-4 py-4 text-sm font-semibold text-[#0B1F4D]">
-                  <span>{label}</span>
+            <div className="mt-6 grid gap-2.5">
+              {['Select service', 'Add job details', 'Confirm location'].map((label, index) => (
+                <div key={label} className="flex items-center justify-between gap-4 rounded-2xl border border-[#0B1F4D]/10 bg-white/70 px-4 py-3 text-sm font-semibold text-[#0B1F4D] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+                  <span className="flex items-center gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#F3F7FF] text-[0.65rem] font-black text-[#123A73]">{String(index + 1).padStart(2, '0')}</span>
+                    {label}
+                  </span>
                   <span aria-hidden="true" className="text-[#123A73]">→</span>
                 </div>
               ))}
