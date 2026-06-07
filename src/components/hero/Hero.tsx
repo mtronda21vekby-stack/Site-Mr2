@@ -9,8 +9,6 @@ interface HeroProps {
   primaryCtaHref: string
   secondaryCtaLabel: string
   secondaryCtaHref: string
-  phoneNumber?: string
-  phoneDisplay?: string
 }
 
 function isInvalidContent(value: string) {
@@ -19,7 +17,7 @@ function isInvalidContent(value: string) {
 }
 
 export default function Hero(props: HeroProps) {
-  const { title, subtitle, badges, primaryCtaHref, secondaryCtaHref, phoneNumber, phoneDisplay } = props
+  const { title, subtitle, badges, primaryCtaHref, secondaryCtaHref } = props
   const hasTitle = !isInvalidContent(title)
   const hasSubtitle = !isInvalidContent(subtitle)
   const visibleBadges = badges.slice(0, 3)
@@ -42,17 +40,6 @@ export default function Hero(props: HeroProps) {
             <h1 className="mx-auto max-w-6xl text-balance text-[clamp(2.65rem,13vw,6.9rem)] font-semibold leading-[0.9] tracking-[-0.065em] text-[#0B1F4D] sm:text-[clamp(3.4rem,8.6vw,6.9rem)] lg:mx-0">
               {title}
             </h1>
-          ) : null}
-
-          {phoneDisplay ? (
-            <a
-              href={`tel:${phoneNumber || phoneDisplay}`}
-              className="notranslate mx-auto mt-5 inline-flex max-w-full items-center justify-center rounded-full border border-[#0B1F4D]/16 bg-white/92 px-5 py-3 text-center text-[0.95rem] font-black tracking-[0.02em] text-[#0B1F4D] shadow-[0_14px_36px_rgba(11,31,77,0.10)] backdrop-blur-2xl transition duration-300 hover:-translate-y-0.5 hover:border-[#0B1F4D]/30 hover:bg-white sm:text-lg lg:mx-0"
-              translate="no"
-              aria-label={`Call Planet Locksmiths ${phoneDisplay}`}
-            >
-              {phoneDisplay}
-            </a>
           ) : null}
 
           {hasSubtitle ? (
