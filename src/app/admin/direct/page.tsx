@@ -70,6 +70,7 @@ const modules: ModuleLink[] = [
 export default function ControlPanelPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
+  const isCompact = useCompactAdminViewport()
   const [isChecking, setIsChecking] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics)
@@ -185,38 +186,39 @@ export default function ControlPanelPage() {
   ].filter(Boolean).length
   const readinessScore = Math.round((readyItems / 5) * 100)
   const liveLoad = metrics.newOrders + metrics.activeOrders
+  const view = getResponsiveDashboardStyles(isCompact)
 
   return (
-    <div style={pageStyle}>
-      <section style={heroStyle}>
+    <div style={view.page}>
+      <section style={view.hero}>
         <div>
           <p style={eyebrowStyle}>Planet Locksmiths / рабочая панель сайта</p>
-          <h1 style={heroTitleStyle}>Панель управления сайтом</h1>
-          <p style={heroTextStyle}>
+          <h1 style={view.heroTitle}>Панель управления сайтом</h1>
+          <p style={view.heroText}>
             Управление заявками, фотографиями, услугами, городами, отзывами, FAQ и основным контентом сайта. Рабочий центр для live production.
           </p>
         </div>
 
-        <div style={heroScoreCardStyle}>
+        <div style={view.heroScoreCard}>
           <div style={scoreHeadStyle}>
             <span style={smallLabelStyle}>Readiness</span>
-            <strong style={scoreValueStyle}>{readinessScore}%</strong>
+            <strong style={view.scoreValue}>{readinessScore}%</strong>
           </div>
           <div style={scoreTrackStyle}>
             <span style={{ ...scoreFillStyle, width: `${readinessScore}%` }} />
           </div>
-          <div style={signalGridStyle}>
+          <div style={view.signalGrid}>
             <span><b>{liveLoad}</b> active</span>
             <span><b>{metrics.services}</b> services</span>
             <span><b>{metrics.areas}</b> areas</span>
           </div>
         </div>
 
-        <div style={heroActionsStyle}>
-          <a href="/admin/photos" style={primaryLinkStyle}>Media</a>
-          <a href="/admin/orders" style={secondaryLinkStyle}>Заявки</a>
-          <a href="/en" style={secondaryLinkStyle}>Открыть сайт</a>
-          <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={refreshButtonStyle(isRefreshing)}>
+        <div style={view.heroActions}>
+          <a href="/admin/photos" style={view.primaryLink}>Media</a>
+          <a href="/admin/orders" style={view.secondaryLink}>Заявки</a>
+          <a href="/en" style={view.secondaryLink}>Открыть сайт</a>
+          <button type="button" onClick={() => window.location.reload()} disabled={isRefreshing} style={refreshButtonStyle(isRefreshing, isCompact)}>
             {isRefreshing ? 'Обновление...' : 'Обновить'}
           </button>
         </div>
@@ -224,7 +226,7 @@ export default function ControlPanelPage() {
 
       {errorMessage ? <div style={errorStyle}>{errorMessage}</div> : null}
 
-      <section style={statsGridStyle}>
+      <section style={view.statsGrid}>
         <AdminStatCard title="Новые заявки" value={String(metrics.newOrders)} note="Свежие запросы клиентов." />
         <AdminStatCard title="Активные" value={String(metrics.activeOrders)} note="В работе или на связи." />
         <AdminStatCard title="Завершено" value={String(metrics.completedOrders)} note="Закрытые обращения." />
@@ -325,6 +327,21 @@ export default function ControlPanelPage() {
   )
 }
 
+function useCompactAdminViewport() {
+  const [isCompact, setIsCompact] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 640px)')
+    const update = () => setIsCompact(media.matches)
+
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  return isCompact
+}
+
 function QualityCard({ title, href, status, note }: { title: string; href: string; status: 'good' | 'warn'; note: string }) {
   const color = status === 'good' ? '#6EE7B7' : '#D6A85F'
 
@@ -376,7 +393,22 @@ const signalGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: '
 const heroActionsStyle: CSSProperties = { gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }
 const primaryLinkStyle: CSSProperties = { minHeight: 48, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 15, border: '1px solid rgba(214,168,95,0.42)', background: 'rgba(214,168,95,0.14)', color: '#F0D099', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4 }
 const secondaryLinkStyle: CSSProperties = { minHeight: 48, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', borderRadius: 15, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.028)', color: '#F5F7FB', textDecoration: 'none', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1.4 }
-function refreshButtonStyle(disabled: boolean): CSSProperties { return { minHeight: 48, padding: '0 18px', borderRadius: 15, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, opacity: disabled ? 0.7 : 1 } }
+function refreshButtonStyle(disabled: boolean, compact = false): CSSProperties {
+  return {
+    minHeight: compact ? 44 : 48,
+    minWidth: 0,
+    padding: compact ? '0 10px' : '0 18px',
+    borderRadius: compact ? 14 : 15,
+    border: '1px solid rgba(245,247,251,0.24)',
+    background: '#F5F7FB',
+    color: '#08090D',
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    letterSpacing: compact ? 0.9 : 1.4,
+    fontSize: compact ? 11 : 13,
+    opacity: disabled ? 0.7 : 1,
+  }
+}
 const errorStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(255,122,122,0.25)', background: 'rgba(255,122,122,0.08)', color: '#FF9A9A', padding: '14px 16px', fontSize: 14, lineHeight: 1.5 }
 const statsGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 14 }
 const panelStyle: CSSProperties = { background: 'linear-gradient(155deg, rgba(255,255,255,0.070), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)', border: '1px solid rgba(255,255,255,0.105)', borderRadius: 24, padding: 18, minWidth: 0, boxShadow: '0 22px 68px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.066)' }
@@ -407,3 +439,94 @@ const orderTitleStyle: CSSProperties = { display: 'block', fontSize: 16, wordBre
 const mutedLineStyle: CSSProperties = { margin: '6px 0 0', color: '#9CA3AF', fontSize: 13, lineHeight: 1.5, wordBreak: 'break-word' }
 const statusTextStyle: CSSProperties = { margin: '8px 0 0', color: '#F0D099', fontSize: 11, lineHeight: 1.5, textTransform: 'uppercase', letterSpacing: 1.4, fontWeight: 900 }
 const emptyStateStyle: CSSProperties = { color: '#9CA3AF', fontSize: 14, lineHeight: 1.7, border: '1px dashed rgba(255,255,255,0.14)', borderRadius: 16, padding: 16 }
+
+function getResponsiveDashboardStyles(compact: boolean) {
+  if (!compact) {
+    return {
+      page: pageStyle,
+      hero: heroStyle,
+      heroTitle: heroTitleStyle,
+      heroText: heroTextStyle,
+      heroScoreCard: heroScoreCardStyle,
+      scoreValue: scoreValueStyle,
+      signalGrid: signalGridStyle,
+      heroActions: heroActionsStyle,
+      primaryLink: primaryLinkStyle,
+      secondaryLink: secondaryLinkStyle,
+      statsGrid: statsGridStyle,
+    }
+  }
+
+  const compactActionStyle: CSSProperties = {
+    minHeight: 44,
+    minWidth: 0,
+    width: '100%',
+    padding: '0 10px',
+    borderRadius: 14,
+    fontSize: 11,
+    letterSpacing: 0.9,
+    textAlign: 'center',
+    whiteSpace: 'normal',
+  }
+
+  return {
+    page: { ...pageStyle, gap: 14, width: '100%', maxWidth: '100%', overflow: 'hidden' },
+    hero: {
+      ...heroStyle,
+      gridTemplateColumns: 'minmax(0, 1fr)',
+      gap: 14,
+      padding: 16,
+      borderRadius: 20,
+      alignItems: 'stretch',
+      overflow: 'hidden',
+    },
+    heroTitle: {
+      ...heroTitleStyle,
+      fontSize: 'clamp(34px, 12vw, 46px)',
+      lineHeight: 0.98,
+      letterSpacing: -1,
+    },
+    heroText: {
+      ...heroTextStyle,
+      marginTop: 14,
+      fontSize: 14,
+      lineHeight: 1.65,
+    },
+    heroScoreCard: {
+      ...heroScoreCardStyle,
+      minHeight: 0,
+      gap: 14,
+      padding: 14,
+      borderRadius: 18,
+    },
+    scoreValue: {
+      ...scoreValueStyle,
+      fontSize: 42,
+      letterSpacing: -1.2,
+    },
+    signalGrid: {
+      ...signalGridStyle,
+      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+      fontSize: 11,
+    },
+    heroActions: {
+      ...heroActionsStyle,
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: 8,
+    },
+    primaryLink: {
+      ...primaryLinkStyle,
+      ...compactActionStyle,
+    },
+    secondaryLink: {
+      ...secondaryLinkStyle,
+      ...compactActionStyle,
+    },
+    statsGrid: {
+      ...statsGridStyle,
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: 10,
+    },
+  }
+}
