@@ -26,10 +26,13 @@ type FormState = {
   urgency: string
   preferred_time: string
   message: string
+  company: string
+  website: string
+  fax: string
 }
 
 const initialForm: FormState = {
-  name: '', phone: '', email: '', service_needed: '', vehicle_make: '', vehicle_model: '', vehicle_year: '', vehicle_make_model: '', location: '', urgency: 'asap', preferred_time: '', message: '',
+  name: '', phone: '', email: '', service_needed: '', vehicle_make: '', vehicle_model: '', vehicle_year: '', vehicle_make_model: '', location: '', urgency: 'asap', preferred_time: '', message: '', company: '', website: '', fax: '',
 }
 
 const glassControlClass = 'min-h-12 rounded-2xl border border-[#0B1F4D]/16 bg-white px-4 py-3 text-sm text-[#0B1F4D] shadow-[0_10px_28px_rgba(11,31,77,0.05)] outline-none transition placeholder:text-[#42526E]/65 focus:border-[#0B1F4D]/45 focus:bg-[#F7FAFF] disabled:cursor-not-allowed disabled:opacity-50'
@@ -110,6 +113,21 @@ export default function ContactSection({ title, text, phoneNumber, phoneDisplay 
         </div>
 
         <form onSubmit={handleSubmit} className="premium-panel rounded-[1.75rem] p-5 sm:p-7">
+          <div className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+            <label>
+              Company
+              <input name="company" value={formData.company} onChange={handleChange} tabIndex={-1} autoComplete="off" />
+            </label>
+            <label>
+              Website
+              <input name="website" value={formData.website} onChange={handleChange} tabIndex={-1} autoComplete="off" />
+            </label>
+            <label>
+              Fax
+              <input name="fax" value={formData.fax} onChange={handleChange} tabIndex={-1} autoComplete="off" />
+            </label>
+          </div>
+
           <div className="relative z-10 mb-6 border-b border-[#0B1F4D]/10 pb-6">
             <p className="text-xs font-black uppercase tracking-[0.26em] text-[#123A73]">Service form</p>
             <h3 className="mt-2 text-3xl font-semibold tracking-[-0.045em] text-[#0B1F4D]">Service details</h3>
