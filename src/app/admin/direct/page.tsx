@@ -9,10 +9,21 @@ type Metrics = {
   newOrders: number
   activeOrders: number
   completedOrders: number
+  ordersToday: number
   reviews: number
   faq: number
   services: number
   areas: number
+  servicesEn: number
+  areasEn: number
+  faqEn: number
+  reviewsEn: number
+  galleryImages: number
+  backgroundImages: number
+  logoImages: number
+  settingsReady: boolean
+  homeReady: boolean
+  logoReady: boolean
 }
 
 type RecentOrder = {
@@ -48,10 +59,29 @@ const initialMetrics: Metrics = {
   newOrders: 0,
   activeOrders: 0,
   completedOrders: 0,
+  ordersToday: 0,
   reviews: 0,
   faq: 0,
   services: 0,
   areas: 0,
+  servicesEn: 0,
+  areasEn: 0,
+  faqEn: 0,
+  reviewsEn: 0,
+  galleryImages: 0,
+  backgroundImages: 0,
+  logoImages: 0,
+  settingsReady: false,
+  homeReady: false,
+  logoReady: false,
+}
+
+const launchTargets = {
+  services: 30,
+  areas: 10,
+  faq: 10,
+  reviews: 6,
+  gallery: 6,
 }
 
 const modules: ModuleLink[] = [
@@ -66,6 +96,34 @@ const modules: ModuleLink[] = [
   { title: 'Настройки', href: '/admin/settings', description: 'Телефон, бренд, email, часы работы и маршрутизация.', accent: '#D6A85F' },
   { title: 'Аудит', href: '/admin/audit', description: 'Проверка качества контента, SEO и готовности страниц.', accent: '#FF9A9A' },
 ]
+
+function hasText(value: unknown, minLength = 1) {
+  return typeof value === 'string' && value.trim().length >= minLength
+}
+
+function isGlobalSettingsReady(row: any) {
+  return Boolean(
+    row &&
+    hasText(row.brand_name) &&
+    hasText(row.phone_primary) &&
+    hasText(row.phone_display) &&
+    hasText(row.email) &&
+    hasText(row.service_hours),
+  )
+}
+
+function isHomeContentReady(row: any) {
+  return Boolean(
+    row &&
+    hasText(row.hero_title, 20) &&
+    hasText(row.hero_subtitle, 80) &&
+    hasText(row.hero_primary_cta) &&
+    hasText(row.hero_secondary_cta) &&
+    hasText(row.contact_title, 12) &&
+    hasText(row.contact_text, 80) &&
+    hasText(row.faq_title, 8),
+  )
+}
 
 export default function ControlPanelPage() {
   const router = useRouter()
@@ -86,29 +144,95 @@ export default function ControlPanelPage() {
         setErrorMessage('')
         setIsRefreshing(true)
 
-        const [newOrders, activeOrders, completedOrders, reviews, faq, services, areas, recent] = await Promise.all([
+        const todayStart = new Date()
+        todayStart.setHours(0, 0, 0, 0)
+
+        const [
+          newOrders,
+          activeOrders,
+          completedOrders,
+          ordersToday,
+          reviews,
+          faq,
+          services,
+          areas,
+          reviewsEn,
+          faqEn,
+          servicesEn,
+          areasEn,
+          galleryImages,
+          backgroundImages,
+          logoImages,
+          settings,
+          home,
+          recent,
+        ] = await Promise.all([
           (supabase.from('orders') as any).select('*', { count: 'exact', head: true }).eq('status', 'new'),
           (supabase.from('orders') as any).select('*', { count: 'exact', head: true }).in('status', ['contacted', 'scheduled', 'in_progress']),
           (supabase.from('orders') as any).select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+          (supabase.from('orders') as any).select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()),
           (supabase.from('reviews') as any).select('*', { count: 'exact', head: true }).eq('is_published', true),
           (supabase.from('faq_items') as any).select('*', { count: 'exact', head: true }).eq('is_published', true),
           (supabase.from('services') as any).select('*', { count: 'exact', head: true }).eq('is_published', true),
           (supabase.from('areas') as any).select('*', { count: 'exact', head: true }).eq('is_published', true),
+          (supabase.from('reviews') as any).select('*', { count: 'exact', head: true }).eq('locale', 'en').eq('is_published', true),
+          (supabase.from('faq_items') as any).select('*', { count: 'exact', head: true }).eq('locale', 'en').eq('is_published', true),
+          (supabase.from('services') as any).select('*', { count: 'exact', head: true }).eq('locale', 'en').eq('is_published', true),
+          (supabase.from('areas') as any).select('*', { count: 'exact', head: true }).eq('locale', 'en').eq('is_published', true),
+          (supabase.from('site_images') as any).select('*', { count: 'exact', head: true }).eq('is_published', true).in('category', ['gallery', 'before', 'after']),
+          (supabase.from('site_images') as any).select('*', { count: 'exact', head: true }).eq('is_published', true).in('category', ['background-decor', 'background-desktop', 'background-mobile']),
+          (supabase.from('site_images') as any).select('*', { count: 'exact', head: true }).eq('is_published', true).eq('category', 'logo'),
+          (supabase.from('site_settings') as any).select('id, brand_name, logo_url, phone_primary, phone_display, email, service_hours').order('updated_at', { ascending: false }).limit(1),
+          (supabase.from('home_pages') as any).select('id, locale, hero_title, hero_subtitle, hero_primary_cta, hero_secondary_cta, contact_title, contact_text, faq_title').eq('locale', 'en').limit(1),
           (supabase.from('orders') as any).select('id, name, phone, service_needed, status, created_at').order('created_at', { ascending: false }).limit(5),
         ])
 
-        const firstError = newOrders.error || activeOrders.error || completedOrders.error || reviews.error || faq.error || services.error || areas.error || recent.error
+        const firstError =
+          newOrders.error ||
+          activeOrders.error ||
+          completedOrders.error ||
+          ordersToday.error ||
+          reviews.error ||
+          faq.error ||
+          services.error ||
+          areas.error ||
+          reviewsEn.error ||
+          faqEn.error ||
+          servicesEn.error ||
+          areasEn.error ||
+          galleryImages.error ||
+          backgroundImages.error ||
+          logoImages.error ||
+          settings.error ||
+          home.error ||
+          recent.error
         if (firstError) throw new Error(firstError.message)
         if (!mounted) return
+
+        const settingsRow = Array.isArray(settings.data) ? settings.data[0] : null
+        const homeRow = Array.isArray(home.data) ? home.data[0] : null
+        const settingsLogoReady = hasText(settingsRow?.logo_url)
+        const imageLogoReady = (logoImages.count ?? 0) > 0
 
         setMetrics({
           newOrders: newOrders.count ?? 0,
           activeOrders: activeOrders.count ?? 0,
           completedOrders: completedOrders.count ?? 0,
+          ordersToday: ordersToday.count ?? 0,
           reviews: reviews.count ?? 0,
           faq: faq.count ?? 0,
           services: services.count ?? 0,
           areas: areas.count ?? 0,
+          reviewsEn: reviewsEn.count ?? 0,
+          faqEn: faqEn.count ?? 0,
+          servicesEn: servicesEn.count ?? 0,
+          areasEn: areasEn.count ?? 0,
+          galleryImages: galleryImages.count ?? 0,
+          backgroundImages: backgroundImages.count ?? 0,
+          logoImages: logoImages.count ?? 0,
+          settingsReady: isGlobalSettingsReady(settingsRow),
+          homeReady: isHomeContentReady(homeRow),
+          logoReady: settingsLogoReady || imageLogoReady,
         })
 
         setRecentOrders(
@@ -177,15 +301,73 @@ export default function ControlPanelPage() {
   const emailReady = Boolean(systemStatus?.emailNotifications?.enabled)
   const emailSenderReady = Boolean(systemStatus?.emailNotifications?.senderConfigured)
   const emailRecipientReady = Boolean(systemStatus?.emailNotifications?.recipientConfigured)
-  const readyItems = [
-    metrics.services >= 6,
-    metrics.areas >= 6,
-    metrics.faq >= 8,
-    metrics.reviews >= 6,
-    emailReady,
-  ].filter(Boolean).length
-  const readinessScore = Math.round((readyItems / 5) * 100)
+  const launchChecks = [
+    {
+      title: 'Глобальные контакты',
+      href: '/admin/settings',
+      ready: metrics.settingsReady,
+      note: metrics.settingsReady ? 'Бренд, телефон, email и часы заполнены.' : 'Проверь бренд, телефон, email и часы работы.',
+    },
+    {
+      title: 'Логотип',
+      href: '/admin/settings',
+      ready: metrics.logoReady,
+      note: metrics.logoReady ? 'Логотип подключен к сайту.' : 'Загрузи логотип PNG/WebP/SVG/JPG и сохрани настройки.',
+    },
+    {
+      title: 'Главная страница',
+      href: '/admin/home',
+      ready: metrics.homeReady,
+      note: metrics.homeReady ? 'Hero, CTA и contact-блок заполнены.' : 'Проверь hero, CTA и contact-текст на главной.',
+    },
+    {
+      title: 'Услуги EN',
+      href: '/admin/services',
+      ready: metrics.servicesEn >= launchTargets.services,
+      note: `${metrics.servicesEn}/${launchTargets.services} опубликованных услуг в EN.`,
+    },
+    {
+      title: 'Города EN',
+      href: '/admin/areas',
+      ready: metrics.areasEn >= launchTargets.areas,
+      note: `${metrics.areasEn}/${launchTargets.areas} локальных страниц в EN.`,
+    },
+    {
+      title: 'FAQ EN',
+      href: '/admin/faq',
+      ready: metrics.faqEn >= launchTargets.faq,
+      note: `${metrics.faqEn}/${launchTargets.faq} FAQ для клиентов.`,
+    },
+    {
+      title: 'Отзывы EN',
+      href: '/admin/reviews',
+      ready: metrics.reviewsEn >= launchTargets.reviews,
+      note: `${metrics.reviewsEn}/${launchTargets.reviews} отзывов для trust-блоков.`,
+    },
+    {
+      title: 'Фото сайта',
+      href: '/admin/photos',
+      ready: metrics.galleryImages >= launchTargets.gallery,
+      note: `${metrics.galleryImages}/${launchTargets.gallery} опубликованных фото галереи.`,
+    },
+    {
+      title: 'Email заявки',
+      href: '/admin/audit',
+      ready: emailReady && emailSenderReady && emailRecipientReady,
+      note: emailReady ? 'Resend настроен, проверь sender/recipient.' : 'Нужны RESEND_API_KEY и CONTACT_FROM_EMAIL.',
+    },
+  ]
+  const readyItems = launchChecks.filter((item) => item.ready).length
+  const readinessScore = Math.round((readyItems / launchChecks.length) * 100)
   const liveLoad = metrics.newOrders + metrics.activeOrders
+  const siteSyncCards = [
+    { title: 'Шапка, телефон, логотип', adminHref: '/admin/settings', publicHref: '/en', note: 'Глобальные настройки питают header, CTA, footer и contact-блоки.' },
+    { title: 'Hero и главная', adminHref: '/admin/home', publicHref: '/en', note: 'Hero, CTA, emergency, reviews title, FAQ title и contact-текст.' },
+    { title: 'Услуги и SEO pages', adminHref: '/admin/services', publicHref: '/en/services', note: 'Список услуг, карточки, detail pages, title и descriptions.' },
+    { title: 'Города и coverage', adminHref: '/admin/areas', publicHref: '/en/areas', note: 'Локальные страницы Philadelphia coverage и supported services.' },
+    { title: 'Фото, фон и галерея', adminHref: '/admin/photos', publicHref: '/en#request-service', note: 'Публичная галерея, кейсы, logo media и фото для доверия.' },
+    { title: 'Заявки клиентов', adminHref: '/admin/orders', publicHref: '/en/contact#request-service', note: 'Request form создает orders и показывает обращения в админке.' },
+  ]
   const view = getResponsiveDashboardStyles(isCompact)
 
   return (
@@ -209,8 +391,8 @@ export default function ControlPanelPage() {
           </div>
           <div style={view.signalGrid}>
             <span><b>{liveLoad}</b> active</span>
-            <span><b>{metrics.services}</b> services</span>
-            <span><b>{metrics.areas}</b> areas</span>
+            <span><b>{metrics.servicesEn}</b> EN services</span>
+            <span><b>{metrics.galleryImages}</b> photos</span>
           </div>
         </div>
 
@@ -228,12 +410,15 @@ export default function ControlPanelPage() {
 
       <section style={view.statsGrid}>
         <AdminStatCard title="Новые заявки" value={String(metrics.newOrders)} note="Свежие запросы клиентов." />
+        <AdminStatCard title="Сегодня" value={String(metrics.ordersToday)} note="Заявки за текущий день." />
         <AdminStatCard title="Активные" value={String(metrics.activeOrders)} note="В работе или на связи." />
         <AdminStatCard title="Завершено" value={String(metrics.completedOrders)} note="Закрытые обращения." />
-        <AdminStatCard title="Услуги" value={String(metrics.services)} note="Опубликованные услуги." />
-        <AdminStatCard title="Города" value={String(metrics.areas)} note="Локальные страницы." />
-        <AdminStatCard title="FAQ" value={String(metrics.faq)} note="Ответы клиентам." />
-        <AdminStatCard title="Отзывы" value={String(metrics.reviews)} note="Карточки доверия." />
+        <AdminStatCard title="Услуги EN" value={`${metrics.servicesEn}/${launchTargets.services}`} note="Опубликованные страницы услуг." />
+        <AdminStatCard title="Города EN" value={`${metrics.areasEn}/${launchTargets.areas}`} note="Локальные страницы покрытия." />
+        <AdminStatCard title="FAQ EN" value={`${metrics.faqEn}/${launchTargets.faq}`} note="Ответы клиентам." />
+        <AdminStatCard title="Отзывы EN" value={`${metrics.reviewsEn}/${launchTargets.reviews}`} note="Карточки доверия." />
+        <AdminStatCard title="Фото" value={String(metrics.galleryImages)} note="Галерея и кейсы на сайте." />
+        <AdminStatCard title="Фоны" value={String(metrics.backgroundImages)} note="Фоновые изображения сайта." />
       </section>
 
       <section style={photoPanelStyle}>
@@ -253,16 +438,13 @@ export default function ControlPanelPage() {
             <p style={smallLabelStyle}>Контроль качества</p>
             <h2 style={sectionTitleStyle}>SEO / UX / рекламная готовность</h2>
           </div>
-          <span style={statusPillStyle}>{readyItems}/5 готово</span>
+          <span style={statusPillStyle}>{readyItems}/{launchChecks.length} готово</span>
         </div>
 
         <div style={qualityGridStyle}>
-          <QualityCard title="Фото CMS" href="/admin/photos" status="good" note="Загрузка фото и кейсов до/после подключена." />
-          <QualityCard title="Страницы услуг" href="/admin/services" status={metrics.services >= 6 ? 'good' : 'warn'} note={metrics.services >= 6 ? 'Покрытие услуг хорошее.' : 'Добавьте больше страниц услуг.'} />
-          <QualityCard title="Города" href="/admin/areas" status={metrics.areas >= 6 ? 'good' : 'warn'} note={metrics.areas >= 6 ? 'Локальное покрытие хорошее.' : 'Добавьте больше городских страниц.'} />
-          <QualityCard title="FAQ" href="/admin/faq" status={metrics.faq >= 8 ? 'good' : 'warn'} note={metrics.faq >= 8 ? 'FAQ база сильная.' : 'Добавьте вопросы про цену, ключи и сроки.'} />
-          <QualityCard title="Отзывы" href="/admin/reviews" status={metrics.reviews >= 6 ? 'good' : 'warn'} note={metrics.reviews >= 6 ? 'Доверие сильное.' : 'Добавьте больше отзывов.'} />
-          <QualityCard title="Email заявки" href="/admin/audit" status={emailReady ? 'good' : 'warn'} note={emailReady ? 'Resend уведомления включены.' : 'Заявки сохраняются, но email требует RESEND_API_KEY.'} />
+          {launchChecks.map((item) => (
+            <QualityCard key={item.title} title={item.title} href={item.href} status={item.ready ? 'good' : 'warn'} note={item.note} />
+          ))}
         </div>
       </section>
 
@@ -276,6 +458,22 @@ export default function ControlPanelPage() {
           <SystemCard title="Resend API" isReady={emailReady} note={emailReady ? 'RESEND_API_KEY найден.' : 'Добавьте RESEND_API_KEY в production secrets.'} />
           <SystemCard title="Получатель" isReady={emailRecipientReady} note={emailRecipientReady ? `Источник: ${systemStatus?.emailNotifications?.recipientSource}` : 'Используется fallback email из настроек сайта.'} />
           <SystemCard title="Отправитель" isReady={emailSenderReady} note={emailSenderReady ? `Источник: ${systemStatus?.emailNotifications?.senderSource}` : 'Нужен CONTACT_FROM_EMAIL с verified domain в Resend.'} />
+        </div>
+      </section>
+
+      <section style={panelStyle}>
+        <div style={panelHeaderStyle}>
+          <div>
+            <p style={smallLabelStyle}>CMS → live site</p>
+            <h2 style={sectionTitleStyle}>Что из админки выходит на сайт</h2>
+          </div>
+          <a href="/en" style={textLinkStyle}>Публичный сайт →</a>
+        </div>
+
+        <div style={siteMapGridStyle}>
+          {siteSyncCards.map((item) => (
+            <PublicSyncCard key={item.title} {...item} />
+          ))}
         </div>
       </section>
 
@@ -367,6 +565,30 @@ function SystemCard({ title, isReady, note }: { title: string; isReady: boolean;
   )
 }
 
+function PublicSyncCard({
+  title,
+  adminHref,
+  publicHref,
+  note,
+}: {
+  title: string
+  adminHref: string
+  publicHref: string
+  note: string
+}) {
+  return (
+    <article style={syncCardStyle}>
+      <span style={qualityStatusStyle}>Connected</span>
+      <strong style={moduleTitleStyle}>{title}</strong>
+      <p style={moduleDescriptionStyle}>{note}</p>
+      <div style={syncActionsStyle}>
+        <a href={adminHref} style={miniActionStyle}>Админка</a>
+        <a href={publicHref} target="_blank" rel="noreferrer" style={miniActionStyle}>Preview</a>
+      </div>
+    </article>
+  )
+}
+
 const pageStyle: CSSProperties = { display: 'grid', gap: 18, minWidth: 0 }
 const heroStyle: CSSProperties = {
   display: 'grid',
@@ -416,6 +638,10 @@ const photoPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gridTem
 const systemPanelStyle: CSSProperties = { ...panelStyle, display: 'grid', gap: 18, border: '1px solid rgba(110,231,183,0.20)', background: 'linear-gradient(135deg, rgba(110,231,183,0.060), rgba(214,168,95,0.055) 55%, rgba(255,255,255,0.020)), rgba(255,255,255,0.018)' }
 const systemGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }
 const systemCardStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.026)', padding: 16, minWidth: 0 }
+const siteMapGridStyle: CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 12, marginTop: 16 }
+const syncCardStyle: CSSProperties = { borderRadius: 18, border: '1px solid rgba(110,231,183,0.18)', background: 'linear-gradient(145deg, rgba(110,231,183,0.045), rgba(255,255,255,0.022)), rgba(255,255,255,0.018)', padding: 16, minWidth: 0 }
+const syncActionsStyle: CSSProperties = { display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 14 }
+const miniActionStyle: CSSProperties = { minHeight: 34, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 11px', borderRadius: 999, border: '1px solid rgba(255,255,255,0.12)', color: '#F5F7FB', background: 'rgba(255,255,255,0.030)', textDecoration: 'none', fontSize: 11, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.2 }
 const sectionTitleStyle: CSSProperties = { margin: '8px 0 0', color: '#F5F7FB', fontSize: 24, lineHeight: 1.1, letterSpacing: -0.7 }
 const sectionTextStyle: CSSProperties = { margin: '12px 0 0', color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }
 const widePrimaryLinkStyle: CSSProperties = { minHeight: 54, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 22px', borderRadius: 999, border: '1px solid rgba(245,247,251,0.24)', background: '#F5F7FB', color: '#08090D', textDecoration: 'none', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.4, whiteSpace: 'nowrap' }

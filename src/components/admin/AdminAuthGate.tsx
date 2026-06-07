@@ -4,6 +4,18 @@ import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
+async function getSessionSafely(supabase: ReturnType<typeof getSupabaseClient>) {
+  try {
+    const timeout = new Promise<{ data: { session: null } }>((resolve) => {
+      window.setTimeout(() => resolve({ data: { session: null } }), 5000)
+    })
+
+    return await Promise.race([supabase.auth.getSession(), timeout])
+  } catch {
+    return { data: { session: null } }
+  }
+}
+
 export default function AdminAuthGate({
   children,
 }: {
@@ -22,7 +34,7 @@ export default function AdminAuthGate({
     async function boot() {
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await getSessionSafely(supabase)
 
       const isLoginRoute = pathname === '/admin/login'
       const hasSession = Boolean(session)

@@ -60,6 +60,14 @@ const requiredTables = [
   'orders',
 ]
 
+const launchTargets = {
+  services: 30,
+  areas: 10,
+  faq: 10,
+  reviews: 6,
+  gallery: 6,
+}
+
 export default function AdminAuditPage() {
   const router = useRouter()
   const supabase: any = useMemo(() => getSupabaseClient() as any, [])
@@ -281,7 +289,11 @@ function auditServiceRows(rows: any[], tableError: string): AuditItem[] {
   if (tableError) return [makeItem('service', 'Услуги недоступны', '/admin/services', undefined, [tableError])]
   if (!rows.length) return [makeItem('service', 'Услуги не заполнены', '/admin/services', undefined, ['Нет строк services'])]
 
-  return rows.map((row) => {
+  const publishedEn = rows.filter((row) => (row.locale || 'en') === 'en' && row.is_published !== false)
+  const summaryIssues: string[] = []
+  if (publishedEn.length < launchTargets.services) summaryIssues.push(`EN услуг меньше ${launchTargets.services}: сейчас ${publishedEn.length}`)
+
+  const rowItems = rows.map((row) => {
     const issues: string[] = []
     if (!row.is_published) issues.push('Страница в черновике')
     if (!text(row.slug)) issues.push('Нет slug')
@@ -294,13 +306,22 @@ function auditServiceRows(rows: any[], tableError: string): AuditItem[] {
     const slug = row.slug || ''
     return makeItem('service', row.title || slug || 'Услуга без названия', '/admin/services', slug ? `/${locale}/services/${slug}` : undefined, issues)
   })
+
+  return [
+    makeItem('service', `Услуги EN: ${publishedEn.length}/${launchTargets.services}`, '/admin/services', '/en/services', summaryIssues),
+    ...rowItems,
+  ]
 }
 
 function auditAreaRows(rows: any[], tableError: string): AuditItem[] {
   if (tableError) return [makeItem('area', 'Города недоступны', '/admin/areas', undefined, [tableError])]
   if (!rows.length) return [makeItem('area', 'Города не заполнены', '/admin/areas', undefined, ['Нет строк areas'])]
 
-  return rows.map((row) => {
+  const publishedEn = rows.filter((row) => (row.locale || 'en') === 'en' && row.is_published !== false)
+  const summaryIssues: string[] = []
+  if (publishedEn.length < launchTargets.areas) summaryIssues.push(`EN городов меньше ${launchTargets.areas}: сейчас ${publishedEn.length}`)
+
+  const rowItems = rows.map((row) => {
     const issues: string[] = []
     const highlights = Array.isArray(row.highlights) ? row.highlights : []
     const supported = Array.isArray(row.supported_services) ? row.supported_services : []
@@ -317,6 +338,11 @@ function auditAreaRows(rows: any[], tableError: string): AuditItem[] {
     const slug = row.slug || ''
     return makeItem('area', row.title || row.city || slug || 'Город без названия', '/admin/areas', slug ? `/${locale}/areas/${slug}` : undefined, issues)
   })
+
+  return [
+    makeItem('area', `Города EN: ${publishedEn.length}/${launchTargets.areas}`, '/admin/areas', '/en/areas', summaryIssues),
+    ...rowItems,
+  ]
 }
 
 function auditBlockRows(rows: any[], tableError: string): AuditItem[] {
@@ -343,11 +369,13 @@ function auditMediaRows(rows: any[], tableError: string): AuditItem {
   const published = rows.filter((row) => row.is_published !== false)
   const logos = published.filter((row) => row.category === 'logo')
   const gallery = published.filter((row) => row.category === 'gallery')
+  const backgrounds = published.filter((row) => ['background-decor', 'background-desktop', 'background-mobile'].includes(row.category))
   const before = published.filter((row) => row.category === 'before')
   const after = published.filter((row) => row.category === 'after')
   if (!published.length) issues.push('Нет опубликованных изображений')
   if (!logos.length) issues.push('Нет logo-изображения в site_images')
-  if (gallery.length < 3) issues.push('Меньше 3 gallery-фото')
+  if (gallery.length < launchTargets.gallery) issues.push(`Меньше ${launchTargets.gallery} gallery-фото`)
+  if (!backgrounds.length) issues.push('Нет опубликованных фоновых изображений')
   if (before.length !== after.length) issues.push('Количество before/after фото не совпадает')
   if (rows.some((row) => !text(row.image_url))) issues.push('Есть изображения без image_url')
   return makeItem('media', `Медиа CMS: ${published.length} опубликовано`, '/admin/photos', '/en', issues)
@@ -366,18 +394,20 @@ function auditReviewsRows(rows: any[], tableError: string): AuditItem {
   const issues: string[] = []
   if (tableError) issues.push(tableError)
   const published = rows.filter((row) => row.is_published !== false)
-  if (published.length < 3) issues.push('Меньше 3 опубликованных отзывов')
+  const publishedEn = published.filter((row) => (row.locale || 'en') === 'en')
+  if (publishedEn.length < launchTargets.reviews) issues.push(`Меньше ${launchTargets.reviews} опубликованных EN отзывов`)
   if (published.some((row) => !text(row.name) || !text(row.quote))) issues.push('Есть отзывы без имени или текста')
-  return makeItem('content-block', `Отзывы: ${published.length}`, '/admin/reviews', '/en/reviews', issues)
+  return makeItem('content-block', `Отзывы EN: ${publishedEn.length}/${launchTargets.reviews}`, '/admin/reviews', '/en/reviews', issues)
 }
 
 function auditFaqRows(rows: any[], tableError: string): AuditItem {
   const issues: string[] = []
   if (tableError) issues.push(tableError)
   const published = rows.filter((row) => row.is_published !== false)
-  if (published.length < 6) issues.push('Меньше 6 опубликованных FAQ')
+  const publishedEn = published.filter((row) => (row.locale || 'en') === 'en')
+  if (publishedEn.length < launchTargets.faq) issues.push(`Меньше ${launchTargets.faq} опубликованных EN FAQ`)
   if (published.some((row) => !text(row.question) || !text(row.answer))) issues.push('Есть FAQ без вопроса или ответа')
-  return makeItem('content-block', `FAQ: ${published.length}`, '/admin/faq', '/en/faq', issues)
+  return makeItem('content-block', `FAQ EN: ${publishedEn.length}/${launchTargets.faq}`, '/admin/faq', '/en/faq', issues)
 }
 
 function makeItem(type: AuditType, title: string, href: string, previewHref: string | undefined, issues: string[]): AuditItem {
